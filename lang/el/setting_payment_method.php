@@ -9,5 +9,8 @@ return [
     'lbl_paypal' => 'PayPal',
     'lbl_flutterwave' => 'Flutterwave',
     'lbl_client_id' => 'Αναγνωριστικό Πελάτη',
-    'lbl_server_key' => 'Κλειδί διακομιστή'
+    'lbl_server_key' => 'Κλειδί διακομιστή',
+    'lbl_wave' => 'Wave Senegal',
+    'lbl_api_key' => 'Κλειδί API',
+    'lbl_base_url' => 'Βασική διεύθυνση URL'
 ];

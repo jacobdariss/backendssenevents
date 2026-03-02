@@ -512,6 +512,51 @@
                 </div>
             </div>
 
+            {{-- Wave Senegal --}}
+            <div class="form-group border-bottom pb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <label class="form-label m-0"
+                        for="payment_method_wave">{{ __('setting_payment_method.lbl_wave') }}</label>
+                    <input type="hidden" value="0" name="wave_payment_method">
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input toggle-input" data-toggle-target="#wave-fields" value="1"
+                            name="wave_payment_method" id="payment_method_wave" type="checkbox"
+                            {{ old('wave_payment_method', $settings['wave_payment_method'] ?? 0) == 1 ? 'checked' : '' }} />
+                    </div>
+                </div>
+            </div>
+            <div id="wave-fields"
+                class=" {{ old('wave_payment_method', $settings['wave_payment_method'] ?? 0) == 1 ? '' : 'd-none' }}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label"
+                                for="wave_api_key">{{ __('setting_payment_method.lbl_api_key') }}</label>
+                            <input type="text" class="form-control @error('wave_api_key') is-invalid @enderror"
+                                name="wave_api_key" id="wave_api_key"
+                                placeholder="{{ __('setting_payment_method.lbl_api_key') }}"
+                                value="{{ old('wave_api_key', $settings['wave_api_key'] ?? '') }}">
+                            @error('wave_api_key')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label"
+                                for="wave_base_url">{{ __('setting_payment_method.lbl_base_url') }}</label>
+                            <input type="text" class="form-control @error('wave_base_url') is-invalid @enderror"
+                                name="wave_base_url" id="wave_base_url"
+                                placeholder="{{ __('setting_payment_method.lbl_base_url') }}"
+                                value="{{ old('wave_base_url', $settings['wave_base_url'] ?? 'https://api.wave.com') }}">
+                            @error('wave_base_url')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- In App Purchase --}}
             <div class="form-group border-bottom pb-3">
                 <div class="d-flex justify-content-between align-items-center">
