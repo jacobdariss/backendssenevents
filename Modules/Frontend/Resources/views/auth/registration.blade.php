@@ -139,7 +139,7 @@
                 var savedCountryIso = sessionStorage.getItem('otp_redirect_country_iso');
                 
                 var iti = window.intlTelInput(input, {
-                    initialCountry: savedCountryIso || "in",
+                    initialCountry: savedCountryIso || "sn",
                     separateDialCode: true,
                     customContainer: "w-100",
                     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
