@@ -149,6 +149,7 @@ return [
     'airtel' => 'أيرتل موني',
     'phonepe' => 'فون بي',
     'midtrans' => 'ميدترانس',
+    'wave' => 'Wave',
     'subtotal' => 'المجموع الفرعي',
     'tax' => 'الضريبة',
     'total' => 'الإجمالي',

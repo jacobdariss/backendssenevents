@@ -9,5 +9,7 @@ return [
     'lbl_paypal' => 'PayPal',
     'lbl_flutterwave' => 'Flutterwave',
     'lbl_client_id' => 'Αναγνωριστικό Πελάτη',
-    'lbl_server_key' => 'Κλειδί διακομιστή'
+    'lbl_server_key' => 'Κλειδί διακομιστή',
+    'lbl_wave' => 'Wave',
+    'lbl_base_url' => 'Base URL',
 ];

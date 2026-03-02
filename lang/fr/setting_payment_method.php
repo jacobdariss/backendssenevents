@@ -9,5 +9,7 @@ return [
     'lbl_paypal' => 'PayPal',
     'lbl_flutterwave' => 'Flutterwave',
     'lbl_client_id' => 'ID Client',
-    'lbl_server_key' => 'Clé du serveur'
+    'lbl_server_key' => 'Clé du serveur',
+    'lbl_wave' => 'Wave',
+    'lbl_base_url' => 'Base URL',
 ];
