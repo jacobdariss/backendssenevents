@@ -126,6 +126,8 @@
                                         'sadad_payment_method' => 'sadad',
                                         'airtel_payment_method' => 'airtel',
                                         'phonepe_payment_method' => 'phonepe',
+                                        'mollie_payment_method' => 'mollie',
+                                        'wave_payment_method' => 'wave',
                                         'midtrans_payment_method' => 'midtrans'
                                     ];
                                 @endphp
