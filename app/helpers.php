@@ -734,9 +734,7 @@ function formatCurrency($number, $noOfDecimal, $decimalSeparator, $thousandSepar
         if ($noOfDecimal > 0) {
             $currencyString .= $decimalSeparator . $decimalPart;
         }
-        if ($currencyPosition == 'right_with_space') {
-            $currencyString .= ' ';
-        }
+        $currencyString .= ' ';
         $currencyString .= $currencySymbol;
     }
 

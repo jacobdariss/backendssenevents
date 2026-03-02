@@ -445,9 +445,7 @@ function formatCurrency(number, noOfDecimal, decimalSeparator, thousandSeparator
     if (noOfDecimal > 0) {
       currencyString += decimalSeparator + decimalPart
     }
-    if (currencyPosition === 'right_with_space') {
-      currencyString += ' '
-    }
+    currencyString += ' '
     currencyString += currencySymbol
   }
 
