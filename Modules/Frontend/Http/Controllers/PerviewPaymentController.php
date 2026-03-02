@@ -141,6 +141,10 @@ class PerviewPaymentController extends Controller
 
     protected function StripePayment(Request $request)
     {
+        if (!extension_loaded('curl')) {
+            return response()->json(['error' => 'The cURL extension is required for Stripe payments. Please contact the administrator.'], 500);
+        }
+
         $baseURL = env('APP_URL');
         $stripe_secret_key = GetpaymentMethod('stripe_secretkey');
         $currency = GetcurrentCurrency();
@@ -182,7 +186,7 @@ class PerviewPaymentController extends Controller
                 $errorMessage = "The amount entered is too low to process a payment. Please increase the amount and try again.";
             }
             return response()->json(['error' => $errorMessage], 400);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
