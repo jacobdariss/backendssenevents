@@ -55,7 +55,7 @@ class Currency extends BaseModel
         $currency = self::getDefaultCurrency();
 
         if (!$currency) {
-            return '$' . number_format($value, 2);
+            return '$' . number_format($value, 0);
         }
 
         return formatCurrency(
