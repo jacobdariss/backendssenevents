@@ -126,6 +126,8 @@
                                         'sadad_payment_method' => 'sadad',
                                         'airtel_payment_method' => 'airtel',
                                         'phonepe_payment_method' => 'phonepe',
+                                        'mollie_payment_method' => 'mollie',
+                                        'wave_payment_method' => 'wave',
                                         'midtrans_payment_method' => 'midtrans'
                                     ];
                                 @endphp
@@ -169,6 +171,23 @@
 
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        @php
+                            $enabled_gateways = array_filter($payment_methods, fn ($settingKey) => setting($settingKey) == 1, ARRAY_FILTER_USE_KEY);
+                        @endphp
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">{{ __('frontend.api_management') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2 text-muted">{{ __('frontend.api_management_desc') }}</p>
+                                <ul class="mb-2">
+                                    <li><strong>{{ __('frontend.api_endpoint') }}:</strong> {{ url('/api/v3/payment-methods') }}</li>
+                                    <li><strong>{{ __('frontend.api_callback_subscription') }}:</strong> {{ url('/payment/success') }}</li>
+                                </ul>
+                                <p class="mb-0"><strong>{{ __('frontend.active_gateways') }}:</strong> {{ count($enabled_gateways) }}</p>
                             </div>
                         </div>
                         <div class="mt-4" id="promotional_section">
@@ -219,6 +238,23 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        @php
+                            $enabled_gateways = array_filter($payment_methods, fn ($settingKey) => setting($settingKey) == 1, ARRAY_FILTER_USE_KEY);
+                        @endphp
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">{{ __('frontend.api_management') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2 text-muted">{{ __('frontend.api_management_desc') }}</p>
+                                <ul class="mb-2">
+                                    <li><strong>{{ __('frontend.api_endpoint') }}:</strong> {{ url('/api/v3/payment-methods') }}</li>
+                                    <li><strong>{{ __('frontend.api_callback_subscription') }}:</strong> {{ url('/payment/success') }}</li>
+                                </ul>
+                                <p class="mb-0"><strong>{{ __('frontend.active_gateways') }}:</strong> {{ count($enabled_gateways) }}</p>
                             </div>
                         </div>
 

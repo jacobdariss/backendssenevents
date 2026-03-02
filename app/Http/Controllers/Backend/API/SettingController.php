@@ -23,7 +23,7 @@ class SettingController extends Controller
 
         $response = [];
         // Define the specific names you want to include
-        $specificNames = ['app_name', 'footer_text', 'primary','razorpay_secretkey', 'razorpay_publickey', 'stripe_secretkey', 'stripe_publickey', 'paystack_secretkey', 'paystack_publickey', 'paypal_secretkey', 'paypal_clientid', 'flutterwave_secretkey', 'flutterwave_publickey', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_channel_id', 'google_maps_key', 'helpline_number', 'copyright', 'inquriy_email', 'site_description', 'customer_app_play_store', 'customer_app_app_store', 'isForceUpdate', 'version_code','cinet_siteid','cinet_api_key','cinet_Secret_key','sadad_Sadadkey','sadad_id_key','sadad_Domain','airtel_money_secretkey','airtel_money_client_id','phonepe_App_id','phonepe_Merchant_id','phonepe_salt_key','phonepe_salt_index','midtrans_client_id','midtrans_server_key','iap_entitlement_id','iap_apple_api_key','iap_google_api_key'];
+        $specificNames = ['app_name', 'footer_text', 'primary','razorpay_secretkey', 'razorpay_publickey', 'stripe_secretkey', 'stripe_publickey', 'paystack_secretkey', 'paystack_publickey', 'paypal_secretkey', 'paypal_clientid', 'flutterwave_secretkey', 'flutterwave_publickey', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_channel_id', 'google_maps_key', 'helpline_number', 'copyright', 'inquriy_email', 'site_description', 'customer_app_play_store', 'customer_app_app_store', 'isForceUpdate', 'version_code','cinet_siteid','cinet_api_key','cinet_Secret_key','sadad_Sadadkey','sadad_id_key','sadad_Domain','airtel_money_secretkey','airtel_money_client_id','phonepe_App_id','phonepe_Merchant_id','phonepe_salt_key','phonepe_salt_index','midtrans_client_id','midtrans_server_key','mollie_api_key','wave_api_key','wave_base_url','iap_entitlement_id','iap_apple_api_key','iap_google_api_key'];
 
         foreach ($settings as $name => $value) {
             if (in_array($name, $specificNames)) {
@@ -95,6 +95,20 @@ class SettingController extends Controller
                 }elseif (strpos($name, 'midtrans_') === 0 && $settings['midtrans_payment_method'] == 1) {
                     $nestedKey = 'midtrans_pay';
                     $nestedName = str_replace('', 'midtrans_', $name);
+                    if (!isset($response[$nestedKey])) {
+                        $response[$nestedKey] = [];
+                    }
+                    $response[$nestedKey][$nestedName] = $value;
+                }elseif (strpos($name, 'mollie_') === 0 && ($settings['mollie_payment_method'] ?? 0) == 1) {
+                    $nestedKey = 'mollie_pay';
+                    $nestedName = str_replace('', 'mollie_', $name);
+                    if (!isset($response[$nestedKey])) {
+                        $response[$nestedKey] = [];
+                    }
+                    $response[$nestedKey][$nestedName] = $value;
+                }elseif (strpos($name, 'wave_') === 0 && ($settings['wave_payment_method'] ?? 0) == 1) {
+                    $nestedKey = 'wave_pay';
+                    $nestedName = str_replace('', 'wave_', $name);
                     if (!isset($response[$nestedKey])) {
                         $response[$nestedKey] = [];
                     }
@@ -365,7 +379,7 @@ class SettingController extends Controller
 
         $response = [];
         // Define the specific names you want to include
-        $specificNames = ['app_name', 'footer_text', 'primary','razorpay_secretkey', 'razorpay_publickey', 'stripe_secretkey', 'stripe_publickey', 'paystack_secretkey', 'paystack_publickey', 'paypal_secretkey', 'paypal_clientid', 'flutterwave_secretkey', 'flutterwave_publickey', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_channel_id', 'google_maps_key', 'helpline_number', 'copyright', 'inquriy_email', 'site_description', 'customer_app_play_store', 'customer_app_app_store', 'isForceUpdate', 'version_code','cinet_siteid','cinet_api_key','cinet_Secret_key','sadad_Sadadkey','sadad_id_key','sadad_Domain','airtel_money_secretkey','airtel_money_client_id','phonepe_App_id','phonepe_Merchant_id','phonepe_salt_key','phonepe_salt_index','midtrans_client_id','midtrans_server_key','iap_entitlement_id','iap_apple_api_key','iap_google_api_key'];
+        $specificNames = ['app_name', 'footer_text', 'primary','razorpay_secretkey', 'razorpay_publickey', 'stripe_secretkey', 'stripe_publickey', 'paystack_secretkey', 'paystack_publickey', 'paypal_secretkey', 'paypal_clientid', 'flutterwave_secretkey', 'flutterwave_publickey', 'onesignal_app_id', 'onesignal_rest_api_key', 'onesignal_channel_id', 'google_maps_key', 'helpline_number', 'copyright', 'inquriy_email', 'site_description', 'customer_app_play_store', 'customer_app_app_store', 'isForceUpdate', 'version_code','cinet_siteid','cinet_api_key','cinet_Secret_key','sadad_Sadadkey','sadad_id_key','sadad_Domain','airtel_money_secretkey','airtel_money_client_id','phonepe_App_id','phonepe_Merchant_id','phonepe_salt_key','phonepe_salt_index','midtrans_client_id','midtrans_server_key','mollie_api_key','wave_api_key','wave_base_url','iap_entitlement_id','iap_apple_api_key','iap_google_api_key'];
 
         foreach ($settings as $name => $value) {
             if (in_array($name, $specificNames)) {
@@ -437,6 +451,20 @@ class SettingController extends Controller
                 }elseif (strpos($name, 'midtrans_') === 0 && $settings['midtrans_payment_method'] == 1) {
                     $nestedKey = 'midtrans_pay';
                     $nestedName = str_replace('', 'midtrans_', $name);
+                    if (!isset($response[$nestedKey])) {
+                        $response[$nestedKey] = [];
+                    }
+                    $response[$nestedKey][$nestedName] = $value;
+                }elseif (strpos($name, 'mollie_') === 0 && ($settings['mollie_payment_method'] ?? 0) == 1) {
+                    $nestedKey = 'mollie_pay';
+                    $nestedName = str_replace('', 'mollie_', $name);
+                    if (!isset($response[$nestedKey])) {
+                        $response[$nestedKey] = [];
+                    }
+                    $response[$nestedKey][$nestedName] = $value;
+                }elseif (strpos($name, 'wave_') === 0 && ($settings['wave_payment_method'] ?? 0) == 1) {
+                    $nestedKey = 'wave_pay';
+                    $nestedName = str_replace('', 'wave_', $name);
                     if (!isset($response[$nestedKey])) {
                         $response[$nestedKey] = [];
                     }

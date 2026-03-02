@@ -1455,6 +1455,58 @@ return [
             'value' => '', // default value if you want
             'help' => 'Paste the only the Measurement Id of Google Analytics stream.', // Help text for the input field.
         ],
+        //mollie
+        [
+            'type' => 'checkbox', // input fields type
+            'data' => 'molliepayment', // data type, string, int, boolean
+            'name' => 'mollie_payment_method', // unique name for field
+            'label' => 'Is Type', // you know what label it is
+            'rules' => '', // validation rule of laravel
+            'class' => '', // any class for input
+            'value' => '0', // default value if you want
+
+        ],
+        [
+            'type' => 'text', // input fields type
+            'data' => 'mollie_payment_method', // data type, string, int, boolean
+            'name' => 'mollie_api_key', // unique name for field
+            'label' => 'molliepayment', // you know what label it is
+            'rules' => 'required|max:191', // validation rule of laravel
+            'class' => '', // any class for input
+            'value' => '', // default value if you want
+            'help' => 'Paste the only the Measurement Id of Google Analytics stream.', // Help text for the input field.
+        ],
+        //wave
+        [
+            'type' => 'checkbox',
+            'data' => 'wavepayment',
+            'name' => 'wave_payment_method',
+            'label' => 'Is Type',
+            'rules' => '',
+            'class' => '',
+            'value' => '0',
+
+        ],
+        [
+            'type' => 'text',
+            'data' => 'wave_payment_method',
+            'name' => 'wave_api_key',
+            'label' => 'wavepayment',
+            'rules' => 'required|max:191',
+            'class' => '',
+            'value' => '',
+            'help' => 'Paste the only the Measurement Id of Google Analytics stream.',
+        ],
+        [
+            'type' => 'text',
+            'data' => 'wave_payment_method',
+            'name' => 'wave_base_url',
+            'label' => 'wavepayment',
+            'rules' => 'nullable|max:191',
+            'class' => '',
+            'value' => 'https://api.wave.com',
+            'help' => 'Wave API base URL',
+        ],
         //min
         [
             'type' => 'checkbox', // input fields type
