@@ -148,10 +148,6 @@ class PaymentController extends Controller
 
     protected function StripePayment(Request $request)
     {
-        if (!extension_loaded('curl')) {
-            return response()->json(['error' => 'The cURL extension is required for Stripe payments. Please contact the administrator.'], 500);
-        }
-
         $baseURL = url('/');
         $stripe_secret_key = GetpaymentMethod('stripe_secretkey');
         $currency = GetcurrentCurrency();
@@ -207,7 +203,7 @@ class PaymentController extends Controller
             return response()->json(['error' => $errorMessage], 400);
 
         } catch (\Throwable $e) {
-
+            \Log::error('Stripe payment error: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }

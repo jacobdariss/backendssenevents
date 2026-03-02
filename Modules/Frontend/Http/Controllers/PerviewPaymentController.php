@@ -141,10 +141,6 @@ class PerviewPaymentController extends Controller
 
     protected function StripePayment(Request $request)
     {
-        if (!extension_loaded('curl')) {
-            return response()->json(['error' => 'The cURL extension is required for Stripe payments. Please contact the administrator.'], 500);
-        }
-
         $baseURL = env('APP_URL');
         $stripe_secret_key = GetpaymentMethod('stripe_secretkey');
         $currency = GetcurrentCurrency();
@@ -187,6 +183,7 @@ class PerviewPaymentController extends Controller
             }
             return response()->json(['error' => $errorMessage], 400);
         } catch (\Throwable $e) {
+            \Log::error('Stripe PPV payment error: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
