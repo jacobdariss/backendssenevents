@@ -160,6 +160,8 @@
                                                     <img src="{{ asset('images/paypal.svg') }}" alt="PayPal" class="payment-icon" >
                                                 @elseif($method == 'flutterwave')
                                                     <img src="{{ asset('images/flutterwave.svg') }}" alt="Flutterwave" class="payment-icon" >
+                                                @elseif($method == 'wave')
+                                                    <img src="{{ asset('images/wave.svg') }}" alt="Wave" class="payment-icon" >
                                                 @else
                                                     <i class="ph-bold ph-credit-card text-primary"></i>
                                                 @endif
@@ -1616,6 +1618,8 @@ $('#payment-form').on('submit', function(e) {
                 });
             } else if (response.redirect) {
                 window.location.href = response.redirect;
+            } else if (response.authorization_url) {
+                window.location.href = response.authorization_url;
             }
         },
         error: function(xhr) {

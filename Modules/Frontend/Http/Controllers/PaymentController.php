@@ -593,9 +593,19 @@ class PaymentController extends Controller
             ], 400);
         }
 
+        $checkoutUrl = data_get($response->json(), 'checkout_url')
+            ?? data_get($response->json(), 'data.checkout_url')
+            ?? data_get($response->json(), 'wave_launch_url');
+
+        if (empty($checkoutUrl)) {
+            return response()->json([
+                'error' => 'Unable to retrieve Wave checkout URL.',
+            ], 400);
+        }
+
         return response()->json([
             'success' => true,
-            'authorization_url' => data_get($response->json(), 'checkout_url') ?? data_get($response->json(), 'data.checkout_url'),
+            'redirect' => $checkoutUrl,
         ]);
     }
 

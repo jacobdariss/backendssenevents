@@ -149,6 +149,7 @@ return [
     'airtel' => 'Airtel Money',
     'phonepe' => 'PhonePe',
     'midtrans' => 'Midtrans',
+    'wave' => 'Wave',
     'subtotal' => 'Zwischensumme',
     'tax' => 'Steuer',
     'total' => 'Gesamt',
