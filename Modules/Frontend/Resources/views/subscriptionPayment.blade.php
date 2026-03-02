@@ -616,50 +616,6 @@ function createTaxTable(taxes) {
         });
     });
 
-
-
-
-             $('#payment-form').on('submit', function(e) {
-                 e.preventDefault(); // Prevent default form submission
-                 
-                 if (!pendingPaymentSubmit && !checkProfileLimitBeforePayment()) {
-                    e.stopImmediatePropagation();
-                    return false;
-                 }
-                 pendingPaymentSubmit = false;
-                 
-                 const paymentMethod = $('#payment-method').val();
-                if (!paymentMethod) {
-                    $('#errorModalMessage').text('Please select a payment method before proceeding.');
-                    if (!$('#errorModal').hasClass('show')) {
-                    $('#errorModal').modal('show');
-                    }
-                    return; // Exit the function
-                }
-
-                 const formData = $(this).serialize();
-                 $.ajax({
-                     url: $(this).attr('action'),
-                     method: 'POST',
-                     data: formData,
-                     success: function(response) {
-                         if (response.redirect) {
-                             window.location.href = response.redirect;
-                         }
-                     },
-                     error: function(xhr) {
-                         const errorResponse = xhr.responseJSON || {};
-                         // Fix: Use response.message instead of response.error
-                        const errorMessage = errorResponse.message || errorResponse.error || 'An error occurred. Please try another payment method.';
-                         // Display an error modal using Bootstrap
-                         $('#errorModalMessage').text(errorMessage);
-                         if (!$('#errorModal').hasClass('show')) {
-                            $('#errorModal').modal('show');
-                            }
-                     }
-                 });
-             });
-
 // Razor Pay
              $('#payment-form').on('submit', function(e) {
 
@@ -1611,6 +1567,11 @@ $('#payment-form').on('submit', function(e) {
 
     // Get the payment method
     const paymentMethod = $('#payment-method').val();
+
+    // Razorpay and Flutterwave have their own dedicated submit handlers
+    if (paymentMethod === 'razorpay' || paymentMethod === 'flutterwave') {
+        return;
+    }
 
     // Check if payment method is selected
     if (!paymentMethod) {
