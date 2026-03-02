@@ -174,22 +174,6 @@
                             </div>
                         </div>
 
-                        @php
-                            $enabled_gateways = array_filter($payment_methods, fn ($settingKey) => setting($settingKey) == 1, ARRAY_FILTER_USE_KEY);
-                        @endphp
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">{{ __('frontend.api_management') }}</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2 text-muted">{{ __('frontend.api_management_desc') }}</p>
-                                <ul class="mb-2">
-                                    <li><strong>{{ __('frontend.api_endpoint') }}:</strong> {{ url('/api/v3/payment-methods') }}</li>
-                                    <li><strong>{{ __('frontend.api_callback_subscription') }}:</strong> {{ url('/payment/success') }}</li>
-                                </ul>
-                                <p class="mb-0"><strong>{{ __('frontend.active_gateways') }}:</strong> {{ count($enabled_gateways) }}</p>
-                            </div>
-                        </div>
                         <div class="mt-4" id="promotional_section">
                             <div class="card apply-coupon-title" data-bs-toggle="collapse" data-bs-target="#collapseCoupon" role="button" aria-expanded="false" aria-controls="collapseCoupon">
                                 <div class="card-header w-100">
@@ -240,25 +224,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        @php
-                            $enabled_gateways = array_filter($payment_methods, fn ($settingKey) => setting($settingKey) == 1, ARRAY_FILTER_USE_KEY);
-                        @endphp
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">{{ __('frontend.api_management') }}</h6>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-2 text-muted">{{ __('frontend.api_management_desc') }}</p>
-                                <ul class="mb-2">
-                                    <li><strong>{{ __('frontend.api_endpoint') }}:</strong> {{ url('/api/v3/payment-methods') }}</li>
-                                    <li><strong>{{ __('frontend.api_callback_subscription') }}:</strong> {{ url('/payment/success') }}</li>
-                                </ul>
-                                <p class="mb-0"><strong>{{ __('frontend.active_gateways') }}:</strong> {{ count($enabled_gateways) }}</p>
-                            </div>
-                        </div>
-
-
 
                         <div class="mt-4">
                             <div class="payment-detail rounded">
