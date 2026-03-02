@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                             @php
-                                $enabled_gateways = array_filter($payment_methods, fn ($settingKey) => setting($settingKey) == 1);
+                                $enabled_gateways = array_filter($payment_methods, fn ($settingKey) => setting($settingKey) == 1, ARRAY_FILTER_USE_KEY);
                             @endphp
                             <div class="card mt-3">
                                 <div class="card-header">
