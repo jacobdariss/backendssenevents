@@ -218,15 +218,16 @@
 
 
     <script>
-        document.addEventListener("readystatechange", () => {
-            if (document.readyState === "complete") {
-                hideLoader();
-            }
+        // Hide loader as soon as DOM is parsed and scripts executed (no need to wait for images/fonts)
+        document.addEventListener("DOMContentLoaded", () => {
+            hideLoader();
         });
 
+        // Fallback: also hide on full load in case DOMContentLoaded already fired
         window.addEventListener("load", () => {
             hideLoader();
         });
+
         // Hide loader smoothly
         function hideLoader() {
             const loader = document.getElementById("page-loader");
@@ -235,10 +236,11 @@
             setTimeout(() => loader.remove(), 600);
         }
 
+        // Safety fallback
         setTimeout(() => {
             const loader = document.getElementById("page-loader");
             if (loader) hideLoader();
-        }, 8000);
+        }, 4000);
     </script>
 
 
