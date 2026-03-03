@@ -139,7 +139,7 @@
                                     <input type="hidden" id="selected-plan-id" name="plan_id">
                                     <input type="hidden" id="selected-price" name="price">
                                     <input type="hidden" id="selected-promotion-id" name="promotion_id">
-                                    <label class="form-label" for="payment-method">{{ __('frontend.choose_payment_method') }}</label>
+                                    <label class="form-label">{{ __('frontend.choose_payment_method') }}</label>
                                 </div>
                                 <div class="card-body">
                                     <input type="hidden" id="payment-method" name="payment_method">
