@@ -137,12 +137,12 @@
                             <div class="card">
                                 <div class="card-header pb-0">
                                     <input type="hidden" id="selected-plan-id" name="plan_id">
-                                    <input type="hidden" id="selected-price" name="price">
+                                    <input type="hidden" id="selected-price" name="price" autocomplete="off">
                                     <input type="hidden" id="selected-promotion-id" name="promotion_id">
                                     <label class="form-label">{{ __('frontend.choose_payment_method') }}</label>
                                 </div>
                                 <div class="card-body">
-                                    <input type="hidden" id="payment-method" name="payment_method">
+                                    <input type="hidden" id="payment-method" name="payment_method" autocomplete="off">
                                     <div class="list-unstyled mb-0 payment-method-list d-flex flex-wrap gap-3">
                                          @foreach ($payment_methods as $setting => $method)
                                           @if (setting($setting) == 1)
@@ -184,7 +184,7 @@
                                     <div class="card-body">
                                         <div class="mb-4 coupon-enter-data">
                                             <h6 class="mb-3">{{ __('messages.enter_coupon_code') }}</h6>
-                                            <input type="text" id="coupon-code" class="form-control" placeholder="{{ __('messages.enter_coupon_code') }}">
+                                            <input type="text" id="coupon-code" class="form-control" placeholder="{{ __('messages.enter_coupon_code') }}" autocomplete="off">
                                         </div>
                                         <div class="">
                                             <h6 class="mb-3">{{ __('frontend.available_coupons') }}</h6>
