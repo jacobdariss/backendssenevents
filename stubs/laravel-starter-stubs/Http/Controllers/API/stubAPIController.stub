@@ -1,8 +1,0 @@
-<?php
-
-namespace {{namespace}}\{{moduleName}}\Http\Controllers\API;
-
-class {{moduleNamePlural}}Controller extends Controller
-{
-  // api controller logic
-}
