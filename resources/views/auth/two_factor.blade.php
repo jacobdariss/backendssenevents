@@ -19,6 +19,12 @@
         <x-auth-session-status class="mb-4" :status="session('status')" />
         <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
+        @if(session('email_sent') === false)
+            <div class="alert alert-warning small mb-3">
+                ⚠️ {{ __('messages.two_factor_email_not_configured') }}
+            </div>
+        @endif
+
         <div class="text-center mb-4">
             <h5 class="fw-semibold">{{ __('messages.two_factor_title') }}</h5>
             <p class="text-muted small">{{ __('messages.two_factor_subtitle') }}</p>

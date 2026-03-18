@@ -66,13 +66,19 @@ class AuthenticatedSessionController extends Controller
 
                 Auth::logout();
 
+                $emailSent = false;
                 try {
                     Mail::to($user->email)->send(new sendOtp(['body' => $otp]));
+                    $emailSent = true;
                 } catch (\Exception $e) {
                     Log::error('2FA OTP send failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+                    // Log OTP in case email is not configured (dev/debug)
+                    Log::info('2FA OTP (email failed)', ['user_id' => $user->id, 'otp' => $otp]);
                 }
 
-                return redirect()->route('admin.2fa');
+                return redirect()->route('admin.2fa')
+                    ->with('email_sent', $emailSent)
+                    ->with('email', $user->email);
             }
         }
 

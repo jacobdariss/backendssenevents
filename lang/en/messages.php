@@ -2133,4 +2133,12 @@ return [
     'episode_plan_must_be_same_or_higher_than_tvshow_plan' => 'Episode plan must be the same as or higher than the TV show plan.',
     'permission_denied' => 'Permission denied',
 
+    // 2FA
+    'two_factor_title'              => 'Two-Factor Authentication',
+    'two_factor_subtitle'           => 'A 6-digit verification code has been sent to your email address. Please enter it below to access your account.',
+    'otp_expired'                   => 'Your verification code has expired. Please request a new one.',
+    'otp_sent_to_email'             => 'A new verification code has been sent to your email.',
+    'resend_otp'                    => 'Resend verification code',
+    'two_factor_email_not_configured' => 'Email is not configured. Please check your server logs to retrieve the OTP code.',
+
 ];

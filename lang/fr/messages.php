@@ -1698,4 +1698,12 @@ return [
   'episode_plan_must_be_same_or_higher_than_tvshow_plan' => 'Le plan de l\'épisode doit être le même ou supérieur au plan de la série.',
   'permission_denied' => 'Permission refusée',
 
+  // 2FA
+  'two_factor_title'              => 'Authentification à deux facteurs',
+  'two_factor_subtitle'           => 'Un code de vérification à 6 chiffres a été envoyé à votre adresse e-mail. Veuillez le saisir ci-dessous pour accéder à votre compte.',
+  'otp_expired'                   => 'Votre code de vérification a expiré. Veuillez en demander un nouveau.',
+  'otp_sent_to_email'             => 'Un nouveau code de vérification a été envoyé à votre adresse e-mail.',
+  'resend_otp'                    => 'Renvoyer le code de vérification',
+  'two_factor_email_not_configured' => 'L\'email n\'est pas configuré. Veuillez consulter les logs du serveur pour récupérer le code OTP.',
+
 ];
