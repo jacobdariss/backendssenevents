@@ -187,6 +187,9 @@
                             <td class="text-muted">{{ $adminUser->email }}</td>
                             <td>
                                 @php $userRole = $adminUser->getRoleNames()->first() @endphp
+                                @if($adminUser->hasRole('admin'))
+                                    <span class="badge bg-danger px-3 py-2">{{ ucfirst($userRole) }}</span>
+                                @else
                                 <select class="form-select form-select-sm role-select"
                                         style="min-width:130px;"
                                         onchange="updateUserRole({{ $adminUser->id }}, this.value)">
@@ -196,6 +199,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @endif
                             </td>
                             <td class="text-end">
                                 @if($adminUser->id !== auth()->id() && !$adminUser->hasRole('admin'))
