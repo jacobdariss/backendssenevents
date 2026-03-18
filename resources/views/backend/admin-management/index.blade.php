@@ -135,12 +135,10 @@
                             </td>
                             <td class="text-end">
                                 @if(!$role->is_fixed && !in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin']))
-                                @can('delete_users')
                                 <button class="btn btn-sm btn-outline-danger"
                                         onclick="deleteRole({{ $role->id }}, this)">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                @endcan
                                 @endif
                             </td>
                         </tr>
@@ -212,12 +210,10 @@
                             </td>
                             <td class="text-end">
                                 @if($adminUser->id !== auth()->id() && !$adminUser->hasRole('admin'))
-                                @can('delete_users')
                                 <button class="btn btn-sm btn-outline-danger"
                                         onclick="deleteAdmin({{ $adminUser->id }}, this)">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                @endcan
                                 @else
                                     <span class="text-muted">–</span>
                                 @endif
