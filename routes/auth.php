@@ -45,8 +45,8 @@ Route::middleware('guest')->prefix('admin')->group(function () {
 
     // 2FA routes
     Route::get('2fa', [TwoFactorController::class, 'create'])->name('admin.2fa');
-    Route::post('2fa', [TwoFactorController::class, 'store'])->name('admin.2fa.verify');
-    Route::post('2fa/resend', [TwoFactorController::class, 'resend'])->name('admin.2fa.resend');
+    Route::post('2fa', [TwoFactorController::class, 'store'])->name('admin.two-factor.store');
+    Route::post('2fa/resend', [TwoFactorController::class, 'resend'])->name('admin.two-factor.resend');
 });
 
 
