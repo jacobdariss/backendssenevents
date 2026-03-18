@@ -7,6 +7,7 @@ use App\Helpers\AuthHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -46,12 +47,20 @@ class AdminManagementController extends Controller
     // ─────────────────────────────────────────────
     public function storeAdmin(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name'     => 'required|string|max:191',
             'email'    => 'required|email|unique:users,email',
             'role'     => 'required|exists:roles,name',
             'password' => ['required', Password::min(8)],
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
 
         $nameParts = explode(' ', $request->name, 2);
         $user = User::create([
@@ -133,9 +142,17 @@ class AdminManagementController extends Controller
     // ─────────────────────────────────────────────
     public function storeRole(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:191|unique:roles,title',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
 
         $name = strtolower(str_replace(' ', '_', preg_replace('/[^a-zA-Z0-9_ ]/', '', $request->title)));
 

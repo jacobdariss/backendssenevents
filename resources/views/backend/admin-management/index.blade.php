@@ -364,15 +364,19 @@ function saveRole() {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
         body: JSON.stringify({ title, import_role: importRole })
     })
-    .then(r => r.json())
-    .then(res => {
-        if (res.status) {
-            successSnackbar(res.message);
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        if (ok && data.status) {
+            successSnackbar(data.message);
             bootstrap.Modal.getInstance(document.getElementById('addRoleModal')).hide();
             document.getElementById('role-title').value = '';
             document.getElementById('import-role').value = '';
-            addRoleRow(res.data);
-        } else { errorSnackbar(res.message); }
+            addRoleRow(data.data);
+        } else {
+            const msg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : '{{ __("messages.error_occurred") }}');
+            showErr('role-title-error', msg);
+            errEl.classList.remove('d-none');
+        }
     })
     .catch(() => errorSnackbar('{{ __("messages.error_occurred") }}'))
     .finally(() => { btn.disabled = false; btn.textContent = '{{ __("messages.save") }}'; });
@@ -427,15 +431,18 @@ function saveAdmin() {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
         body: JSON.stringify({ name, email, role, password })
     })
-    .then(r => r.json())
-    .then(res => {
-        if (res.status) {
-            successSnackbar(res.message);
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        if (ok && data.status) {
+            successSnackbar(data.message);
             bootstrap.Modal.getInstance(document.getElementById('addAdminModal')).hide();
             ['name','email','password'].forEach(f => document.getElementById('admin-'+f).value = '');
             document.getElementById('admin-role').value = '';
-            addAdminRow(res.data);
-        } else { errorSnackbar(res.message); }
+            addAdminRow(data.data);
+        } else {
+            const msg = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : '{{ __("messages.error_occurred") }}');
+            errorSnackbar(msg);
+        }
     })
     .catch(() => errorSnackbar('{{ __("messages.error_occurred") }}'))
     .finally(() => { btn.disabled = false; btn.textContent = '{{ __("messages.save") }}'; });
