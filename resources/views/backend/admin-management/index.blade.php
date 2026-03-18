@@ -13,8 +13,8 @@
         @forelse ($roles as $role)
             @if ($role->name !== 'admin' && $role->name !== 'user')
             <div class="border-bottom">
-                @if($role->is_fixed)
-                {{-- Rôle fixe (admin) : non éditable --}}
+                @if($role->is_fixed || in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin']))
+                {{-- Rôle fixe : non éditable --}}
                 <div class="d-flex align-items-center justify-content-between px-4 py-3">
                     <div class="d-flex align-items-center gap-2">
                         <h6 class="mb-0 fw-semibold">{{ ucfirst($role->title) }}</h6>
@@ -134,7 +134,7 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                @if(!$role->is_fixed)
+                                @if(!$role->is_fixed && !in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin']))
                                 @can('delete_users')
                                 <button class="btn btn-sm btn-outline-danger"
                                         onclick="deleteRole({{ $role->id }}, this)">
