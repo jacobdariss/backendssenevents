@@ -123,10 +123,10 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="avatar-xs rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
                                          style="width:32px;height:32px;font-size:13px;flex-shrink:0;">
-                                        {{ strtoupper(substr($adminUser->name, 0, 1)) }}
+                                        {{ strtoupper(substr($adminUser->full_name, 0, 1)) }}
                                     </div>
                                     <div>
-                                        <strong>{{ $adminUser->name }}</strong>
+                                        <strong>{{ $adminUser->full_name }}</strong>
                                         @if($adminUser->id === auth()->id())
                                             <span class="badge bg-success ms-1">{{ __('messages.you') }}</span>
                                         @endif

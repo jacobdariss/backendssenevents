@@ -24,7 +24,7 @@ class AdminManagementController extends Controller
 
         $adminUsers = User::with('roles')
             ->whereHas('roles', fn($q) => $q->where('name', '!=', 'user'))
-            ->orderBy('name')
+            ->orderBy('first_name')
             ->get();
 
         $availableRoles = Role::where('name', '!=', 'user')
@@ -46,10 +46,10 @@ class AdminManagementController extends Controller
             'password' => ['required', Password::min(8)],
         ]);
 
+        $nameParts = explode(' ', $request->name, 2);
         $user = User::create([
-            'name'       => $request->name,
-            'first_name' => explode(' ', $request->name)[0],
-            'last_name'  => trim(substr($request->name, strpos($request->name, ' '))),
+            'first_name' => $nameParts[0],
+            'last_name'  => $nameParts[1] ?? '',
             'email'      => $request->email,
             'password'   => Hash::make($request->password),
             'status'     => 1,
@@ -63,10 +63,9 @@ class AdminManagementController extends Controller
             'message' => __('messages.create_form', ['form' => __('messages.admin_user')]),
             'data'    => [
                 'id'    => $user->id,
-                'name'  => $user->name,
+                'name'  => $user->full_name,
                 'email' => $user->email,
                 'role'  => $user->getRoleNames()->first(),
-                'badge' => '<span class="badge bg-primary">' . ucfirst($user->getRoleNames()->first()) . '</span>',
             ],
         ]);
     }
