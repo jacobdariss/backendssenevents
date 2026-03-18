@@ -120,7 +120,7 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-light text-dark border">
+                                <span class="badge bg-primary">
                                     {{ $role->users_count }} {{ __('messages.users') }}
                                 </span>
                             </td>
@@ -382,7 +382,7 @@ function addRoleRow(role) {
     const tr = document.createElement('tr');
     tr.id = 'role-row-' + role.id;
     tr.innerHTML = `<td><strong>${role.title}</strong></td>
-        <td><span class="badge bg-light text-dark border">0 {{ __('messages.users') }}</span></td>
+        <td><span class="badge bg-primary">0 {{ __('messages.users') }}</span></td>
         <td class="text-end">
             <button class="btn btn-sm btn-outline-danger" onclick="deleteRole(${role.id}, this)">
                 <i class="fas fa-trash"></i></button></td>`;
