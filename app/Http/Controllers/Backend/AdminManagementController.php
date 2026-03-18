@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\AuthHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class AdminManagementController extends Controller
@@ -31,7 +33,12 @@ class AdminManagementController extends Controller
             ->orderBy('title')
             ->get();
 
-        return view('backend.admin-management.index', compact('roles', 'adminUsers', 'availableRoles'));
+        $modules     = config('constant.MODULES');
+        $permissions = Permission::get();
+
+        return view('backend.admin-management.index', compact(
+            'roles', 'adminUsers', 'availableRoles', 'modules', 'permissions'
+        ));
     }
 
     // ─────────────────────────────────────────────
