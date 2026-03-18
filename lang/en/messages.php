@@ -2161,6 +2161,7 @@ return [
     'min_8_chars'         => 'Minimum 8 characters',
     'are_you_sure'        => 'Are you sure?',
     'error_occurred'      => 'An error occurred. Please try again.',
+    'not_editable'         => 'Not Editable',
     'cannot_delete_yourself' => 'You cannot delete your own account.',
 
 ];

@@ -13,6 +13,17 @@
         @forelse ($roles as $role)
             @if ($role->name !== 'admin' && $role->name !== 'user')
             <div class="border-bottom">
+                @if($role->is_fixed)
+                {{-- Rôle fixe (admin) : non éditable --}}
+                <div class="d-flex align-items-center justify-content-between px-4 py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="mb-0 fw-semibold">{{ ucfirst($role->title) }}</h6>
+                        <span class="badge bg-secondary">{{ __('messages.fixed') }}</span>
+                    </div>
+                    <span class="badge bg-secondary text-muted">{{ __('messages.not_editable') }}</span>
+                </div>
+                @else
+                {{-- Rôle personnalisé : éditable --}}
                 <div class="d-flex align-items-center justify-content-between px-4 py-3"
                      style="cursor:pointer;"
                      data-bs-toggle="collapse"
@@ -20,9 +31,6 @@
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-chevron-right text-muted" id="chevron-{{ $role->id }}"></i>
                         <h6 class="mb-0 fw-semibold">{{ ucfirst($role->title) }}</h6>
-                        @if($role->is_fixed)
-                            <span class="badge bg-secondary">{{ __('messages.fixed') }}</span>
-                        @endif
                     </div>
                     <span class="badge bg-primary">{{ __('messages.permission') }}</span>
                 </div>
@@ -82,6 +90,7 @@
                         </div>
                     </form>
                 </div>
+                @endif {{-- end @else non-fixed --}}
             </div>
             @endif
         @empty
