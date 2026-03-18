@@ -48,8 +48,8 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
         Route::post('update-player-id', [UserController::class, 'update_player_id'])->name('update-player-id');
         Route::get('get_search_data', [SearchController::class, 'get_search_data'])->name('get_search_data');
 
-        // Sync Role & Permission
-        Route::get('/permission-role', [RolePermission::class, 'index'])->name('permission-role.list')->middleware('password.confirm');
+        // Admin Management — accessible via /app/permission-role
+        Route::get('/permission-role', [AdminManagementController::class, 'index'])->name('permission-role.list')->middleware('password.confirm');
         Route::post('/permission-role/store/{role_id}', [RolePermission::class, 'store'])->name('permission-role.store');
         Route::get('/permission-role/reset/{role_id}', [RolePermission::class, 'reset_permission'])->name('permission-role.reset');
         // Role & Permissions Crud
