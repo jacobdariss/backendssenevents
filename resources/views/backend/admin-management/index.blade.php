@@ -116,7 +116,7 @@
                     <tr>
                         <th>{{ __('messages.role') }}</th>
                         <th>{{ __('messages.users') }}</th>
-                        <th class="text-end">{{ __('labels.backend.action') }}</th>
+                        <th class="text-end">{{ __('messages.action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -173,7 +173,7 @@
                         <th>{{ __('messages.name') }}</th>
                         <th>{{ __('messages.email') }}</th>
                         <th>{{ __('messages.role') }}</th>
-                        <th class="text-end">{{ __('labels.backend.action') }}</th>
+                        <th class="text-end">{{ __('messages.action') }}</th>
                     </tr>
                 </thead>
                 <tbody id="admin-users-body">
