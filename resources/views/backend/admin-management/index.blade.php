@@ -103,11 +103,9 @@
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="card-title mb-0">{{ __('messages.role_manager') }}</h4>
-        @can('add_users')
         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">
             <i class="fas fa-plus me-1"></i> {{ __('messages.add_role') }}
         </button>
-        @endcan
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -157,11 +155,9 @@
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="card-title mb-0">{{ __('messages.admin_users') }}</h4>
-        @can('add_users')
         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
             <i class="fas fa-user-plus me-1"></i> {{ __('messages.add_admin_user') }}
         </button>
-        @endcan
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
