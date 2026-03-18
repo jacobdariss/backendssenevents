@@ -729,12 +729,12 @@ function formatCurrency($number, $noOfDecimal, $decimalSeparator, $thousandSepar
 
     if ($currencyPosition == 'right' || $currencyPosition == 'right_with_space') {
 
+        $currencyString .= $integerPart;
+
         if ($noOfDecimal > 0) {
-            $currencyString .= $integerPart . $decimalSeparator . $decimalPart;
+            $currencyString .= $decimalSeparator . $decimalPart;
         }
-        if ($currencyPosition == 'right_with_space') {
-            $currencyString .= ' ';
-        }
+        $currencyString .= ' ';
         $currencyString .= $currencySymbol;
     }
 

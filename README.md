@@ -1,4 +1,4 @@
-# Streamit Laravel Admin Panel
+# Sen Events Laravel Admin Panel
 
 
 

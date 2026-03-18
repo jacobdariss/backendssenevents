@@ -268,7 +268,7 @@
         }
         var input = document.querySelector("#mobile");
         var iti = window.intlTelInput(input, {
-            initialCountry: "in", // Automatically detect user's country
+            initialCountry: "sn", // Automatically detect user's country
             separateDialCode: true, // Show the country code separately
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js" // To handle number formatting
         });

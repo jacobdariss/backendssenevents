@@ -1,0 +1,9 @@
+{
+    "name": "nwidart/partner",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Partner\\": "/"
+        }
+    }
+}

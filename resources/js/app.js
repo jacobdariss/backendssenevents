@@ -811,13 +811,12 @@
     }
 
     if (currencyPosition === 'right' || currencyPosition === 'right_with_space') {
+      currencyString += integerPart
       // Add decimal part and decimal separator if applicable
       if (noOfDecimal > 0) {
-        currencyString += integerPart + decimalSeparator + decimalPart
+        currencyString += decimalSeparator + decimalPart
       }
-      if (currencyPosition === 'right_with_space') {
-        currencyString += ' '
-      }
+      currencyString += ' '
       currencyString += currencySymbol
     }
 

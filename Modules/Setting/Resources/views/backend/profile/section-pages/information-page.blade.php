@@ -140,7 +140,7 @@
     <script>
         var input = document.querySelector("#mobile");
         var iti = window.intlTelInput(input, {
-            initialCountry: "in",
+            initialCountry: "sn",
             separateDialCode: true,
             customContainer: "w-100",
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js" // To handle number formatting

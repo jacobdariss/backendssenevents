@@ -520,6 +520,48 @@ class SettingSeeder extends Seeder
             35 =>
             array (
                 'id' => 36,
+                'name' => 'wave_payment_method',
+                'val' => '0',
+                'type' => 'wavepayment',
+                'datatype' => NULL,
+                'created_by' => 2,
+                'updated_by' => 2,
+                'deleted_by' => NULL,
+                'created_at' => '2024-08-08 10:38:37',
+                'updated_at' => '2024-08-08 10:38:37',
+                'deleted_at' => NULL,
+            ),
+            36 =>
+            array (
+                'id' => 37,
+                'name' => 'wave_api_key',
+                'val' => '',
+                'type' => 'wave_payment_method',
+                'datatype' => NULL,
+                'created_by' => 2,
+                'updated_by' => 2,
+                'deleted_by' => NULL,
+                'created_at' => '2024-08-08 10:38:37',
+                'updated_at' => '2024-08-08 10:38:37',
+                'deleted_at' => NULL,
+            ),
+            37 =>
+            array (
+                'id' => 38,
+                'name' => 'wave_base_url',
+                'val' => 'https://api.wave.com',
+                'type' => 'wave_payment_method',
+                'datatype' => NULL,
+                'created_by' => 2,
+                'updated_by' => 2,
+                'deleted_by' => NULL,
+                'created_at' => '2024-08-08 10:38:37',
+                'updated_at' => '2024-08-08 10:38:37',
+                'deleted_at' => NULL,
+            ),
+            38 =>
+            array (
+                'id' => 39,
                 'name' => 'local',
                 'val' => '1',
                 'type' => 'storage_settings',

@@ -1,0 +1,56 @@
+<?php
+
+return [
+    'title'                    => 'Partenaires',
+    'add_title'                => 'Ajouter un partenaire',
+    'edit_title'               => 'Modifier le partenaire',
+    'lbl_partner'              => 'Partenaire',
+    'lbl_no_partner'           => 'Aucun partenaire',
+    'lbl_logo'                 => 'Logo',
+    'lbl_email'                => 'Email',
+    'lbl_phone'                => 'Téléphone',
+    'lbl_website'              => 'Site web',
+    'lbl_description'          => 'Description',
+    'lbl_company_name'         => 'Nom de l\'entreprise',
+    'placeholder_name'         => 'Entrez le nom du partenaire',
+    'placeholder_email'        => 'Entrez l\'adresse email',
+    'placeholder_phone'        => 'Entrez le numéro de téléphone',
+    'placeholder_website'      => 'Entrez l\'URL du site web',
+    'placeholder_description'  => 'Entrez la description du partenaire',
+
+    // Gestion du compte
+    'lbl_account'              => 'Compte partenaire',
+    'lbl_create_account'       => 'Créer un compte utilisateur',
+    'lbl_create_account_help'  => 'Activez pour créer un compte de connexion pour ce partenaire. Il pourra gérer son contenu depuis le panneau admin.',
+    'account_linked'           => 'Compte lié',
+    'no_account_linked'        => 'Aucun compte utilisateur lié à ce partenaire.',
+
+    // Inscription (frontend)
+    'register_title'           => 'Inscription partenaire',
+    'register_subtitle'        => 'Créez un compte partenaire pour gérer votre contenu.',
+    'register_section_account' => 'Votre compte',
+    'register_section_company' => 'Votre entreprise',
+    'register_submit'          => 'Créer mon compte partenaire',
+    'already_have_account'     => 'Vous avez déjà un compte ?',
+    'register_success'         => 'Bienvenue ! Votre compte partenaire a été créé avec succès.',
+
+    // Types de contenu autorisés
+    'lbl_content_types'        => 'Types de contenu autorisés',
+    'lbl_content_types_help'   => 'Sélectionnez les types de contenu que ce partenaire peut gérer.',
+    'content_type_video'       => 'Vidéos',
+    'content_type_movie'       => 'Films',
+    'content_type_tvshow'      => 'Séries TV',
+    'content_type_livetv'      => 'TV en direct',
+
+    // Validation
+    'validation_title'         => 'Validation des contenus partenaires',
+    'pending_badge'            => 'en attente',
+    'status_pending'           => 'En attente',
+    'status_approved'          => 'Approuvé',
+    'status_rejected'          => 'Rejeté',
+    'approve'                  => 'Approuver',
+    'reject'                   => 'Rejeter',
+    'content_approved'         => 'Contenu approuvé avec succès.',
+    'content_rejected'         => 'Contenu rejeté.',
+    'no_content_to_validate'   => 'Aucun contenu à afficher pour les filtres sélectionnés.',
+];

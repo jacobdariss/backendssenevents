@@ -9,5 +9,8 @@ return [
     'lbl_paypal' => 'باي بال',
     'lbl_flutterwave' => 'فلاتر ويف',
     'lbl_client_id' => 'معرف العميل',
-    'lbl_server_key' => 'مفتاح الخادم'
+    'lbl_server_key' => 'مفتاح الخادم',
+    'lbl_wave' => 'Wave Senegal',
+    'lbl_api_key' => 'مفتاح API',
+    'lbl_base_url' => 'عنوان URL الأساسي'
 ];

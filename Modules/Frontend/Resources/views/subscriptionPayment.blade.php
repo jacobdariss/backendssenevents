@@ -118,7 +118,6 @@
                                  @php
                                     $payment_methods = [
                                         'str_payment_method' => 'stripe',
-                                        'razor_payment_method' => 'razorpay',
                                         'paystack_payment_method' => 'paystack',
                                         'paypal_payment_method' => 'paypal',
                                         'flutterwave_payment_method' => 'flutterwave',
@@ -126,6 +125,8 @@
                                         'sadad_payment_method' => 'sadad',
                                         'airtel_payment_method' => 'airtel',
                                         'phonepe_payment_method' => 'phonepe',
+                                        'mollie_payment_method' => 'mollie',
+                                        'wave_payment_method' => 'wave',
                                         'midtrans_payment_method' => 'midtrans'
                                     ];
                                 @endphp
@@ -136,12 +137,12 @@
                             <div class="card">
                                 <div class="card-header pb-0">
                                     <input type="hidden" id="selected-plan-id" name="plan_id">
-                                    <input type="hidden" id="selected-price" name="price">
+                                    <input type="hidden" id="selected-price" name="price" autocomplete="off">
                                     <input type="hidden" id="selected-promotion-id" name="promotion_id">
-                                    <label class="form-label" for="payment-method">{{ __('frontend.choose_payment_method') }}</label>
+                                    <label class="form-label">{{ __('frontend.choose_payment_method') }}</label>
                                 </div>
                                 <div class="card-body">
-                                    <input type="hidden" id="payment-method" name="payment_method">
+                                    <input type="hidden" id="payment-method" name="payment_method" autocomplete="off">
                                     <div class="list-unstyled mb-0 payment-method-list d-flex flex-wrap gap-3">
                                          @foreach ($payment_methods as $setting => $method)
                                           @if (setting($setting) == 1)
@@ -150,14 +151,14 @@
                                             <label class="btn-box d-flex align-items-center justify-content-center gap-1 cursor-pointer" for="pm-{{ $method }}" title="{{ $method }}">
                                                 @if($method == 'stripe')
                                                     <img src="{{ asset('images/stripe.svg') }}" alt="Stripe" class="payment-icon" >
-                                                @elseif($method == 'razorpay')
-                                                    <img src="{{ asset('images/razorpay.svg') }}" alt="Razorpay" class="payment-icon" >
                                                 @elseif($method == 'paystack')
                                                     <img src="{{ asset('images/paystack.svg') }}" alt="Paystack" class="payment-icon" >
                                                 @elseif($method == 'paypal')
                                                     <img src="{{ asset('images/paypal.svg') }}" alt="PayPal" class="payment-icon" >
                                                 @elseif($method == 'flutterwave')
                                                     <img src="{{ asset('images/flutterwave.svg') }}" alt="Flutterwave" class="payment-icon" >
+                                                @elseif($method == 'wave')
+                                                    <img src="{{ asset('images/wave.svg') }}" alt="Wave" class="payment-icon" >
                                                 @else
                                                     <i class="ph-bold ph-credit-card text-primary"></i>
                                                 @endif
@@ -171,6 +172,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="mt-4" id="promotional_section">
                             <div class="card apply-coupon-title" data-bs-toggle="collapse" data-bs-target="#collapseCoupon" role="button" aria-expanded="false" aria-controls="collapseCoupon">
                                 <div class="card-header w-100">
@@ -182,7 +184,7 @@
                                     <div class="card-body">
                                         <div class="mb-4 coupon-enter-data">
                                             <h6 class="mb-3">{{ __('messages.enter_coupon_code') }}</h6>
-                                            <input type="text" id="coupon-code" class="form-control" placeholder="{{ __('messages.enter_coupon_code') }}">
+                                            <input type="text" id="coupon-code" class="form-control" placeholder="{{ __('messages.enter_coupon_code') }}" autocomplete="off">
                                         </div>
                                         <div class="">
                                             <h6 class="mb-3">{{ __('frontend.available_coupons') }}</h6>
@@ -221,8 +223,6 @@
                                 </div>
                             </div>
                         </div>
-
-
 
                         <div class="mt-4">
                             <div class="payment-detail rounded">
@@ -378,7 +378,6 @@
 
         <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
         <script src="https://checkout.flutterwave.com/v3.js"></script>
         <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ $clientKey }}"></script>
         <script>
@@ -614,119 +613,6 @@ function createTaxTable(taxes) {
             }
         });
     });
-
-
-
-
-             $('#payment-form').on('submit', function(e) {
-                 e.preventDefault(); // Prevent default form submission
-                 
-                 if (!pendingPaymentSubmit && !checkProfileLimitBeforePayment()) {
-                    e.stopImmediatePropagation();
-                    return false;
-                 }
-                 pendingPaymentSubmit = false;
-                 
-                 const paymentMethod = $('#payment-method').val();
-                if (!paymentMethod) {
-                    $('#errorModalMessage').text('Please select a payment method before proceeding.');
-                    if (!$('#errorModal').hasClass('show')) {
-                    $('#errorModal').modal('show');
-                    }
-                    return; // Exit the function
-                }
-
-                 const formData = $(this).serialize();
-                 $.ajax({
-                     url: $(this).attr('action'),
-                     method: 'POST',
-                     data: formData,
-                     success: function(response) {
-                         if (response.redirect) {
-                             window.location.href = response.redirect;
-                         }
-                     },
-                     error: function(xhr) {
-                         const errorResponse = xhr.responseJSON || {};
-                         // Fix: Use response.message instead of response.error
-                        const errorMessage = errorResponse.message || errorResponse.error || 'An error occurred. Please try another payment method.';
-                         // Display an error modal using Bootstrap
-                         $('#errorModalMessage').text(errorMessage);
-                         if (!$('#errorModal').hasClass('show')) {
-                            $('#errorModal').modal('show');
-                            }
-                     }
-                 });
-             });
-
-// Razor Pay
-             $('#payment-form').on('submit', function(e) {
-
-                if ($('#payment-method').val() !== 'razorpay') {
-                    return true;
-                }
-
-                e.preventDefault();
-
-                // Include promotion ID in the data
-                const formData = new FormData(this);
-                const selectedPromotionId = $('.coupon-radio:checked').val();
-                if (selectedPromotionId) {
-                    formData.append('promotion_id', selectedPromotionId);
-                }
-                const promotionId = selectedPromotionId || null;
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        var options = {
-                            "key": response.key,
-                            "amount": response.amount,
-                            "currency": response.currency,
-                            "name": response.name,
-                            "description": response.description,
-                            "order_id": response.order_id,
-                            "handler": function (paymentResponse){
-                                const successUrl = new URL(response.success_url);
-                                successUrl.searchParams.append('gateway', 'razorpay');
-                                successUrl.searchParams.append('razorpay_payment_id', paymentResponse.razorpay_payment_id);
-                                successUrl.searchParams.append('plan_id', response.plan_id);
-
-                                if (promotionId) {
-                                    successUrl.searchParams.append('promotion_id', promotionId);
-                                }
-
-                                window.location.href = successUrl.toString();
-                            },
-                            "prefill": {
-                                "name": response.prefill.name??'-',
-                                "email": response.prefill.email,
-                                "contact": response.prefill.contact??'-',
-                            },
-                            "theme": {
-                                "color": "#F37254"
-                            }
-                        };
-
-                        var rzp1 = new Razorpay(options);
-                        rzp1.open();
-                    },
-                    error: function(xhr) {
-                        if(xhr.status === 401) {
-                            window.location.href = xhr.responseJSON.redirect_url;
-                        } else {
-                            console.log('Something went wrong. Please try again.');
-                        }
-                    }
-                });
-                });
 
 // Flutterwave
 
@@ -1611,6 +1497,11 @@ $('#payment-form').on('submit', function(e) {
     // Get the payment method
     const paymentMethod = $('#payment-method').val();
 
+    // Flutterwave has its own dedicated submit handler
+    if (paymentMethod === 'flutterwave') {
+        return;
+    }
+
     // Check if payment method is selected
     if (!paymentMethod) {
         $('#errorModalMessage').text('Please select a payment method before proceeding.');
@@ -1654,6 +1545,8 @@ $('#payment-form').on('submit', function(e) {
                 });
             } else if (response.redirect) {
                 window.location.href = response.redirect;
+            } else if (response.authorization_url) {
+                window.location.href = response.authorization_url;
             }
         },
         error: function(xhr) {

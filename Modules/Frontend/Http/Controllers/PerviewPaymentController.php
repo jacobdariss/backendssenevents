@@ -127,6 +127,8 @@ class PerviewPaymentController extends Controller
             'sadad' => 'SadadPayment',
             'airtel' => 'AirtelPayment',
             'phonepe' => 'PhonePePayment',
+            'mollie' => 'MolliePayment',
+            'wave' => 'WavePayment',
             'midtrans' => 'MidtransPayment',
         ];
 
@@ -180,7 +182,8 @@ class PerviewPaymentController extends Controller
                 $errorMessage = "The amount entered is too low to process a payment. Please increase the amount and try again.";
             }
             return response()->json(['error' => $errorMessage], 400);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error('Stripe PPV payment error: ' . $e->getMessage());
             return response()->json(['error' => 'Something went wrong. Please try again later.'], 500);
         }
     }
@@ -386,6 +389,105 @@ class PerviewPaymentController extends Controller
         }
     }
 
+    protected function MolliePayment(Request $request)
+    {
+        $mollieApiKey = GetpaymentMethod('mollie_api_key');
+
+        if (empty($mollieApiKey)) {
+            return response()->json(['error' => 'Mollie API key is not configured.'], 400);
+        }
+
+        $currency = strtoupper(GetcurrentCurrency() ?? 'EUR');
+        $supportedCurrencies = ['EUR', 'USD', 'GBP', 'CAD', 'AUD', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN'];
+        $currency = in_array($currency, $supportedCurrencies) ? $currency : 'EUR';
+
+        $response = Http::withToken($mollieApiKey)
+            ->acceptJson()
+            ->post('https://api.mollie.com/v2/payments', [
+                'amount' => [
+                    'currency' => $currency,
+                    'value' => number_format((float) $request->input('price'), 2, '.', ''),
+                ],
+                'description' => 'Pay per view payment',
+                'redirectUrl' => url('/payment/success/pay-per-view?' . http_build_query([
+                    'gateway' => 'mollie',
+                    'movie_id' => $request->input('movie_id'),
+                    'type' => $request->input('type'),
+                    'access_duration' => $request->input('access_duration'),
+                    'available_for' => $request->input('available_for'),
+                    'discount' => $request->input('discount'),
+                ])),
+                'metadata' => [
+                    'movie_id' => $request->input('movie_id'),
+                    'type' => $request->input('type'),
+                    'access_duration' => $request->input('access_duration'),
+                    'available_for' => $request->input('available_for'),
+                    'discount' => $request->input('discount'),
+                ],
+            ]);
+
+        if (! $response->successful()) {
+            return response()->json([
+                'error' => data_get($response->json(), 'detail', 'Unable to initialize Mollie payment.'),
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'authorization_url' => data_get($response->json(), '_links.checkout.href'),
+        ]);
+    }
+
+
+
+    protected function WavePayment(Request $request)
+    {
+        $waveBaseUrl = rtrim(GetpaymentMethod('wave_base_url') ?? 'https://api.wave.com', '/');
+        $waveApiKey = GetpaymentMethod('wave_api_key');
+
+        if (empty($waveApiKey)) {
+            return response()->json(['error' => 'Wave API key is not configured.'], 400);
+        }
+
+        $currency = strtoupper(GetcurrentCurrency() ?? 'XOF');
+
+        $response = Http::withToken($waveApiKey)
+            ->acceptJson()
+            ->post($waveBaseUrl . '/v1/payments', [
+                'amount' => [
+                    'currency' => $currency,
+                    'value' => number_format((float) $request->input('price'), 2, '.', ''),
+                ],
+                'description' => 'Pay per view payment',
+                'success_url' => url('/payment/success/pay-per-view?' . http_build_query([
+                    'gateway' => 'wave',
+                    'movie_id' => $request->input('movie_id'),
+                    'type' => $request->input('type'),
+                    'access_duration' => $request->input('access_duration'),
+                    'available_for' => $request->input('available_for'),
+                    'discount' => $request->input('discount'),
+                ])),
+                'metadata' => [
+                    'movie_id' => $request->input('movie_id'),
+                    'type' => $request->input('type'),
+                    'access_duration' => $request->input('access_duration'),
+                    'available_for' => $request->input('available_for'),
+                    'discount' => $request->input('discount'),
+                ],
+            ]);
+
+        if (! $response->successful()) {
+            return response()->json([
+                'error' => data_get($response->json(), 'message', 'Unable to initialize Wave payment.'),
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'authorization_url' => data_get($response->json(), 'checkout_url') ?? data_get($response->json(), 'data.checkout_url'),
+        ]);
+    }
+
     public function paymentSuccess(Request $request)
     {
         $gateway = $request->input('gateway');
@@ -409,6 +511,10 @@ class PerviewPaymentController extends Controller
                 return $this->handleAirtelSuccess($request);
             case 'phonepe':
                 return $this->handlePhonePeSuccess($request);
+            case 'mollie':
+                return $this->handleMollieSuccess($request);
+            case 'wave':
+                return $this->handleWaveSuccess($request);
             case 'midtrans':
                 return $this->MidtransPayment($request);
             default:
@@ -1520,5 +1626,78 @@ class PerviewPaymentController extends Controller
             'hasMore' => $paginator->hasMorePages(),
             'message' => 'Pay-per-view episode list loaded',
         ]);
+    }
+
+
+
+    protected function handleWaveSuccess(Request $request)
+    {
+        $transactionId = $request->input('id') ?? $request->input('transaction_id');
+        $waveBaseUrl = rtrim(GetpaymentMethod('wave_base_url') ?? 'https://api.wave.com', '/');
+        $waveApiKey = GetpaymentMethod('wave_api_key');
+
+        if (empty($transactionId) || empty($waveApiKey)) {
+            return redirect('/')->with('error', 'Invalid Wave payment callback.');
+        }
+
+        $response = Http::withToken($waveApiKey)
+            ->acceptJson()
+            ->get($waveBaseUrl . "/v1/payments/{$transactionId}");
+
+        if (! $response->successful()) {
+            return redirect('/')->with('error', 'Wave payment verification failed.');
+        }
+
+        $paymentData = $response->json();
+
+        if (!in_array(data_get($paymentData, 'status'), ['succeeded', 'completed', 'paid'], true)) {
+            return redirect('/')->with('error', 'Wave payment is not completed.');
+        }
+
+        return $this->handlePaymentSuccess(
+            (float) (data_get($paymentData, 'amount.value') ?? data_get($paymentData, 'amount')),
+            'wave',
+            (string) ($transactionId),
+            (int) data_get($paymentData, 'metadata.movie_id'),
+            (string) data_get($paymentData, 'metadata.type'),
+            data_get($paymentData, 'metadata.access_duration') ? (int) data_get($paymentData, 'metadata.access_duration') : null,
+            data_get($paymentData, 'metadata.available_for') ? (int) data_get($paymentData, 'metadata.available_for') : null,
+            data_get($paymentData, 'metadata.discount') ? (int) data_get($paymentData, 'metadata.discount') : null
+        );
+    }
+
+    protected function handleMollieSuccess(Request $request)
+    {
+        $paymentId = $request->input('id');
+        $mollieApiKey = GetpaymentMethod('mollie_api_key');
+
+        if (empty($paymentId) || empty($mollieApiKey)) {
+            return redirect('/')->with('error', 'Invalid Mollie payment callback.');
+        }
+
+        $response = Http::withToken($mollieApiKey)
+            ->acceptJson()
+            ->get("https://api.mollie.com/v2/payments/{$paymentId}");
+
+        if (! $response->successful()) {
+            return redirect('/')->with('error', 'Mollie payment verification failed.');
+        }
+
+        $paymentData = $response->json();
+
+        if (data_get($paymentData, 'status') !== 'paid') {
+            return redirect('/')->with('error', 'Mollie payment is not paid.');
+        }
+
+        return $this->handlePaymentSuccess(
+            (float) data_get($paymentData, 'amount.value'),
+            'mollie',
+            (string) data_get($paymentData, 'id'),
+            (int) data_get($paymentData, 'metadata.movie_id'),
+            (string) data_get($paymentData, 'metadata.type'),
+            data_get($paymentData, 'metadata.access_duration') ? (int) data_get($paymentData, 'metadata.access_duration') : null,
+            data_get($paymentData, 'metadata.available_for') ? (int) data_get($paymentData, 'metadata.available_for') : null,
+            data_get($paymentData, 'metadata.discount') ? (int) data_get($paymentData, 'metadata.discount') : null
+        );
     }
 }

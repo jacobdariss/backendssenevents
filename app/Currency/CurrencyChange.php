@@ -33,7 +33,7 @@ class CurrencyChange
     public function format($amount)
     {
 
-        $noOfDecimal = $this->defaultCurrency->no_of_decimal ?? 2;
+        $noOfDecimal = $this->defaultCurrency->no_of_decimal ?? 0;
         $decimalSeparator = $this->defaultCurrency->decimal_separator ?? '';
         $thousandSeparator = $this->defaultCurrency->thousand_separator ?? '';
         $currencyPosition = $this->defaultCurrency->currency_position ?? 'left';
