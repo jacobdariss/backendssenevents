@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\AdminManagementController;
 use App\Http\Controllers\Backend\BackendController;
 use App\Http\Controllers\Backend\BackupController;
 use App\Http\Controllers\Backend\SettingController;
@@ -109,6 +110,16 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
 
         Route::get('/dashboard', [BackendController::class, 'index'])->name('home');
         Route::get('/daterange', [BackendController::class, 'daterange'])->name('daterange');
+
+        // Admin Management (Users & Roles)
+        Route::group(['prefix' => 'admin-management', 'as' => 'admin-management.'], function () {
+            Route::get('/', [AdminManagementController::class, 'index'])->name('index');
+            Route::post('users', [AdminManagementController::class, 'storeAdmin'])->name('users.store');
+            Route::patch('users/{id}/role', [AdminManagementController::class, 'updateAdminRole'])->name('users.update-role');
+            Route::delete('users/{id}', [AdminManagementController::class, 'destroyAdmin'])->name('users.destroy');
+            Route::post('roles', [AdminManagementController::class, 'storeRole'])->name('roles.store');
+            Route::delete('roles/{id}', [AdminManagementController::class, 'destroyRole'])->name('roles.destroy');
+        });
         Route::get('google-auth', [BackendController::class, 'googleAuth'])->name('google-auth');
         Route::get('/get_revnue_chart_data/{type}', [BackendController::class, 'getRevenuechartData']);
         Route::get('/get_subscriber_chart_data/{type}', [BackendController::class, 'getSubscriberChartData']);

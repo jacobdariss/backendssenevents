@@ -2141,4 +2141,26 @@ return [
     'resend_otp'                    => 'Resend verification code',
     'two_factor_email_not_configured' => 'Email is not configured. Please check your server logs to retrieve the OTP code.',
 
+    // Admin Management
+    'admin_management'    => 'Admin Management',
+    'role_manager'        => 'Role Manager',
+    'admin_users'         => 'Admin Users',
+    'add_role'            => 'Add Role',
+    'add_admin_user'      => 'Add Admin User',
+    'admin_user'          => 'Admin User',
+    'role'                => 'Role',
+    'users'               => 'Users',
+    'email'               => 'Email',
+    'fixed'               => 'Fixed',
+    'you'                 => 'You',
+    'none'                => 'None',
+    'select_role'         => 'Select a role',
+    'enter_role_name'     => 'Enter role name',
+    'enter_name'          => 'Enter full name',
+    'enter_email'         => 'Enter email address',
+    'min_8_chars'         => 'Minimum 8 characters',
+    'are_you_sure'        => 'Are you sure?',
+    'error_occurred'      => 'An error occurred. Please try again.',
+    'cannot_delete_yourself' => 'You cannot delete your own account.',
+
 ];
