@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\Trait\AuthTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Mail\sendOtp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -52,17 +55,24 @@ class AuthenticatedSessionController extends Controller
 
             } else {
 
-                $request->session()->regenerate();
+                // 2FA : store user in session, send OTP, logout temporarily
+                $user = Auth::user();
+                $otp  = (string) random_int(100000, 999999);
 
-                Artisan::call('cache:clear');
-                Artisan::call('config:clear');
-                Artisan::call('view:clear');
-                Artisan::call('config:cache');
-                Artisan::call('route:clear');
+                $request->session()->put('2fa_pending_user_id', $user->id);
+                $request->session()->put('2fa_otp', $otp);
+                $request->session()->put('2fa_otp_expires_at', now()->addMinutes(10)->timestamp);
+                $request->session()->put('2fa_remember', (bool) $request->remember_me);
 
+                Auth::logout();
 
+                try {
+                    Mail::to($user->email)->send(new sendOtp(['body' => $otp]));
+                } catch (\Exception $e) {
+                    Log::error('2FA OTP send failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+                }
 
-            return redirect('app/dashboard');
+                return redirect()->route('admin.2fa');
             }
         }
 
