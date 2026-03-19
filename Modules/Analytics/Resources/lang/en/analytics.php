@@ -43,4 +43,14 @@ return [
     'payment_gateways' => 'Payment Gateways',
     'transactions' => 'Transactions',
 
+    'finance_title' => 'Finance',
+    'total_revenue' => 'Total revenue',
+    'revenue_by_partner' => 'Revenue by partner',
+    'top_ppv_content' => 'Top PPV content',
+    'recent_transactions' => 'Recent transactions',
+    'avg_transaction' => 'Avg. transaction',
+
+    'finance_hint' => 'PPV revenue, subscriptions, gateways and partner details.',
+    'see_finance' => 'See Finance',
+
 ];

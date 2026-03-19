@@ -108,6 +108,15 @@ class GenerateMenus
                 'order'  => 0,
             ]);
 
+            // Finance admin
+            $this->mainRoute($menu, [
+                'title'  => __('analytics::analytics.finance_title'),
+                'url'    => url('/app/finance'),
+                'icon'   => 'ph ph-currency-circle-dollar',
+                'active' => ['app/finance', 'app/finance/*'],
+                'order'  => 0,
+            ]);
+
 
             $this->mainRoute($menu, [
                 'icon' => 'ph ph-images-square',

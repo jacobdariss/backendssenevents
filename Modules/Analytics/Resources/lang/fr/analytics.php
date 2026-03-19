@@ -43,4 +43,14 @@ return [
     'payment_gateways' => 'Passerelles de paiement',
     'transactions' => 'Transactions',
 
+    'finance_title' => 'Finance',
+    'total_revenue' => 'Revenus totaux',
+    'revenue_by_partner' => 'Revenus par partenaire',
+    'top_ppv_content' => 'Top contenus PPV',
+    'recent_transactions' => 'Transactions récentes',
+    'avg_transaction' => 'Panier moyen',
+
+    'finance_hint' => 'Revenus PPV, abonnements, gateways et partenaires en détail.',
+    'see_finance' => 'Voir Finance',
+
 ];
