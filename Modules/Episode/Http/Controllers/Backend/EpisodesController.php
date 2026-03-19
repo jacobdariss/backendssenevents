@@ -613,6 +613,14 @@ public function update(EpisodeRequest $request, int $id)
         $requestData['plan_id'] = null;
     }
 
+    // Guard partner fields — only include if columns exist in DB
+    if (!\Schema::hasColumn('episodes', 'partner_id')) {
+        unset($requestData['partner_id']);
+    }
+    if (!\Schema::hasColumn('episodes', 'approval_status')) {
+        unset($requestData['approval_status']);
+    }
+
     // Update the episode
     $data = $this->episodeService->update($id, $requestData);
 

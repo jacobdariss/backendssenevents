@@ -353,6 +353,14 @@ public function update(SeasonRequest $request, int $id)
     $requestData['canonical_url'] = $request->input('canonical_url');
     $requestData['short_description'] = $request->input('short_description');
 
+    // Guard partner fields — only include if columns exist in DB
+    if (!\Schema::hasColumn('seasons', 'partner_id')) {
+        unset($requestData['partner_id']);
+    }
+    if (!\Schema::hasColumn('seasons', 'approval_status')) {
+        unset($requestData['approval_status']);
+    }
+
     $this->seasonService->update($id, $requestData);
 
     $message = __('messages.update_form_season', ['form' => 'Season']);
