@@ -32,7 +32,10 @@ class GenerateMenus
 
                 // Menus dynamiques selon les types de contenu autorisés
                 $partner = \Modules\Partner\Models\Partner::where('user_id', auth()->id())->first();
-                $allowedTypes = $partner ? ($partner->allowed_content_types ?? []) : [];
+                $rawTypes = $partner ? ($partner->allowed_content_types ?? []) : [];
+                // Si aucun type configuré → tout est autorisé
+                $allTypes = ['video', 'movie', 'tvshow', 'livetv'];
+                $allowedTypes = empty($rawTypes) ? $allTypes : $rawTypes;
 
                 if (in_array('video', $allowedTypes)) {
                     $this->mainRoute($menu, [
