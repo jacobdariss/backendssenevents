@@ -53,17 +53,17 @@
 {{-- Courbes --}}
 <div class="row g-3 mb-4">
     <div class="col-md-8">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header"><h6 class="mb-0"><i class="ph ph-trend-up me-2"></i>{{ __('analytics::analytics.views_over_time') }}</h6></div>
-            <div class="card-body"><canvas id="viewsChart" height="90"></canvas></div>
+            <div class="card-body p-2" style="position:relative;height:200px"><canvas id="viewsChart"></canvas></div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header"><h6 class="mb-0"><i class="ph ph-device-mobile me-2"></i>{{ __('analytics::analytics.by_device') }}</h6></div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 @if($byDevice->count())
-                    <canvas id="deviceChart" height="90" style="max-height:150px"></canvas>
+                    <canvas id="deviceChart" style="max-height:170px;max-width:170px"></canvas>
                 @else
                     <p class="text-muted small">{{ __('messages.no_record_found') }}</p>
                 @endif
@@ -74,17 +74,17 @@
 
 <div class="row g-3 mb-4">
     <div class="col-md-8">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header"><h6 class="mb-0"><i class="ph ph-currency-circle-dollar me-2"></i>{{ __('analytics::analytics.revenue_over_time') }}</h6></div>
-            <div class="card-body"><canvas id="revenueChart" height="90"></canvas></div>
+            <div class="card-body p-2" style="position:relative;height:200px"><canvas id="revenueChart"></canvas></div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header"><h6 class="mb-0"><i class="ph ph-desktop me-2"></i>{{ __('analytics::analytics.by_platform') }}</h6></div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 @if($byPlatform->count())
-                    <canvas id="platformChart" height="90" style="max-height:150px"></canvas>
+                    <canvas id="platformChart" style="max-height:170px;max-width:170px"></canvas>
                 @else
                     <p class="text-muted small">{{ __('messages.no_record_found') }}</p>
                 @endif
@@ -356,7 +356,7 @@ new Chart(document.getElementById('revenueChart'), {
 new Chart(document.getElementById('deviceChart'), {
     type: 'doughnut',
     data: { labels: @json($byDevice->pluck('device_type')), datasets: [{ data: @json($byDevice->pluck('views')), backgroundColor: C }] },
-    options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' } }, layout:{ padding:0 } }
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
 });
 @endif
 
@@ -364,7 +364,7 @@ new Chart(document.getElementById('deviceChart'), {
 new Chart(document.getElementById('platformChart'), {
     type: 'doughnut',
     data: { labels: @json($byPlatform->pluck('platform')), datasets: [{ data: @json($byPlatform->pluck('views')), backgroundColor: C }] },
-    options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' } }, layout:{ padding:0 } }
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
 });
 @endif
 // Likes chart
