@@ -2173,6 +2173,7 @@ return [
     'last_name'  => 'Last Name',
     'password_confirmation'  => 'Confirm Password',
     'no_record_found'  => 'No records found',
+    'login'  => 'Login',
     'optional'  => 'Optional',
     'security' => 'Security',
     '2fa_admin_label' => 'Admin Two-Factor Authentication (2FA)',
