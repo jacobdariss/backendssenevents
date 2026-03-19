@@ -58,7 +58,7 @@ class RoleBasedRouteAccess
                 }
             }
             // Allow logout & profile
-            if (in_array($path, ['app/logout', 'app/my-profile']) || str_starts_with($path, 'app/my-profile')) {
+            if (in_array($path, ['app/logout', 'app/my-profile']) || str_starts_with($path, 'app/my-profile') || str_starts_with($path, 'app/profile')) {
                 $isAllowed = true;
             }
             if (!$isAllowed) {
