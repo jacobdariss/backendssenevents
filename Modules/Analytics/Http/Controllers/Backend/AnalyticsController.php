@@ -42,6 +42,16 @@ class AnalyticsController extends Controller
         $likesPerDay   = $this->analytics->likesPerDay($from, $to);
         $topLiked      = $this->analytics->topLikedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $partners      = Partner::where('status', 1)->orderBy('name')->get();
+
+        // Pré-charger les stats partenaires en une seule requête (évite N+1 en vue)
+        $partnerViewStats = \Modules\Entertainment\Models\EntertainmentView::select(
+                'partner_id',
+                \Illuminate\Support\Facades\DB::raw('COUNT(*) as views'),
+                \Illuminate\Support\Facades\DB::raw('SUM(watch_time) as watch_time'))
+            ->whereNotNull('partner_id')
+            ->groupBy('partner_id')
+            ->get()
+            ->keyBy('partner_id');
         $module_action = 'Analytics';
 
         return view('analytics::backend.analytics.index', compact(

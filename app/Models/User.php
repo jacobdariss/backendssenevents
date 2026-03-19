@@ -95,7 +95,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
      */
     public function routeNotificationForSlack($notification)
     {
-        return env('SLACK_NOTIFICATION_WEBHOOK');
+        return config('services.slack.webhook_url');
     }
 
     /**
@@ -247,7 +247,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             'reset_link' => $url,
             'reset_url' => $url,
             'password_reset_link' => $url,
-            'site_url' => env('APP_URL'),
+            'site_url' => config('app.url'),
         ];
 
         if (function_exists('sendNotification')) {

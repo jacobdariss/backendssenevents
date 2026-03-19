@@ -175,8 +175,8 @@
             <tbody>
                 @foreach($partners as $p)
                 @php
-                    $pViews = \Modules\Entertainment\Models\EntertainmentView::where('partner_id',$p->id)->count();
-                    $pTime  = \Modules\Entertainment\Models\EntertainmentView::where('partner_id',$p->id)->sum('watch_time')??0;
+                    $pViews = $partnerViewStats[$p->id]->views ?? 0;
+                    $pTime  = $partnerViewStats[$p->id]->watch_time ?? 0;
                 @endphp
                 <tr>
                     <td><strong>{{ $p->name }}</strong></td>

@@ -557,7 +557,6 @@ class WatchlistController extends Controller
         $user = auth()->user();
         $watch_data = $request->all();
         $type = $request->entertainment_type == 'episode' ? 'tvshow' : $request->entertainment_type;
-        \Log::info($watch_data);
         $watch_data['total_watched_time'] = $watch_data['total_watched_time'] ?? '00:00:01';
         $watch_data['watched_time'] = $watch_data['watched_time'] ?? '00:00:01';
         $watch_data['user_id'] = $user->id;

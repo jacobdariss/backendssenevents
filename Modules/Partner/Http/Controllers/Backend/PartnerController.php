@@ -129,8 +129,22 @@ class PartnerController extends Controller
 
         // Gestion upload contrat
         if ($request->hasFile('contract_file') && $request->file('contract_file')->isValid()) {
-            $file      = $request->file('contract_file');
-            $filename  = 'contract_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file = $request->file('contract_file');
+
+            // Validation MIME réelle (contenu binaire, pas juste l'extension)
+            $allowedMimes = ['application/pdf', 'application/msword',
+                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!in_array($file->getMimeType(), $allowedMimes)) {
+                return redirect()->back()->withErrors(['contract_file' => __('partner::partner.contract_invalid_type')]);
+            }
+            if ($file->getSize() > 10 * 1024 * 1024) { // 10 Mo max
+                return redirect()->back()->withErrors(['contract_file' => __('partner::partner.contract_too_large')]);
+            }
+
+            // Nom sécurisé sans utiliser le nom original client
+            $ext      = ['application/pdf' => 'pdf', 'application/msword' => 'doc',
+                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'][$file->getMimeType()] ?? 'bin';
+            $filename = 'contract_' . $id . '_' . time() . '.' . $ext;
             $file->storeAs('public/partners/contracts', $filename);
             $data['contract_url'] = 'partners/contracts/' . $filename;
         } else {

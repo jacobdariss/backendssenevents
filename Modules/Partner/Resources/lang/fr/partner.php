@@ -155,4 +155,7 @@ return [
     'quota_exceeded' => 'Quota atteint (:current/:max contenus). Supprimez du contenu ou contactez l\'administrateur.',
     'quota_exceeded_warning' => 'Quota atteint ! Vous ne pouvez plus ajouter de contenu.',
 
+    'contract_invalid_type' => 'Type de fichier invalide. Seuls PDF, DOC et DOCX sont acceptés.',
+    'contract_too_large' => 'Le fichier est trop volumineux (maximum 10 Mo).',
+
 ];
