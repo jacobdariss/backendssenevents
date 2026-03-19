@@ -4,6 +4,34 @@
 
 @section('content')
 
+{{-- Quota ──────────────────────────────────────────────────────────── --}}
+@if($stats['quota_max'] !== null)
+<div class="card mb-3">
+    <div class="card-body py-2">
+        @php
+            $pct = min(100, round($stats['quota_used'] / max(1, $stats['quota_max']) * 100));
+            $color = $pct >= 90 ? 'danger' : ($pct >= 70 ? 'warning' : 'success');
+        @endphp
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="small fw-semibold"><i class="ph ph-database me-1"></i>{{ __('partner::partner.quota_usage') }}</span>
+            <span class="small {{ $pct >= 90 ? 'text-danger fw-bold' : 'text-muted' }}">
+                {{ $stats['quota_used'] }} / {{ $stats['quota_max'] }} {{ __('partner::partner.quota_videos') }}
+                @if($pct >= 90) <i class="ph ph-warning ms-1"></i> @endif
+            </span>
+        </div>
+        <div class="progress" style="height:8px">
+            <div class="progress-bar bg-{{ $color }}" style="width:{{ $pct }}%"></div>
+        </div>
+        @if($pct >= 100)
+        <div class="alert alert-danger mt-2 py-1 mb-0 small">
+            <i class="ph ph-warning me-1"></i>{{ __('partner::partner.quota_exceeded_warning') }}
+        </div>
+        @endif
+    </div>
+</div>
+@endif
+
+
 <div class="d-flex align-items-center gap-3 mb-4">
     @if($partner->logo_url)
         @php $logoUrl = setBaseUrlWithFileName($partner->logo_url, 'image', 'partners'); @endphp

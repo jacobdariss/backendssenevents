@@ -31,12 +31,19 @@ class PartnerDashboardController extends Controller
         }
 
         // Stats
+        // Quota usage
+        $totalContent = \Modules\Video\Models\Video::where('partner_id', $partner->id)->count()
+            + \Modules\Entertainment\Models\Entertainment::where('partner_id', $partner->id)->count()
+            + \Modules\LiveTV\Models\LiveTvChannel::where('partner_id', $partner->id)->count();
+
         $stats = [
             'videos_active'   => $this->countVideos($partner->id, 1),
             'videos_inactive' => $this->countVideos($partner->id, 0),
             'videos_pending'  => $this->countVideosByApproval($partner->id, 'pending'),
             'videos_rejected' => $this->countVideosByApproval($partner->id, 'rejected'),
             'movies_total'    => $this->countMovies($partner->id),
+            'quota_used'      => $totalContent,
+            'quota_max'       => $partner->video_quota,
         ];
 
         return view('partner::frontend.dashboard', compact('partner', 'stats'));

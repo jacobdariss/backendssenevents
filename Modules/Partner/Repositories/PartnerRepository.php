@@ -40,7 +40,7 @@ class PartnerRepository implements PartnerRepositoryInterface
         $partner = Partner::findOrFail($id);
 
         // Guard: remove columns that don't exist yet in DB (migrations pending)
-        $guardColumns = ['commission_rate', 'revenue_model', 'allowed_content_types', 'user_id', 'contract_url', 'contract_signed_at', 'contract_status'];
+        $guardColumns = ['commission_rate', 'revenue_model', 'allowed_content_types', 'user_id', 'contract_url', 'contract_signed_at', 'contract_status', 'video_quota'];
         foreach ($guardColumns as $col) {
             if (isset($data[$col]) && !\Schema::hasColumn('partners', $col)) {
                 unset($data[$col]);

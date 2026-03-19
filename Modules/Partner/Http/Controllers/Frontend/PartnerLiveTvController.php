@@ -43,6 +43,8 @@ class PartnerLiveTvController extends Controller
         $partner = $this->currentPartner();
         if (!$partner) return redirect()->route('partner.dashboard');
 
+        if ($redirect = $this->checkQuota($partner)) return $redirect;
+
         $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'required|string',
@@ -169,4 +171,23 @@ class PartnerLiveTvController extends Controller
         return redirect()->route('partner.livetv')
             ->with('success', __('partner::partner.video_updated'));
     }
+
+    protected function checkQuota(Partner $partner): ?\Illuminate\Http\RedirectResponse
+    {
+        if ($partner->video_quota === null) return null; // illimité
+
+        // Compter tous les contenus du partenaire
+        $count = 0;
+        $count += \Modules\Video\Models\Video::where('partner_id', $partner->id)->count();
+        $count += \Modules\Entertainment\Models\Entertainment::where('partner_id', $partner->id)->count();
+        $count += \Modules\LiveTV\Models\LiveTvChannel::where('partner_id', $partner->id)->count();
+
+        if ($count >= $partner->video_quota) {
+            return redirect()->back()->with('error',
+                __('partner::partner.quota_exceeded', ['max' => $partner->video_quota, 'current' => $count])
+            );
+        }
+        return null;
+    }
+
 }

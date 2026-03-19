@@ -146,4 +146,13 @@ return [
     'mark_all_read' => 'Mark all as read',
     'no_notifications' => 'No notifications',
 
+    // Quota
+    'video_quota' => 'Content quota',
+    'quota_unlimited' => 'Unlimited',
+    'quota_videos' => 'contents',
+    'quota_help' => 'Leave empty for unlimited. Counts videos + movies + shows + live TV.',
+    'quota_usage' => 'Quota usage',
+    'quota_exceeded' => 'Quota reached (:current/:max contents). Delete content or contact admin.',
+    'quota_exceeded_warning' => 'Quota reached! You cannot add more content.',
+
 ];

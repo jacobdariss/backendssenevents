@@ -64,6 +64,14 @@
 
                         {{-- Commission plateforme --}}
                         <div class="col-md-4">
+                            {{ html()->label(__('partner::partner.video_quota'), 'video_quota')->class('form-label') }}
+                            <div class="input-group">
+                                {{ html()->number('video_quota', old('video_quota', $partner->video_quota))->class('form-control')->attribute('min', 0)->attribute('placeholder', __('partner::partner.quota_unlimited')) }}
+                                <span class="input-group-text">{{ __('partner::partner.quota_videos') }}</span>
+                            </div>
+                            <small class="text-muted">{{ __('partner::partner.quota_help') }}</small>
+                        </div>
+                        <div class="col-md-4">
                             {{ html()->label(__('partner::partner.lbl_commission_rate') . ' (%)', 'commission_rate')->class('form-label') }}
                             <div class="input-group">
                                 {{ html()->number('commission_rate', old('commission_rate', $partner->commission_rate))->class('form-control')->attribute('step', '0.01')->attribute('min', 0)->attribute('max', 100)->attribute('placeholder', '30') }}

@@ -146,4 +146,13 @@ return [
     'mark_all_read' => 'Tout marquer comme lu',
     'no_notifications' => 'Aucune notification',
 
+    // Quota
+    'video_quota' => 'Quota de contenus',
+    'quota_unlimited' => 'Illimité',
+    'quota_videos' => 'contenus',
+    'quota_help' => 'Laissez vide pour illimité. Compte vidéos + films + séries + TV en direct.',
+    'quota_usage' => 'Utilisation du quota',
+    'quota_exceeded' => 'Quota atteint (:current/:max contenus). Supprimez du contenu ou contactez l'administrateur.',
+    'quota_exceeded_warning' => 'Quota atteint ! Vous ne pouvez plus ajouter de contenu.',
+
 ];
