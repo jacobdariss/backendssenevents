@@ -431,12 +431,29 @@ class GenerateMenus
 
 
 
-            $this->mainRoute($menu, [
-                'icon' => 'ph ph-handshake',
-                'title' => __('partner::partner.title'),
-                'url'   => url('/app/partners'),
-                'active' => ['app/partners', 'app/partners/*', 'app/partner-validation', 'app/partner-validation/*'],
-                'order' => 5,
+            $partner_menu = $this->parentMenu($menu, [
+                'icon'     => 'ph ph-handshake',
+                'title'    => __('partner::partner.title'),
+                'nickname' => 'partners',
+                'order'    => 5,
+            ]);
+
+            $this->childMain($partner_menu, [
+                'icon'       => 'ph ph-list',
+                'title'      => __('partner::partner.title'),
+                'route'      => 'backend.partners.index',
+                'active'     => ['app/partners', 'app/partners/*'],
+                'shortTitle' => 'P',
+                'order'      => 1,
+            ]);
+
+            $this->childMain($partner_menu, [
+                'icon'       => 'ph ph-seal-check',
+                'title'      => __('partner::partner.validation_title'),
+                'route'      => 'backend.partner-validation.index',
+                'active'     => ['app/partner-validation', 'app/partner-validation/*'],
+                'shortTitle' => 'V',
+                'order'      => 2,
             ]);
 
             $this->mainRoute($menu, [
