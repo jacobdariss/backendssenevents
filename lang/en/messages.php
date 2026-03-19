@@ -2163,6 +2163,7 @@ return [
     'error_occurred'      => 'An error occurred. Please try again.',
     'not_editable'         => 'Not Editable',
 
+    'contact_admin'  => 'Please contact your administrator to link your account.',
     'optional'  => 'Optional',
     'security' => 'Security',
     '2fa_admin_label' => 'Admin Two-Factor Authentication (2FA)',

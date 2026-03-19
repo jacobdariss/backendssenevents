@@ -39,6 +39,30 @@ class RoleBasedRouteAccess
             return redirect()->route('user.login');
         }
 
+        // Partner: can access /app/ but only partner-specific routes
+        if ($user->hasRole('partner') && $isAdminRoute) {
+            $partnerAllowed = [
+                'app/partner-dashboard',
+                'app/partner-videos',
+                'app/partner-analytics',
+                'app/setting/security',
+            ];
+            $isAllowed = false;
+            foreach ($partnerAllowed as $allowed) {
+                if ($path === ltrim($allowed, '/') || str_starts_with($path, ltrim($allowed, '/') . '/')) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            // Allow logout & profile
+            if (in_array($path, ['app/logout', 'app/my-profile']) || str_starts_with($path, 'app/my-profile')) {
+                $isAllowed = true;
+            }
+            if (!$isAllowed) {
+                return redirect()->route('partner.dashboard');
+            }
+        }
+
         if ($user->hasRole('user')) {
             $routeName = $request->route() ? $request->route()->getName() : null;
             if ($routeName && in_array($routeName, ['manage-profile', 'profile-management'])) {

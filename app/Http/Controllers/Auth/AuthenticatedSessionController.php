@@ -59,6 +59,10 @@ class AuthenticatedSessionController extends Controller
 
                 // Si le 2FA admin est désactivé → connexion directe
                 if (!setting('admin_2fa_enabled', true)) {
+                    // Partenaire → dashboard partenaire
+                    if ($user->hasRole('partner')) {
+                        return redirect()->route('partner.dashboard');
+                    }
                     return redirect()->intended('/app/dashboard');
                 }
 

@@ -74,6 +74,10 @@ class TwoFactorController extends Controller
         Artisan::call('config:cache');
         Artisan::call('route:clear');
 
+        // Partenaire → dashboard partenaire
+        if (auth()->user()->hasRole('partner')) {
+            return redirect()->route('partner.dashboard');
+        }
         return redirect('app/dashboard');
     }
 

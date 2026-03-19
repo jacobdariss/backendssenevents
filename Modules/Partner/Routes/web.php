@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Partner\Http\Controllers\Backend\PartnerController;
 use Modules\Partner\Http\Controllers\Backend\PartnerValidationController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerAuthController;
+use Modules\Partner\Http\Controllers\Frontend\PartnerDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,16 @@ use Modules\Partner\Http\Controllers\Frontend\PartnerAuthController;
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('register', [PartnerAuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [PartnerAuthController::class, 'register'])->name('register.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Partner Dashboard Routes (espace partenaire dans /app/)
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'app', 'as' => 'partner.', 'middleware' => ['auth', 'role:partner']], function () {
+    Route::get('partner-dashboard',          [PartnerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('partner-videos',             [PartnerDashboardController::class, 'videos'])->name('videos');
 });
 
 /*

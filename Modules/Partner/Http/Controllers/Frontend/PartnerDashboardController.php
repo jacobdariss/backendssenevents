@@ -1,0 +1,95 @@
+<?php
+
+namespace Modules\Partner\Http\Controllers\Frontend;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Modules\Partner\Models\Partner;
+use Modules\Video\Models\Video;
+use Modules\Entertainment\Models\Entertainment;
+
+class PartnerDashboardController extends Controller
+{
+    /**
+     * Retourne le partenaire lié à l'utilisateur connecté.
+     */
+    protected function currentPartner(): ?Partner
+    {
+        return Partner::where('user_id', Auth::id())->first();
+    }
+
+    /**
+     * Dashboard principal du partenaire.
+     */
+    public function index()
+    {
+        $partner = $this->currentPartner();
+
+        if (!$partner) {
+            return view('partner::frontend.no_partner');
+        }
+
+        // Stats
+        $stats = [
+            'videos_active'   => $this->countVideos($partner->id, 1),
+            'videos_inactive' => $this->countVideos($partner->id, 0),
+            'videos_pending'  => $this->countVideosByApproval($partner->id, 'pending'),
+            'videos_rejected' => $this->countVideosByApproval($partner->id, 'rejected'),
+            'movies_total'    => $this->countMovies($partner->id),
+        ];
+
+        return view('partner::frontend.dashboard', compact('partner', 'stats'));
+    }
+
+    /**
+     * Liste des vidéos du partenaire.
+     */
+    public function videos(Request $request)
+    {
+        $partner = $this->currentPartner();
+
+        if (!$partner) {
+            return redirect()->route('partner.dashboard');
+        }
+
+        $status          = $request->get('status', '');
+        $approvalStatus  = $request->get('approval_status', '');
+
+        $query = Video::where('partner_id', $partner->id)->latest();
+
+        if ($status !== '') {
+            $query->where('status', $status);
+        }
+        if ($approvalStatus !== '') {
+            $query->where('approval_status', $approvalStatus);
+        }
+
+        $videos = $query->paginate(20);
+
+        return view('partner::frontend.videos', compact('partner', 'videos', 'status', 'approvalStatus'));
+    }
+
+    // ── helpers ──────────────────────────────────────────────────
+
+    private function countVideos(int $partnerId, int $status): int
+    {
+        try {
+            return Video::where('partner_id', $partnerId)->where('status', $status)->count();
+        } catch (\Exception $e) { return 0; }
+    }
+
+    private function countVideosByApproval(int $partnerId, string $approvalStatus): int
+    {
+        try {
+            return Video::where('partner_id', $partnerId)->where('approval_status', $approvalStatus)->count();
+        } catch (\Exception $e) { return 0; }
+    }
+
+    private function countMovies(int $partnerId): int
+    {
+        try {
+            return Entertainment::where('partner_id', $partnerId)->count();
+        } catch (\Exception $e) { return 0; }
+    }
+}

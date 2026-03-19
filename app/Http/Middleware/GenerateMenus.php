@@ -17,6 +17,30 @@ class GenerateMenus
     public function handle()
     {
         return \Menu::make('menu', function ($menu) {
+
+            // ── Menu spécifique PARTENAIRE ──────────────────────────────
+            if (auth()->user()->hasRole('partner')) {
+                $this->staticMenu($menu, ['title' => __('partner::partner.title'), 'order' => 0]);
+
+                $this->mainRoute($menu, [
+                    'icon'   => 'ph ph-squares-four',
+                    'title'  => __('sidebar.dashboard'),
+                    'url'    => url('/app/partner-dashboard'),
+                    'active' => ['app/partner-dashboard'],
+                    'order'  => 1,
+                ]);
+
+                $this->mainRoute($menu, [
+                    'icon'   => 'ph ph-video',
+                    'title'  => __('video.title'),
+                    'url'    => url('/app/partner-videos'),
+                    'active' => ['app/partner-videos', 'app/partner-videos/*'],
+                    'order'  => 2,
+                ]);
+
+                return;
+            }
+
             if (auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])) {
                 $this->staticMenu($menu, ['title' =>  __('sidebar.main'), 'order' => 0]);
                 $this->mainRoute($menu, [
