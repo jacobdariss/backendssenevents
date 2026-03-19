@@ -44,7 +44,8 @@ class Kernel extends HttpKernel
         //    \App\Http\Middleware\Authenticate::class,
             // \App\Http\Middleware\CheckDeviceAuthorization::class,
             \App\Http\Middleware\UpdateDeviceActivity::class,
-            \App\Http\Middleware\RoleBasedRouteAccess::class, 
+            \App\Http\Middleware\RoleBasedRouteAccess::class,
+            \App\Http\Middleware\AdminSessionTimeout::class, 
         ],
 
         'api' => [

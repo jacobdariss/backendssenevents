@@ -40,12 +40,12 @@ Route::get('/', [FrontendController::class, 'index'])->name('user.login');
 Route::get('/web-qr-status/{id}', [WebQrLoginController::class, 'checkStatus'])->name('web-qr-status');
 
 
-Route::group(['prefix' => 'app', ['middleware' => ['auth','admin','admin.timeout']]], function () {
+Route::group(['prefix' => 'app', 'middleware' => ['auth','admin']], function () {
     // Language Switch
     Route::get('language/{language}', [LanguageController::class, 'switch'])->name('language.switch');
     Route::post('set-user-setting', [BackendController::class, 'setUserSetting'])->name('backend.setUserSetting');
     Route::post('check-in-trash', [SearchController::class, 'check_in_trash'])->name('check-in-trash');
-    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin','admin.timeout']], function () {
+    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin']], function () {
         Route::post('update-player-id', [UserController::class, 'update_player_id'])->name('update-player-id');
         Route::get('get_search_data', [SearchController::class, 'get_search_data'])->name('get_search_data');
 
@@ -70,7 +70,7 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin','admin.timeout
           *
           * ---------------------------------------------------------------------
           */
-        Route::group(['middleware' => ['admin','admin.timeout']], function () {
+        Route::group(['middleware' => ['admin']], function () {
             Route::get('settings/{vue_capture?}', [SettingController::class, 'index'])->name('settings')->where('vue_capture', '^(?!storage).*$');
             Route::get('settings-data', [SettingController::class, 'index_data']);
             Route::post('settings', [SettingController::class, 'store'])->name('settings.store');
@@ -107,7 +107,7 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin','admin.timeout
     * These routes need view-backend permission
     * --------------------------------------------------------------------
     */
-    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin','admin.timeout']], function () {
+    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin']], function () {
 
         Route::get('/dashboard', [BackendController::class, 'index'])->name('home');
         Route::get('/daterange', [BackendController::class, 'daterange'])->name('daterange');
