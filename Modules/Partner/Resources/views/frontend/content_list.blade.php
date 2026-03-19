@@ -11,7 +11,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="ph ph-film-strip me-2"></i>{{ $title }}</h4>
-        @if(in_array($content_type, ['movie', 'tvshow', 'livetv']))
+        @if(in_array($content_type, ['movie', 'livetv']) || ($content_type === 'tvshow' && $items->isNotEmpty()))
             @php
                 $createRoute = match($content_type) {
                     'movie'  => route('partner.movies.create'),
