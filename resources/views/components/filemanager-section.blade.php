@@ -125,7 +125,6 @@
                                 mkdir($partnerImageDir, 0777, true);
                             }
                             // Pointer directement vers le dossier image — pas de navigation
-                            $partnerFolder = $partnerFolder . '/image';
                             $folders[] = $formatFolder($partnerFolder);
                         } elseif ($activeDisk === 'local') {
                             $root = storage_path('app/public');
@@ -1019,8 +1018,7 @@
             mediaModal.addEventListener('shown.bs.modal', function() {
                 if (FileManager.config.partnerFolder && !FileManager.state.currentFolder) {
                     // Ouvrir directement le dossier image du partenaire
-                    const imageFolder = FileManager.config.partnerFolder + '/image';
-                    FileManager.navigation.openFolder(imageFolder);
+                    FileManager.navigation.openFolder(FileManager.config.partnerFolder);
                 }
             });
             // Reset currentFolder à la fermeture pour permettre la réouverture
