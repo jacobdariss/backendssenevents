@@ -13,8 +13,7 @@
     <div class="alert alert-success mb-3">{{ session('success') }}</div>
 @endif
 
-{{ html()->form('PUT', $content_type === 'movie' ? route($content_type === 'movie' ? 'partner.movies.update' : 'partner.tvshows.update', $item->id)
-    ->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->open() }}
+{{ html()->form('PUT', $content_type === 'movie' ? route('partner.movies.update', $item->id) : route('partner.tvshows.update', $item->id))->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->open() }}
 
     @method('PUT')
 
