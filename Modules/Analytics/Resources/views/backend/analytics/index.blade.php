@@ -125,21 +125,30 @@
     </div>
     <div class="col-md-5">
         <div class="card">
-            <div class="card-header"><h6 class="mb-0"><i class="ph ph-globe me-2"></i>{{ __('analytics::analytics.by_country') }}</h6></div>
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-credit-card me-2"></i>{{ __('analytics::analytics.payment_gateways') }}</h6></div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
                     <thead><tr>
-                        <th>{{ __('analytics::analytics.country') }}</th>
-                        <th class="text-end">{{ __('analytics::analytics.views') }}</th>
-                        <th class="text-end">%</th>
+                        <th>Gateway</th>
+                        <th class="text-end">{{ __('analytics::analytics.transactions') }}</th>
+                        <th class="text-end">Revenus</th>
                     </tr></thead>
                     <tbody>
-                        @php $total = $byCountry->sum('views') ?: 1; @endphp
-                        @forelse($byCountry as $row)
+                        @php $totalRev = $gatewayStats->sum('revenue') ?: 1; @endphp
+                        @forelse($gatewayStats as $row)
                         <tr>
-                            <td>{{ $row->country_code ?? '—' }}</td>
-                            <td class="text-end">{{ number_format($row->views) }}</td>
-                            <td class="text-end text-muted small">{{ round($row->views/$total*100,1) }}%</td>
+                            <td>
+                                <span class="badge bg-secondary text-uppercase">{{ $row['gateway'] }}</span>
+                            </td>
+                            <td class="text-end fw-bold">{{ number_format($row['transactions']) }}</td>
+                            <td class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <div class="progress flex-grow-1" style="height:6px;max-width:60px">
+                                        <div class="progress-bar bg-warning" style="width:{{ round($row['revenue']/$totalRev*100) }}%"></div>
+                                    </div>
+                                    <span class="small text-muted">{{ number_format($row['revenue'],0,',',' ') }}</span>
+                                </div>
+                            </td>
                         </tr>
                         @empty
                         <tr><td colspan="3" class="text-center text-muted py-3">{{ __('messages.no_record_found') }}</td></tr>

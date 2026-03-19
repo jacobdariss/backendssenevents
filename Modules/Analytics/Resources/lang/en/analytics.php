@@ -40,4 +40,7 @@ return [
     'by_plan' => 'By plan',
 
     'all_time' => 'All time',
+    'payment_gateways' => 'Payment Gateways',
+    'transactions' => 'Transactions',
+
 ];

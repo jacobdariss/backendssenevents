@@ -73,6 +73,42 @@ class AnalyticsService
         return $q->groupBy('platform')->orderByDesc('views')->get();
     }
 
+    public function paymentGatewayStats(Carbon $from, Carbon $to): \Illuminate\Support\Collection
+    {
+        // Transactions PPV par gateway
+        $ppv = \Modules\Frontend\Models\PayperviewTransaction::select(
+                'payment_type',
+                DB::raw('COUNT(*) as transactions'),
+                DB::raw('SUM(amount) as revenue'))
+            ->whereBetween('created_at', [$from, $to])
+            ->where('payment_status', 'success')
+            ->groupBy('payment_type')
+            ->get()
+            ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => $r->transactions, 'revenue' => $r->revenue, 'type' => 'PPV']);
+
+        // Abonnements par gateway
+        $subs = DB::table('subscriptions_transactions')
+            ->select('payment_type',
+                DB::raw('COUNT(*) as transactions'),
+                DB::raw('SUM(total_amount) as revenue'))
+            ->whereBetween('created_at', [$from, $to])
+            ->groupBy('payment_type')
+            ->get()
+            ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => $r->transactions, 'revenue' => $r->revenue, 'type' => 'Abonnement']);
+
+        return collect($ppv)->merge($subs)
+            ->groupBy('gateway')
+            ->map(function($rows, $gateway) {
+                return [
+                    'gateway'      => $gateway,
+                    'transactions' => $rows->sum('transactions'),
+                    'revenue'      => round($rows->sum('revenue'), 2),
+                ];
+            })
+            ->values()
+            ->sortByDesc('revenue');
+    }
+
     public function viewsByCountry(Carbon $from, Carbon $to, ?int $partnerId = null, int $limit = 10): \Illuminate\Support\Collection
     {
         $q = EntertainmentView::select('country_code', DB::raw('COUNT(*) as views'))

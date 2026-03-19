@@ -40,4 +40,7 @@ return [
     'by_plan' => 'Par plan',
 
     'all_time' => 'Tout le temps',
+    'payment_gateways' => 'Passerelles de paiement',
+    'transactions' => 'Transactions',
+
 ];

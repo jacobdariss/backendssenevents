@@ -28,6 +28,7 @@ class AnalyticsController extends Controller
         $byDevice      = $this->analytics->viewsByDevice($from, $to);
         $byPlatform    = $this->analytics->viewsByPlatform($from, $to);
         $byCountry     = $this->analytics->viewsByCountry($from, $to);
+        $gatewayStats  = $this->analytics->paymentGatewayStats($from, $to);
         $topContent    = $this->analytics->topContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $revenuePerDay = $this->analytics->revenuePerDay($from, $to);
         $subsStats     = $this->analytics->subscriptionStats($from, $to);
