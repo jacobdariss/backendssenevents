@@ -73,6 +73,11 @@ class PartnerVideoController extends Controller
             $data['partner_proposed_price'] = null;
         }
 
+        // Si Local, utiliser le fichier sélectionné comme URL vidéo
+        if ($request->video_upload_type === 'Local' && $request->filled('video_file')) {
+            $data['video_url_input'] = extractFileNameFromUrl($request->video_file, 'video');
+        }
+
         // Extraire le nom de fichier des URLs
         foreach (['thumbnail_url', 'poster_url', 'poster_tv_url'] as $field) {
             if (!empty($data[$field])) {

@@ -172,7 +172,7 @@
                         {{ html()->text('video_file_input', old('video_file_input', $video->video_url_input))->class('form-control')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerVideourl')->attribute('data-hidden-input', 'file_url_video') }}
                     </div>
                     <div class="mt-2" id="selectedImageContainerVideourl"></div>
-                    {{ html()->hidden('video_url_input')->id('file_url_video')->value(old('video_url_input', $video->video_url_input)) }}
+                    {{ html()->hidden('video_file')->id('file_url_video') }}
                 </div>
 
                 </div>{{-- end video url/file/embed --}}
