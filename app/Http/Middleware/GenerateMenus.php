@@ -67,6 +67,15 @@ class GenerateMenus
                     ]);
                 }
 
+                // Analytics partenaire
+                $this->staticMenu($menu, [
+                    'title'  => __('analytics::analytics.title'),
+                    'url'    => url('/app/partner-analytics'),
+                    'icon'   => 'ph ph-chart-pie-slice',
+                    'active' => ['app/partner-analytics'],
+                    'order'  => 99,
+                ]);
+
                 if (in_array('livetv', $allowedTypes)) {
                     $this->mainRoute($menu, [
                         'icon'   => 'ph ph-broadcast',
@@ -114,6 +123,15 @@ class GenerateMenus
                 'active' => ['app/genres','app/genres/*'],
                 'permission' => ['view_genres'],
                 'order' => 0,
+            ]);
+
+            // Analytics admin
+            $this->staticMenu($menu, [
+                'title'      => __('analytics::analytics.title'),
+                'url'        => url('/app/analytics'),
+                'icon'       => 'ph ph-chart-pie-slice',
+                'active'     => ['app/analytics', 'app/analytics/*'],
+                'order'      => 5,
             ]);
 
             if(isenablemodule('movie')==1){

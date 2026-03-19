@@ -1,164 +1,81 @@
 <?php
-
 namespace Modules\Analytics\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Analytics\Services\AnalyticsService;
+use Modules\Partner\Models\Partner;
+use Modules\Entertainment\Models\Entertainment;
+use Modules\Episode\Models\Episode;
 use Modules\Video\Models\Video;
-use Modules\Entertainment\Models\EntertainmentView;
-use Modules\Entertainment\Models\Like;
 
 class AnalyticsController extends Controller
 {
-    /**
-     * Display the analytics dashboard.
-     */
+    protected AnalyticsService $analytics;
+
+    public function __construct(AnalyticsService $analytics)
+    {
+        $this->analytics = $analytics;
+    }
+
     public function index(Request $request)
     {
-        $isPartner = auth()->user()->hasRole('partner');
-        $partnerId = $isPartner ? optional(auth()->user()->partner)->id : null;
+        $period = $request->get('period', '30d');
+        [$from, $to] = $this->analytics->getPeriodDates($period);
 
-        // Period filter: 7, 30, 90 days (default 30)
-        $days = (int) $request->get('days', 30);
-        if (!in_array($days, [7, 30, 90])) {
-            $days = 30;
-        }
-
-        $since = now()->subDays($days)->startOfDay();
-
-        // Base query scoped to partner if applicable
-        $videoQuery = Video::query()->whereNull('videos.deleted_at');
-        if ($isPartner && $partnerId) {
-            $videoQuery->where('videos.partner_id', $partnerId);
-        }
-
-        $videoIds = (clone $videoQuery)->pluck('id');
-
-        // Total views in period
-        $totalViews = EntertainmentView::whereIn('entertainment_id', $videoIds)
-            ->where('created_at', '>=', $since)
-            ->count();
-
-        // Total views all time
-        $totalViewsAllTime = EntertainmentView::whereIn('entertainment_id', $videoIds)->count();
-
-        // Unique viewers in period
-        $uniqueViewers = EntertainmentView::whereIn('entertainment_id', $videoIds)
-            ->where('created_at', '>=', $since)
-            ->whereNotNull('user_id')
-            ->distinct('user_id')
-            ->count('user_id');
-
-        // Total videos
-        $totalVideos = $videoIds->count();
-
-        // Likes in period
-        $totalLikes = Like::whereIn('entertainment_id', $videoIds)
-            ->where('type', 'video')
-            ->where('is_like', 1)
-            ->where('created_at', '>=', $since)
-            ->count();
-
-        // Top 10 most watched videos in period
-        $topVideos = (clone $videoQuery)
-            ->select('videos.id', 'videos.name', 'videos.poster_url')
-            ->withCount([
-                'entertainmentView as views_count' => function ($q) use ($since) {
-                    $q->where('created_at', '>=', $since);
-                },
-                'entertainmentLike as likes_count' => function ($q) use ($since) {
-                    $q->where('is_like', 1)->where('type', 'video')->where('created_at', '>=', $since);
-                },
-            ])
-            ->orderByDesc('views_count')
-            ->limit(10)
-            ->get()
-            ->each(function ($video) {
-                $video->poster_url = $video->poster_url
-                    ? setBaseUrlWithFileName($video->poster_url, 'image', 'video')
-                    : null;
-            });
+        $stats         = $this->analytics->globalStats($from, $to);
+        $viewsPerDay   = $this->analytics->viewsPerDay($from, $to);
+        $byDevice      = $this->analytics->viewsByDevice($from, $to);
+        $byPlatform    = $this->analytics->viewsByPlatform($from, $to);
+        $byCountry     = $this->analytics->viewsByCountry($from, $to);
+        $topContent    = $this->analytics->topContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $revenuePerDay = $this->analytics->revenuePerDay($from, $to);
+        $partners      = Partner::where('status', 1)->orderBy('name')->get();
+        $module_action = 'Analytics';
 
         return view('analytics::backend.analytics.index', compact(
-            'totalViews',
-            'totalViewsAllTime',
-            'uniqueViewers',
-            'totalVideos',
-            'totalLikes',
-            'topVideos',
-            'days',
-            'isPartner'
+            'stats','viewsPerDay','byDevice','byPlatform','byCountry',
+            'topContent','revenuePerDay','partners','period','module_action'
         ));
     }
 
-    /**
-     * Return daily view counts for chart (JSON).
-     */
-    public function chartData(Request $request)
+    public function partner(Request $request, int $partnerId)
     {
-        $isPartner = auth()->user()->hasRole('partner');
-        $partnerId = $isPartner ? optional(auth()->user()->partner)->id : null;
+        $partner = Partner::findOrFail($partnerId);
+        $period  = $request->get('period', '30d');
+        [$from, $to] = $this->analytics->getPeriodDates($period);
 
-        $days = (int) $request->get('days', 30);
-        if (!in_array($days, [7, 30, 90])) {
-            $days = 30;
-        }
+        $stats = [
+            'total_views' => $this->analytics->totalViews($from, $to, $partnerId),
+            'watch_time'  => $this->analytics->totalWatchTime($from, $to, $partnerId),
+            'ppv_revenue' => $this->analytics->ppvRevenue($from, $to, $partnerId),
+        ];
+        $viewsPerDay = $this->analytics->viewsPerDay($from, $to, $partnerId);
+        $byDevice    = $this->analytics->viewsByDevice($from, $to, $partnerId);
+        $byPlatform  = $this->analytics->viewsByPlatform($from, $to, $partnerId);
+        $byCountry   = $this->analytics->viewsByCountry($from, $to, $partnerId);
+        $topContent  = $this->analytics->topContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $module_action = 'Analytics';
 
-        $since = now()->subDays($days - 1)->startOfDay();
-
-        $videoIds = Video::query()
-            ->whereNull('deleted_at')
-            ->when($isPartner && $partnerId, fn($q) => $q->where('partner_id', $partnerId))
-            ->pluck('id');
-
-        $rawData = EntertainmentView::selectRaw('DATE(created_at) as date, COUNT(*) as total')
-            ->whereIn('entertainment_id', $videoIds)
-            ->where('created_at', '>=', $since)
-            ->groupBy('date')
-            ->orderBy('date')
-            ->pluck('total', 'date');
-
-        // Fill all days with 0 if no views
-        $labels = [];
-        $data = [];
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
-            $labels[] = now()->subDays($i)->format('d M');
-            $data[] = $rawData[$date] ?? 0;
-        }
-
-        return response()->json(['labels' => $labels, 'data' => $data]);
+        return view('analytics::backend.analytics.partner', compact(
+            'partner','stats','viewsPerDay','byDevice','byPlatform',
+            'byCountry','topContent','period','module_action'
+        ));
     }
 
-    /**
-     * Return top videos data for bar chart (JSON).
-     */
-    public function topVideos(Request $request)
+    public function partnerSelf(Request $request)
     {
-        $isPartner = auth()->user()->hasRole('partner');
-        $partnerId = $isPartner ? optional(auth()->user()->partner)->id : null;
+        $partner = Partner::where('user_id', auth()->id())->firstOrFail();
+        return $this->partner($request, $partner->id);
+    }
 
-        $days = (int) $request->get('days', 30);
-        if (!in_array($days, [7, 30, 90])) {
-            $days = 30;
-        }
-
-        $since = now()->subDays($days)->startOfDay();
-
-        $results = Video::query()
-            ->whereNull('videos.deleted_at')
-            ->when($isPartner && $partnerId, fn($q) => $q->where('videos.partner_id', $partnerId))
-            ->select('videos.id', 'videos.name')
-            ->withCount(['entertainmentView as views_count' => function ($q) use ($since) {
-                $q->where('created_at', '>=', $since);
-            }])
-            ->orderByDesc('views_count')
-            ->limit(10)
-            ->get();
-
-        return response()->json([
-            'labels' => $results->pluck('name'),
-            'data'   => $results->pluck('views_count'),
-        ]);
+    protected function resolveName($row): string
+    {
+        try {
+            if ($row->episode_id) return Episode::find($row->episode_id)?->name ?? 'Épisode #'.$row->episode_id;
+            if ($row->video_id)   return Video::find($row->video_id)?->name   ?? 'Vidéo #'.$row->video_id;
+            if ($row->entertainment_id) return Entertainment::find($row->entertainment_id)?->name ?? 'Contenu #'.$row->entertainment_id;
+        } catch (\Exception $e) {}
+        return 'Inconnu';
     }
 }
