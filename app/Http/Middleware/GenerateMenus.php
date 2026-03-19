@@ -242,7 +242,7 @@ class GenerateMenus
                 'icon'     => 'ph ph-handshake',
                 'title'    => __('partner::partner.title'),
                 'nickname' => 'partners',
-                'order'    => 5,
+                'order'    => 0,
             ]);
 
             $this->childMain($partner_menu, [
