@@ -90,7 +90,7 @@ class AnalyticsService
         $subs = DB::table('subscriptions_transactions')
             ->select('payment_type',
                 DB::raw('COUNT(*) as transactions'),
-                DB::raw('SUM(total_amount) as revenue'))
+                DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
             ->groupBy('payment_type')
             ->get()
@@ -241,7 +241,7 @@ class AnalyticsService
         return Subscription::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(total_amount) as revenue'))
+                DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
             ->groupBy('date')->orderBy('date')->get();
     }
@@ -250,7 +250,7 @@ class AnalyticsService
     {
         return Subscription::select('name',
                 DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(total_amount) as revenue'))
+                DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
             ->groupBy('name')
             ->orderByDesc('count')
