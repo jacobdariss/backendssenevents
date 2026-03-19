@@ -19,6 +19,9 @@ class LiveTvChannel extends BaseModel
     protected $fillable = [
         'name','slug','category_id','poster_url','thumb_url','access','plan_id','description','status','poster_tv_url',
         'partner_id',
+        'partner_proposed_price',
+        'price',
+        'purchase_type',
         'approval_status',
         'rejection_reason',
     ];

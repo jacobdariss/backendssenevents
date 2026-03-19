@@ -88,4 +88,11 @@ return [
     'admin_price_review_info'    => 'You can keep the partner\'s proposed price or set a different one.',
     'leave_blank_keep_proposed'   => 'Leave blank to keep partner\'s price',
 
+    'add_movie'    => 'Add Movie',
+    'edit_movie'   => 'Edit Movie',
+    'add_tvshow'   => 'Add TV Show',
+    'edit_tvshow'  => 'Edit TV Show',
+    'add_livetv'   => 'Add Live TV Channel',
+    'edit_livetv'  => 'Edit Live TV Channel',
+
 ];

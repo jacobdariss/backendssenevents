@@ -6,6 +6,8 @@ use Modules\Partner\Http\Controllers\Backend\PartnerValidationController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerAuthController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerDashboardController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerVideoController;
+use Modules\Partner\Http\Controllers\Frontend\PartnerContentController;
+use Modules\Partner\Http\Controllers\Frontend\PartnerLiveTvController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,9 +39,23 @@ Route::group(['prefix' => 'app', 'as' => 'partner.', 'middleware' => ['auth', 'r
     Route::post('partner-videos/store',      [PartnerVideoController::class, 'store'])->name('videos.store');
     Route::get('partner-videos/{id}/edit',   [PartnerVideoController::class, 'edit'])->name('videos.edit');
     Route::put('partner-videos/{id}/update', [PartnerVideoController::class, 'update'])->name('videos.update');
-    Route::get('partner-movies',    [PartnerDashboardController::class, 'movies'])->name('movies');
-    Route::get('partner-tvshows',   [PartnerDashboardController::class, 'tvshows'])->name('tvshows');
-    Route::get('partner-livetv',    [PartnerDashboardController::class, 'livetv'])->name('livetv');
+    Route::get('partner-movies',              [PartnerDashboardController::class, 'movies'])->name('movies');
+    Route::get('partner-movies/create',       [PartnerContentController::class, 'moviesCreate'])->name('movies.create');
+    Route::post('partner-movies/store',       [PartnerContentController::class, 'moviesStore'])->name('movies.store');
+    Route::get('partner-movies/{id}/edit',    [PartnerContentController::class, 'moviesEdit'])->name('movies.edit');
+    Route::put('partner-movies/{id}/update',  [PartnerContentController::class, 'moviesUpdate'])->name('movies.update');
+
+    Route::get('partner-tvshows',             [PartnerDashboardController::class, 'tvshows'])->name('tvshows');
+    Route::get('partner-tvshows/create',      [PartnerContentController::class, 'tvshowsCreate'])->name('tvshows.create');
+    Route::post('partner-tvshows/store',      [PartnerContentController::class, 'tvshowsStore'])->name('tvshows.store');
+    Route::get('partner-tvshows/{id}/edit',   [PartnerContentController::class, 'tvshowsEdit'])->name('tvshows.edit');
+    Route::put('partner-tvshows/{id}/update', [PartnerContentController::class, 'tvshowsUpdate'])->name('tvshows.update');
+
+    Route::get('partner-livetv',              [PartnerDashboardController::class, 'livetv'])->name('livetv');
+    Route::get('partner-livetv/create',       [PartnerLiveTvController::class, 'create'])->name('livetv.create');
+    Route::post('partner-livetv/store',       [PartnerLiveTvController::class, 'store'])->name('livetv.store');
+    Route::get('partner-livetv/{id}/edit',    [PartnerLiveTvController::class, 'edit'])->name('livetv.edit');
+    Route::put('partner-livetv/{id}/update',  [PartnerLiveTvController::class, 'update'])->name('livetv.update');
 });
 
 /*

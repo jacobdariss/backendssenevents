@@ -1,3 +1,7 @@
+@if(session('success'))
+    <div class="alert alert-success mb-3">{{ session('success') }}</div>
+@endif
+
 @extends('backend.layouts.app')
 
 @section('title') {{ $title }} — {{ $partner->name }} @endsection
@@ -7,6 +11,21 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="ph ph-film-strip me-2"></i>{{ $title }}</h4>
+        @if(in_array($content_type, ['movie', 'tvshow', 'livetv']))
+            @php
+                $createRoute = match($content_type) {
+                    'movie'  => route('partner.movies.create'),
+                    'tvshow' => route('partner.tvshows.create'),
+                    'livetv' => route('partner.livetv.create'),
+                    default  => null,
+                };
+            @endphp
+            @if($createRoute)
+            <a href="{{ $createRoute }}" class="btn btn-primary btn-sm">
+                <i class="ph ph-plus-circle me-1"></i>{{ __('messages.add') }}
+            </a>
+            @endif
+        @endif
     </div>
 
     <div class="card-body p-0">
@@ -18,6 +37,7 @@
                         <th>{{ __('messages.lbl_status') }}</th>
                         <th>{{ __('partner::partner.validation_title') }}</th>
                         <th>{{ __('messages.updated_at') }}</th>
+                        <th>{{ __('messages.action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,6 +77,21 @@
                             @endif
                         </td>
                         <td class="text-muted small">{{ $item->updated_at->format('d/m/Y') }}</td>
+                        <td>
+                            @php
+                                $editRoute = match($content_type) {
+                                    'movie'  => route('partner.movies.edit',  $item->id),
+                                    'tvshow' => route('partner.tvshows.edit', $item->id),
+                                    'livetv' => route('partner.livetv.edit',  $item->id),
+                                    default  => null,
+                                };
+                            @endphp
+                            @if($editRoute)
+                            <a href="{{ $editRoute }}" class="btn btn-warning-subtle btn-sm">
+                                <i class="ph ph-pencil"></i>
+                            </a>
+                            @endif
+                        </td>
                     </tr>
                     @empty
                     <tr>
