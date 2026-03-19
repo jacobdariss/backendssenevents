@@ -18,7 +18,7 @@
                     </div>
                     <div class="uploaded-image mb-2" id="selectedImageContainerLogo">
                         @if ($partner->logo_url)
-                            <img src="{{ $partner->logo_url }}" class="img-fluid mb-2 box-preview-image">
+                            <img src="{{ setBaseUrlWithFileName($partner->logo_url, 'image', 'partners') }}" class="img-fluid mb-2 box-preview-image">
                         @endif
                     </div>
                     {{ html()->hidden('logo_url')->id('logo_url_input')->value($partner->logo_url) }}

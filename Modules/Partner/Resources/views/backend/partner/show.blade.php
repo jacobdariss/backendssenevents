@@ -13,7 +13,8 @@
         <div class="card h-100">
             <div class="card-body text-center">
                 @if($partner->logo_url)
-                    <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}"
+                    @php $logoUrl = setBaseUrlWithFileName($partner->logo_url, 'image', 'partners'); @endphp
+                    <img src="{{ $logoUrl }}" alt="{{ $partner->name }}"
                          class="rounded-circle mb-3" style="width:90px;height:90px;object-fit:cover;">
                 @else
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white mx-auto mb-3"

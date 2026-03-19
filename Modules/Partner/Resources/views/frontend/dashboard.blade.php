@@ -6,7 +6,8 @@
 
 <div class="d-flex align-items-center gap-3 mb-4">
     @if($partner->logo_url)
-        <img src="{{ $partner->logo_url }}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
+        @php $logoUrl = setBaseUrlWithFileName($partner->logo_url, 'image', 'partners'); @endphp
+        <img src="{{ $logoUrl }}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
     @else
         <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
              style="width:48px;height:48px;font-size:20px;flex-shrink:0;">
