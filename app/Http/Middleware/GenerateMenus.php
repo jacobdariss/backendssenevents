@@ -238,6 +238,31 @@ class GenerateMenus
             ]);
 
 
+            $partner_menu = $this->parentMenu($menu, [
+                'icon'     => 'ph ph-handshake',
+                'title'    => __('partner::partner.title'),
+                'nickname' => 'partners',
+                'order'    => 5,
+            ]);
+
+            $this->childMain($partner_menu, [
+                'icon'       => 'ph ph-list',
+                'title'      => __('partner::partner.title'),
+                'route'      => 'backend.partners.index',
+                'active'     => ['app/partners', 'app/partners/*'],
+                'shortTitle' => 'P',
+                'order'      => 1,
+            ]);
+
+            $this->childMain($partner_menu, [
+                'icon'       => 'ph ph-seal-check',
+                'title'      => __('partner::partner.validation_title'),
+                'route'      => 'backend.partner-validation.index',
+                'active'     => ['app/partner-validation', 'app/partner-validation/*'],
+                'shortTitle' => 'V',
+                'order'      => 2,
+            ]);
+
             $permissionsToCheck = ['view_subscription', 'view_plans', 'view_planlimitation'];
 
             if (collect($permissionsToCheck)->contains(fn ($permission) => auth()->user()->can($permission))) {
@@ -428,33 +453,6 @@ class GenerateMenus
                     'permission' => ['view_notification_template'],
                     'order' => 0,
                 ]);
-
-
-
-            $partner_menu = $this->parentMenu($menu, [
-                'icon'     => 'ph ph-handshake',
-                'title'    => __('partner::partner.title'),
-                'nickname' => 'partners',
-                'order'    => 5,
-            ]);
-
-            $this->childMain($partner_menu, [
-                'icon'       => 'ph ph-list',
-                'title'      => __('partner::partner.title'),
-                'route'      => 'backend.partners.index',
-                'active'     => ['app/partners', 'app/partners/*'],
-                'shortTitle' => 'P',
-                'order'      => 1,
-            ]);
-
-            $this->childMain($partner_menu, [
-                'icon'       => 'ph ph-seal-check',
-                'title'      => __('partner::partner.validation_title'),
-                'route'      => 'backend.partner-validation.index',
-                'active'     => ['app/partner-validation', 'app/partner-validation/*'],
-                'shortTitle' => 'V',
-                'order'      => 2,
-            ]);
 
             $this->mainRoute($menu, [
                 'icon' => 'ph ph-gear-six',
