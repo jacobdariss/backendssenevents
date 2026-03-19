@@ -209,10 +209,30 @@ class PartnerSeasonEpisodeController extends Controller
         if ($request->access === 'pay-per-view' && $request->price) {
             $data['partner_proposed_price'] = $request->price;
         } else {
-            $data['access'] = 'free';
+            $data['access'] = $request->access ?? 'free';
             $data['price']  = null;
         }
 
+        // Traitement vidéo — même logique que l'admin
+        $videoType = $data['video_upload_type'] ?? null;
+        $videoUrl  = $data['video_url_input'] ?? null;
+        if ($videoType === 'Embedded') {
+            $data['video_url_input'] = $data['embed_code'] ?? '';
+        } elseif ($videoType === 'Local') {
+            $data['video_url_input'] = basename($videoUrl ?? '');
+        } else {
+            $data['video_url_input'] = $videoUrl;
+        }
+
+        // Traitement bande annonce
+        $trailerType = $data['trailer_url_type'] ?? null;
+        if ($trailerType === 'Embedded') {
+            $data['trailer_url'] = $data['trailer_embedded'] ?? '';
+        } elseif ($trailerType === 'Local') {
+            $data['trailer_url'] = basename($data['trailer_url'] ?? '');
+        }
+
+        // Images — extraire uniquement le nom de fichier
         foreach (['poster_url', 'poster_tv_url'] as $field) {
             if (!empty($data[$field])) {
                 $data[$field] = extractFileNameFromUrl($data[$field], 'episode');
@@ -263,9 +283,28 @@ class PartnerSeasonEpisodeController extends Controller
         if ($request->access === 'pay-per-view' && $request->price) {
             $data['partner_proposed_price'] = $request->price;
         } else {
-            $data['access'] = 'free';
+            $data['access'] = $request->access ?? 'free';
             $data['price']  = null;
             $data['partner_proposed_price'] = null;
+        }
+
+        // Traitement vidéo — même logique que l'admin
+        $videoType = $data['video_upload_type'] ?? null;
+        $videoUrl  = $data['video_url_input'] ?? null;
+        if ($videoType === 'Embedded') {
+            $data['video_url_input'] = $data['embed_code'] ?? '';
+        } elseif ($videoType === 'Local') {
+            $data['video_url_input'] = basename($videoUrl ?? '');
+        } else {
+            $data['video_url_input'] = $videoUrl;
+        }
+
+        // Traitement bande annonce
+        $trailerType = $data['trailer_url_type'] ?? null;
+        if ($trailerType === 'Embedded') {
+            $data['trailer_url'] = $data['trailer_embedded'] ?? '';
+        } elseif ($trailerType === 'Local') {
+            $data['trailer_url'] = basename($data['trailer_url'] ?? '');
         }
 
         foreach (['poster_url', 'poster_tv_url'] as $field) {

@@ -51,14 +51,8 @@ class PartnerContentController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'description'       => 'required|string',
-            'release_date'      => 'required',
-            'movie_access'      => 'required|in:free,pay-per-view',
-            'video_upload_type' => 'required',
-            'price'             => 'required_if:movie_access,pay-per-view|nullable|numeric|min:0',
-            'purchase_type'     => 'required_if:movie_access,pay-per-view',
-        ]);
+            'name' => 'required|string|max:255',
+        ]);  // minimal validation for partners
 
         $data                    = $request->except(['_token']);
         $data['type']            = 'movie';
@@ -72,6 +66,25 @@ class PartnerContentController extends Controller
         } else {
             $data['movie_access'] = 'free';
             $data['price'] = null;
+        }
+
+        // Traitement vidéo — même logique que l'admin
+        $videoType = $data['video_upload_type'] ?? null;
+        $videoUrl  = $data['video_url_input'] ?? null;
+        if ($videoType === 'Embedded') {
+            $data['video_url_input'] = $data['embed_code'] ?? '';
+        } elseif ($videoType === 'Local') {
+            $data['video_url_input'] = basename($videoUrl ?? '');
+        } else {
+            $data['video_url_input'] = $videoUrl;
+        }
+
+        // Traitement bande annonce
+        $trailerType = $data['trailer_url_type'] ?? null;
+        if ($trailerType === 'Embedded') {
+            $data['trailer_url'] = $data['trailer_embedded'] ?? '';
+        } elseif ($trailerType === 'Local') {
+            $data['trailer_url'] = basename($data['trailer_url'] ?? '');
         }
 
         foreach (['thumbnail_url', 'poster_url', 'poster_tv_url'] as $field) {
