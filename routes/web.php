@@ -204,3 +204,5 @@ Route::middleware(['web'])->group(function () {
 
 });
 
+// Partner Module Routes
+require base_path('Modules/Partner/Routes/web.php');
