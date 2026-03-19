@@ -243,7 +243,15 @@ class PartnerSeasonEpisodeController extends Controller
             }
         }
 
-        Episode::create($data);
+        $episode = Episode::create($data);
+        \Log::info('=== EPISODE CREATED ===', [
+            'id'               => $episode->id,
+            'video_upload_type'=> $episode->video_upload_type,
+            'video_url_input'  => $episode->video_url_input,
+            'trailer_url_type' => $episode->trailer_url_type,
+            'trailer_url'      => $episode->trailer_url,
+            'data_sent'        => array_keys($data),
+        ]);
 
         return redirect()->route('partner.tvshow.season.episodes', [$tvshowId, $seasonId])
             ->with('success', __('partner::partner.episode_created'));
