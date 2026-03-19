@@ -1,12 +1,12 @@
-@if(session('success'))
-    <div class="alert alert-success mb-3">{{ session('success') }}</div>
-@endif
-
 @extends('backend.layouts.app')
 
 @section('title') {{ $title }} — {{ $partner->name }} @endsection
 
 @section('content')
+
+@if(session('success'))
+    <div class="alert alert-success mb-3">{{ session('success') }}</div>
+@endif
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
