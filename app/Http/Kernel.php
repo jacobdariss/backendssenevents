@@ -80,6 +80,8 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         'admin' => \App\Http\Middleware\CheckAdmin::class,
+        'admin.timeout' => \App\Http\Middleware\AdminSessionTimeout::class,
+        'csp' => \App\Http\Middleware\ContentSecurityPolicy::class,
         'user' => \App\Http\Middleware\CheckUser::class,
         'checkModule' => \App\Http\Middleware\CheckModule::class,
         'checkInstallation' => \App\Http\Middleware\CheckInstallation::class,
