@@ -24,6 +24,8 @@
                     <option value="tvshow" {{ $type == 'tvshow' ? 'selected' : '' }}>{{ __('movie.tvshows') }}</option>
                     <option value="video" {{ $type == 'video' ? 'selected' : '' }}>{{ __('video.title') }}</option>
                     <option value="livetv" {{ $type == 'livetv' ? 'selected' : '' }}>{{ __('frontend.livetv') }}</option>
+                    <option value="season" {{ $type == 'season' ? 'selected' : '' }}>{{ __('episode.lbl_season') }}</option>
+                    <option value="episode" {{ $type == 'episode' ? 'selected' : '' }}>{{ __('episode.title') }}</option>
                 </select>
             </div>
             <div class="col-auto">

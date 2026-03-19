@@ -49,6 +49,7 @@ class Episode extends BaseModel
                           'video_quality_url','tmdb_id','tmdb_season','episode_number','poster_tv_url','enable_subtitle',
                         'poster_tv_url',
                         'price',
+        'partner_proposed_price',
                         'purchase_type',
                         'access_duration',
                         'discount',
@@ -149,6 +150,7 @@ class Episode extends BaseModel
             'id','slug','season_id','entertainment_id','plan_id','video_url_input','trailer_url','trailer_url_type','video_upload_type',
             'poster_url','poster_tv_url','is_restricted','name','content_rating','duration','release_date','IMDb_rating','description',
             'enable_quality','download_status','download_type','download_url','enable_download_quality','access','price',
+        'partner_proposed_price',
             'purchase_type','access_duration','discount','available_for','status','start_time','end_time','enable_subtitle',
             'subtitle_language','is_default_subtitle','tmdb_id','bunny_trailer_url','bunny_video_url',           
         ])

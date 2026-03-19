@@ -32,6 +32,7 @@ class Season extends BaseModel
         'status',
         'poster_tv_url',
         'price',
+        'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',

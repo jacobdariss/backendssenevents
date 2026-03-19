@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\ModuleTrait;
 use Modules\Entertainment\Models\Entertainment;
+use Modules\Episode\Models\Episode;
+use Modules\Season\Models\Season;
 use Modules\Video\Models\Video;
 use Modules\LiveTV\Models\LiveTvChannel;
 use Illuminate\Support\Facades\Schema;
@@ -34,6 +36,8 @@ class PartnerValidationController extends Controller
         $tvshows   = collect();
         $videos    = collect();
         $livetvs   = collect();
+        $seasons   = collect();
+        $episodes  = collect();
         $pendingCount = 0;
         $migrationNeeded = false;
 
@@ -43,7 +47,7 @@ class PartnerValidationController extends Controller
             $migrationNeeded = true;
             $module_action = 'List';
             return view('partner::backend.validation.index', compact(
-                'movies', 'tvshows', 'videos', 'livetvs',
+                'movies', 'tvshows', 'videos', 'livetvs', 'seasons', 'episodes',
                 'type', 'status', 'pendingCount', 'module_action', 'migrationNeeded'
             ));
         }
@@ -84,17 +88,41 @@ class PartnerValidationController extends Controller
             }
         }
 
+        if (in_array($type, ['all', 'season'])) {
+            if (Schema::hasColumn('seasons', 'approval_status')) {
+                $seasons = Season::with('partner')
+                    ->where('approval_status', $status)
+                    ->whereNotNull('partner_id')
+                    ->latest()->get();
+            }
+        }
+
+        if (in_array($type, ['all', 'episode'])) {
+            if (Schema::hasColumn('episodes', 'approval_status')) {
+                $episodes = Episode::with('partner')
+                    ->where('approval_status', $status)
+                    ->whereNotNull('partner_id')
+                    ->latest()->get();
+            }
+        }
+
         $pendingCount = Entertainment::where('approval_status', 'pending')->whereNotNull('partner_id')->count()
             + Video::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
 
         if (Schema::hasColumn('live_tv_channel', 'approval_status')) {
             $pendingCount += LiveTvChannel::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
         }
+        if (Schema::hasColumn('seasons', 'approval_status')) {
+            $pendingCount += Season::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
+        }
+        if (Schema::hasColumn('episodes', 'approval_status')) {
+            $pendingCount += Episode::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
+        }
 
         $module_action = 'List';
 
         return view('partner::backend.validation.index', compact(
-            'movies', 'tvshows', 'videos', 'livetvs',
+            'movies', 'tvshows', 'videos', 'livetvs', 'seasons', 'episodes',
             'type', 'status', 'pendingCount', 'module_action', 'migrationNeeded'
         ));
     }
@@ -151,6 +179,8 @@ class PartnerValidationController extends Controller
             'movie', 'tvshow' => Entertainment::find($id),
             'video'           => Video::find($id),
             'livetv'          => LiveTvChannel::find($id),
+            'season'          => Season::find($id),
+            'episode'         => Episode::find($id),
             default           => null,
         };
     }
