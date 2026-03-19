@@ -100,7 +100,33 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center text-muted py-4">{{ __('messages.no_record_found') }}</td>
+                        <td colspan="5" class="py-5">
+                            @if($content_type === 'tvshow')
+                                {{-- Guide pas-à-pas pour les séries TV --}}
+                                <div class="text-center">
+                                    <i class="ph ph-monitor-play text-muted" style="font-size:3rem;"></i>
+                                    <h5 class="mt-3">{{ __('partner::partner.no_tvshow_yet') }}</h5>
+                                    <p class="text-muted small mb-4">{{ __('partner::partner.tvshow_flow_desc') }}</p>
+
+                                    <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                                        <a href="{{ route('partner.tvshows.create') }}" class="btn btn-primary">
+                                            <i class="ph ph-plus-circle me-1"></i>
+                                            <strong>1.</strong> {{ __('partner::partner.add_tvshow') }}
+                                        </a>
+                                        <i class="ph ph-arrow-right text-muted"></i>
+                                        <span class="btn btn-outline-secondary disabled opacity-50">
+                                            <strong>2.</strong> {{ __('partner::partner.add_season') }}
+                                        </span>
+                                        <i class="ph ph-arrow-right text-muted"></i>
+                                        <span class="btn btn-outline-secondary disabled opacity-50">
+                                            <strong>3.</strong> {{ __('partner::partner.add_episode') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center text-muted">{{ __('messages.no_record_found') }}</div>
+                            @endif
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

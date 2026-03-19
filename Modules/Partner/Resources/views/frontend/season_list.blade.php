@@ -61,7 +61,25 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="text-center text-muted py-4">{{ __('messages.no_record_found') }}</td></tr>
+                    <tr>
+                        <td colspan="5" class="py-5">
+                            <div class="text-center">
+                                <i class="ph ph-stack text-muted" style="font-size:3rem;"></i>
+                                <h5 class="mt-3">{{ __('partner::partner.no_season_yet') }}</h5>
+                                <p class="text-muted small mb-4">{{ __('partner::partner.season_flow_desc') }}</p>
+                                <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                                    <a href="{{ route('partner.tvshow.season.create', $tvshow->id) }}" class="btn btn-primary">
+                                        <i class="ph ph-plus-circle me-1"></i>
+                                        <strong>1.</strong> {{ __('partner::partner.add_season') }}
+                                    </a>
+                                    <i class="ph ph-arrow-right text-muted"></i>
+                                    <span class="btn btn-outline-secondary disabled opacity-50">
+                                        <strong>2.</strong> {{ __('partner::partner.add_episode') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>

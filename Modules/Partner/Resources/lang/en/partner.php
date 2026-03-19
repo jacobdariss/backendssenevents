@@ -109,4 +109,10 @@ return [
     'lbl_season_number'  => 'Season Number',
     'lbl_episode_number' => 'Episode Number',
 
+    // Guided flow
+    'no_tvshow_yet'     => 'No TV show yet',
+    'tvshow_flow_desc'  => 'To add episodes, you must first create a TV show, then add a season.',
+    'no_season_yet'     => 'No season yet',
+    'season_flow_desc'  => 'To add episodes, start by creating a season for this TV show.',
+
 ];

@@ -109,4 +109,10 @@ return [
     'lbl_season_number'  => 'Numéro de saison',
     'lbl_episode_number' => 'Numéro d\'épisode',
 
+    // Flow guidé
+    'no_tvshow_yet'     => 'Aucune série TV pour le moment',
+    'tvshow_flow_desc'  => 'Pour ajouter des épisodes, vous devez d\'abord créer une série TV, puis une saison.',
+    'no_season_yet'     => 'Aucune saison pour le moment',
+    'season_flow_desc'  => 'Pour ajouter des épisodes, commencez par créer une saison pour cette série.',
+
 ];
