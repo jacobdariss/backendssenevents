@@ -636,8 +636,11 @@
                 let hasMediaFiles = false;
 
                 if (contents.length === 0) {
-                    html =
-                        '<div class="text-center text-muted">{{ __('frontend.no_files_found_in_folder') }}</div>';
+                    const uploadHint = FileManager.config.partnerFolder
+                        ? '<br><button class="btn btn-primary btn-sm mt-3" onclick="document.getElementById(\'nav-upload-files-tab\').click()">' +
+                          '<i class="ph ph-upload me-1"></i>{{ __('messages.upload_file') }}</button>'
+                        : '';
+                    html = '<div class="text-center text-muted py-4">{{ __('frontend.no_files_found_in_folder') }}' + uploadHint + '</div>';
                 } else {
                     contents.forEach(item => {
                         html += FileManager.render.generateItemHTML(item);
