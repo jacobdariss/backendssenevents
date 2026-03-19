@@ -64,6 +64,8 @@ class PartnerSeasonEpisodeController extends Controller
             'season_number' => 'required|integer|min:1',
         ]);
 
+        \Log::info('=== EPISODE STORE ===', $request->all());
+
         $data = $request->except(['_token']);
         $data['entertainment_id'] = $tvshow->id;
         $data['partner_id']       = $partner->id;
@@ -197,6 +199,8 @@ class PartnerSeasonEpisodeController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
+
+        \Log::info('=== EPISODE STORE ===', $request->all());
 
         $data = $request->except(['_token']);
         $data['entertainment_id'] = $tvshow->id;
