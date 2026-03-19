@@ -112,6 +112,12 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
         Route::get('/dashboard', [BackendController::class, 'index'])->name('home');
         Route::get('/daterange', [BackendController::class, 'daterange'])->name('daterange');
 
+        // Security (2FA + Permissions) — Super Admin only
+        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
+            Route::get('/', [SecurityController::class, 'index'])->name('index');
+            Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
+        });
+
         // Admin Management (Users & Roles)
         Route::group(['prefix' => 'admin-management', 'as' => 'admin-management.'], function () {
             Route::get('/', [AdminManagementController::class, 'index'])->name('index');
@@ -121,12 +127,6 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
             Route::post('roles', [AdminManagementController::class, 'storeRole'])->name('roles.store');
             Route::delete('roles/{id}', [AdminManagementController::class, 'destroyRole'])->name('roles.destroy');
         });
-        // Security (2FA + Permissions) — Super Admin only
-        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
-            Route::get('/', [SecurityController::class, 'index'])->name('index');
-            Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
-        });
-
         Route::get('google-auth', [BackendController::class, 'googleAuth'])->name('google-auth');
         Route::get('/get_revnue_chart_data/{type}', [BackendController::class, 'getRevenuechartData']);
         Route::get('/get_subscriber_chart_data/{type}', [BackendController::class, 'getSubscriberChartData']);

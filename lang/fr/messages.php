@@ -1726,6 +1726,7 @@ return [
   'min_8_chars'         => 'Minimum 8 caractères',
   'are_you_sure'        => 'Êtes-vous sûr ?',
   'error_occurred'      => 'Une erreur est survenue. Veuillez réessayer.',
+  'security'             => 'Sécurité',
   'cannot_delete_yourself' => 'Vous ne pouvez pas supprimer votre propre compte.',
 
 ];
