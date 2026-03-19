@@ -19,6 +19,7 @@ class AnalyticsService
         return match ($period) {
             '7d'    => [Carbon::now()->subDays(7)->startOfDay(),  Carbon::now()->endOfDay()],
             'month' => [Carbon::now()->startOfMonth(),            Carbon::now()->endOfDay()],
+            'all'   => [Carbon::createFromDate(2020, 1, 1)->startOfDay(), Carbon::now()->endOfDay()],
             default => [Carbon::now()->subDays(30)->startOfDay(), Carbon::now()->endOfDay()],
         };
     }

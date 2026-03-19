@@ -39,4 +39,5 @@ return [
     'subs_over_time' => 'Subscriptions over time',
     'by_plan' => 'By plan',
 
+    'all_time' => 'All time',
 ];

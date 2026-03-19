@@ -39,4 +39,5 @@ return [
     'subs_over_time' => 'Évolution des abonnements',
     'by_plan' => 'Par plan',
 
+    'all_time' => 'Tout le temps',
 ];
