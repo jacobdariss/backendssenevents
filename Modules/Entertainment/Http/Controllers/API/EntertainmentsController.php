@@ -2123,14 +2123,61 @@ class EntertainmentsController extends Controller
         $user = auth()->user();
         $data = $request->all();
         $data['user_id'] = $user->id;
-        $viewData = EntertainmentView::where('entertainment_id', $request->entertainment_id)->where('user_id', $user->id)->first();
 
-        // Views are user-specific, no cache clearing needed
+        // ── Enrichir avec device, platform, pays, partenaire ──────────────
+        $data['device_type'] = getDeviceType($request);
+
+        // Platform depuis User-Agent
+        $ua = $request->header('User-Agent', '');
+        if (preg_match('/android/i', $ua))        $data['platform'] = 'Android';
+        elseif (preg_match('/iphone|ipad|ios/i', $ua)) $data['platform'] = 'iOS';
+        elseif (preg_match('/windows/i', $ua))    $data['platform'] = 'Windows';
+        elseif (preg_match('/macintosh|mac os/i', $ua)) $data['platform'] = 'macOS';
+        elseif (preg_match('/linux/i', $ua))      $data['platform'] = 'Linux';
+        else $data['platform'] = 'Web';
+
+        // IP & pays
+        $data['ip_address'] = $request->ip();
+        // Code pays depuis l'IP (si geoip disponible) ou depuis le header Cloudflare
+        $data['country_code'] = $request->header('CF-IPCountry')
+            ?? $request->header('X-Country-Code')
+            ?? null;
+
+        // content_type
+        $data['content_type'] = $request->content_type ?? null;
+
+        // partner_id depuis le contenu
+        if ($request->entertainment_id) {
+            $ent = \Modules\Entertainment\Models\Entertainment::select('partner_id')
+                ->find($request->entertainment_id);
+            if ($ent?->partner_id) $data['partner_id'] = $ent->partner_id;
+        }
+        if (!isset($data['partner_id']) && $request->episode_id) {
+            $ep = \Modules\Episode\Models\Episode::select('partner_id')
+                ->find($request->episode_id);
+            if ($ep?->partner_id) $data['partner_id'] = $ep->partner_id;
+        }
+
+        // episode_id & video_id
+        if ($request->episode_id) $data['episode_id'] = $request->episode_id;
+        if ($request->video_id)   $data['video_id']   = $request->video_id;
+        // ──────────────────────────────────────────────────────────────────
+
+        $viewData = EntertainmentView::where('entertainment_id', $request->entertainment_id)
+            ->where('user_id', $user->id)->first();
 
         if (!$viewData) {
             $views = EntertainmentView::create($data);
             $message = __('movie.view_add');
         } else {
+            // Mettre à jour les métadonnées si déjà vu
+            $viewData->update(array_filter([
+                'device_type'  => $data['device_type'],
+                'platform'     => $data['platform'],
+                'ip_address'   => $data['ip_address'],
+                'country_code' => $data['country_code'],
+                'partner_id'   => $data['partner_id'] ?? null,
+            ]));
             $message = __('movie.already_added');
         }
 

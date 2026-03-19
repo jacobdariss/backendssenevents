@@ -571,6 +571,19 @@ class WatchlistController extends Controller
 
         $result = ContinueWatch::updateOrCreate(['entertainment_id' => $request->entertainment_id, 'user_id' => $user->id, 'entertainment_type' => $type,'profile_id'=>$profile_id,'episode_id'=>$request->episode_id], $watch_data);
 
+        // ── Sync watch_time vers entertainment_views pour les analytics ────
+        if ($result && $request->watched_time) {
+            // Convertir HH:MM:SS en secondes
+            $parts = explode(':', $request->watched_time ?? '0:0:0');
+            $seconds = (int)($parts[0] ?? 0) * 3600 + (int)($parts[1] ?? 0) * 60 + (int)($parts[2] ?? 0);
+            if ($seconds > 0) {
+                \Modules\Entertainment\Models\EntertainmentView::where('user_id', $user->id)
+                    ->where('entertainment_id', $request->entertainment_id)
+                    ->update(['watch_time' => $seconds]);
+            }
+        }
+        // ──────────────────────────────────────────────────────────────────
+
         // Instant notification trigger when setting is 0 days
         if ($result && intval(setting('continue_watch')) === 0) {
             // Only notify if not fully watched
