@@ -2,6 +2,7 @@
 namespace Modules\Analytics\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Modules\Analytics\Services\AnalyticsService;
 use Modules\Partner\Models\Partner;
@@ -46,8 +47,8 @@ class AnalyticsController extends Controller
         // Pré-charger les stats partenaires en une seule requête (évite N+1 en vue)
         $partnerViewStats = \Modules\Entertainment\Models\EntertainmentView::select(
                 'partner_id',
-                \Illuminate\Support\Facades\DB::raw('COUNT(*) as views'),
-                \Illuminate\Support\Facades\DB::raw('SUM(watch_time) as watch_time'))
+                DB::raw('COUNT(*) as views'),
+                DB::raw('SUM(watch_time) as watch_time'))
             ->whereNotNull('partner_id')
             ->groupBy('partner_id')
             ->get()

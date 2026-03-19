@@ -43,8 +43,9 @@ fi
 echo -e "${YELLOW}🗄️  Migrations base de données...${NC}"
 php artisan migrate --force
 
-# 6. Vider les caches
+# 6. Vider les caches (optimize:clear d'abord pour éviter Class "view" does not exist)
 echo -e "${YELLOW}🔄 Vidage des caches...${NC}"
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
