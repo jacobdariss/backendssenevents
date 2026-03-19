@@ -168,15 +168,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof tinymce !== 'undefined') {
         tinymce.init({
             selector: '#description',
-            plugins: 'link image code lists',
-            toolbar: 'undo redo | styleselect | bold italic | bullist numlist | link | alignleft aligncenter alignright | removeformat | code',
-            height: 250,
-            skin: (window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'oxide-dark' : 'oxide',
-            content_css: (window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default',
+            plugins: 'link image code',
+            toolbar: 'undo redo | styleselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify | removeformat | code | image',
         });
     }
     if ($.fn.select2) {
         $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
+    }
+    const typeSelect = document.getElementById('video_upload_type');
+    if (typeSelect) {
+        handleVideoUrlTypeChange(typeSelect.value);
+        typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
     }
 });
 
@@ -195,12 +197,6 @@ function handleVideoUrlTypeChange(val) {
     if (val === 'Local') { if(fileSection) fileSection.classList.remove('d-none'); }
     else if (val === 'Embedded') { if(embedSection) embedSection.classList.remove('d-none'); }
     else if (val !== '') { if(urlSection) urlSection.classList.remove('d-none'); }
-}
-
-const typeSelect = document.getElementById('video_upload_type');
-if (typeSelect) {
-    document.addEventListener('DOMContentLoaded', function() { handleVideoUrlTypeChange(typeSelect.value); });
-    typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
 }
 </script>
 @endpush
