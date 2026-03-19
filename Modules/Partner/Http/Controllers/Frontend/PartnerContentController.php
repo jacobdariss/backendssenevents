@@ -37,7 +37,7 @@ class PartnerContentController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $partnerFolder = 'partners/' . $partner->id;
-        $page_type     = 'movie';
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $content_type  = 'movie';
 
         return view('partner::frontend.movie_create',
@@ -99,7 +99,7 @@ class PartnerContentController extends Controller
         $item->poster_tv_url = $item->poster_tv_url ? setBaseUrlWithFileName($item->poster_tv_url, 'image', 'movie') : null;
 
         $partnerFolder = 'partners/' . $partner->id;
-        $page_type     = 'movie';
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $content_type  = 'movie';
 
         return view('partner::frontend.movie_edit',
@@ -156,7 +156,7 @@ class PartnerContentController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $partnerFolder = 'partners/' . $partner->id;
-        $page_type     = 'movie'; // même stockage que films
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/ // même stockage que films
         $content_type  = 'tvshow';
 
         return view('partner::frontend.movie_create',
@@ -215,7 +215,7 @@ class PartnerContentController extends Controller
         $item->poster_tv_url = $item->poster_tv_url ? setBaseUrlWithFileName($item->poster_tv_url, 'image', 'movie') : null;
 
         $partnerFolder = 'partners/' . $partner->id;
-        $page_type     = 'movie'; // même stockage que films
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/ // même stockage que films
         $content_type  = 'tvshow';
 
         return view('partner::frontend.movie_edit',

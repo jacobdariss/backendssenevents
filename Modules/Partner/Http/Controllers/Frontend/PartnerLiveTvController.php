@@ -30,7 +30,7 @@ class PartnerLiveTvController extends Controller
         $plan          = Plan::where('status', 1)->get();
         $mediaUrls     = getMediaUrls();
         $assets        = ['textarea'];
-        $page_type     = 'livetvchannel';
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder = 'partners/' . $partner->id;
 
         return view('partner::frontend.livetv_create',
@@ -107,7 +107,7 @@ class PartnerLiveTvController extends Controller
         $plan          = Plan::where('status', 1)->get();
         $mediaUrls     = getMediaUrls();
         $assets        = ['textarea'];
-        $page_type     = 'livetvchannel';
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder = 'partners/' . $partner->id;
 
         return view('partner::frontend.livetv_edit',

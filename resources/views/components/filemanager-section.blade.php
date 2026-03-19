@@ -1007,13 +1007,18 @@
 
     // Auto-ouvrir le dossier partenaire si restreint
     if (FileManager.config.partnerFolder) {
-        // Quand la modal s'ouvre, naviguer directement dans le dossier partenaire
         const mediaModal = document.getElementById('exampleModal');
         if (mediaModal) {
             mediaModal.addEventListener('shown.bs.modal', function() {
                 if (FileManager.config.partnerFolder && !FileManager.state.currentFolder) {
-                    FileManager.navigation.openFolder(FileManager.config.partnerFolder);
+                    // Ouvrir directement le dossier image du partenaire
+                    const imageFolder = FileManager.config.partnerFolder + '/image';
+                    FileManager.navigation.openFolder(imageFolder);
                 }
+            });
+            // Reset currentFolder à la fermeture pour permettre la réouverture
+            mediaModal.addEventListener('hidden.bs.modal', function() {
+                FileManager.state.currentFolder = '';
             });
         }
     }

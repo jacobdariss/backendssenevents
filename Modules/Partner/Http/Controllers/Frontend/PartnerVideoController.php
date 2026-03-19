@@ -30,7 +30,7 @@ class PartnerVideoController extends Controller
         $video_quality   = $constants->get('video_quality', collect());
         $plan            = Plan::where('status', 1)->get();
         $mediaUrls       = getMediaUrls();
-        $page_type       = 'video';
+        $page_type       = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder   = 'partners/' . $partner->id;
 
         $assets = ['textarea'];
@@ -100,7 +100,7 @@ class PartnerVideoController extends Controller
         $video_quality   = $constants->get('video_quality', collect());
         $plan            = Plan::where('status', 1)->get();
         $mediaUrls       = getMediaUrls();
-        $page_type       = 'video';
+        $page_type       = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder   = 'partners/' . $partner->id;
 
         // Reconstituer les URLs complètes pour l'affichage
