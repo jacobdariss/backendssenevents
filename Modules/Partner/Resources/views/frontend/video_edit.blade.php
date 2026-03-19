@@ -143,7 +143,7 @@
                 {{-- Trailer URL type --}}
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_trailer_url_type') . ' <span class="text-danger">*</span>', 'trailer_url_type')->class('form-label') }}
-                    {{ html()->select('trailer_url_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_type'), ''), old('trailer_url_type', '$video->trailer_url_type ?? '''))->class('form-control select2')->id('trailer_url_type')->attribute('required') }}
+                    {{ html()->select('trailer_url_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_type'), ''), old('trailer_url_type', $video->trailer_url_type ?? ''))->class('form-control select2')->id('trailer_url_type')->attribute('required') }}
                     @error('trailer_url_type')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
@@ -151,16 +151,16 @@
                 <div class="col-md-8">
                     <div id="url_input">
                         {{ html()->label(__('movie.lbl_trailer_url') . ' <span class="text-danger">*</span>', 'trailer_url')->class('form-label') }}
-                        {{ html()->text('trailer_url', old('trailer_url', '$video->trailer_url ?? '''))->class('form-control')->placeholder(__('placeholder.lbl_trailer_url'))->id('trailer_url') }}
+                        {{ html()->text('trailer_url', old('trailer_url', $video->trailer_url ?? ''))->class('form-control')->placeholder(__('placeholder.lbl_trailer_url'))->id('trailer_url') }}
                     </div>
                     <div id="url_file_input" class="d-none">
                         {{ html()->label(__('movie.lbl_trailer_video'), 'trailer_video')->class('form-label') }}
                         <div class="input-group btn-video-link-upload">
                             {{ html()->button(__('placeholder.lbl_select_file') . '<i class="ph ph-upload"></i>')->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainertailerurl')->attribute('data-hidden-input', 'file_url_trailer') }}
-                            {{ html()->text('trailer_input', old('trailer_url', '$video->trailer_url ?? '''))->class('form-control')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainertailerurl')->attribute('data-hidden-input', 'file_url_trailer') }}
+                            {{ html()->text('trailer_input', old('trailer_url', $video->trailer_url ?? ''))->class('form-control')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainertailerurl')->attribute('data-hidden-input', 'file_url_trailer') }}
                         </div>
                         <div class="mt-2" id="selectedImageContainertailerurl"></div>
-                        {{ html()->hidden('trailer_url')->id('file_url_trailer')->value(old('trailer_url', '$video->trailer_url ?? ''')) }}
+                        {{ html()->hidden('trailer_url')->id('file_url_trailer')->value(old('trailer_url', $video->trailer_url ?? '')) }}
                     </div>
                     <div id="trailer_embed_input_section" class="d-none">
                         {{ html()->label(__('movie.lbl_embed_code'), 'trailer_embedded')->class('form-label') }}
