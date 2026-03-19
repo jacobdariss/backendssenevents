@@ -115,4 +115,8 @@ return [
     'no_season_yet'     => 'Aucune saison pour le moment',
     'season_flow_desc'  => 'Pour ajouter des épisodes, commencez par créer une saison pour cette série.',
 
+    // Validation images
+    'images_required_hint' => 'L\'affiche et l\'affiche TV sont obligatoires pour un bon affichage sur web et mobile.',
+    'image_required'        => 'Cette image est obligatoire.',
+
 ];

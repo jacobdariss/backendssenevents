@@ -115,4 +115,8 @@ return [
     'no_season_yet'     => 'No season yet',
     'season_flow_desc'  => 'To add episodes, start by creating a season for this TV show.',
 
+    // Image validation
+    'images_required_hint' => 'Poster and TV poster are required for proper display on web and mobile.',
+    'image_required'        => 'This image is required.',
+
 ];
