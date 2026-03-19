@@ -126,22 +126,21 @@
                         <td class="small text-muted">{{ $item->created_at->format('d/m/Y H:i') }}</td>
                         <td class="text-end">
                             <div class="d-flex gap-2 justify-content-end flex-wrap" id="actions-{{ $row['content_type'] }}-{{ $item->id }}">
-                                {{-- Bouton Voir la vidéo --}}
+                                {{-- Bouton Éditer --}}
                                 @php
-                                    $previewUrl = null;
-                                    $videoUrl = $item->video_url_input ?? null;
-                                    if ($videoUrl) {
-                                        // YouTube
-                                        if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $videoUrl, $m)) {
-                                            $previewUrl = 'https://www.youtube.com/watch?v=' . $m[1];
-                                        } else {
-                                            $previewUrl = $videoUrl;
-                                        }
-                                    }
+                                    $editUrl = match($row['content_type']) {
+                                        'movie'   => route('backend.movies.edit',          $item->id),
+                                        'tvshow'  => route('backend.tvshows.edit',         $item->id),
+                                        'video'   => route('backend.videos.edit',          $item->id),
+                                        'episode' => route('backend.episodes.edit',        $item->id),
+                                        'season'  => route('backend.entertainments.edit',  $item->entertainment_id ?? $item->id),
+                                        'livetv'  => route('backend.livetvs.edit', $item->id),
+                                        default   => null,
+                                    };
                                 @endphp
-                                @if($previewUrl)
-                                <a href="{{ $previewUrl }}" target="_blank" class="btn btn-sm btn-info">
-                                    <i class="ph ph-play-circle me-1"></i>{{ __('partner::partner.preview_video') }}
+                                @if($editUrl)
+                                <a href="{{ $editUrl }}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="ph ph-pencil me-1"></i>{{ __('messages.edit') }}
                                 </a>
                                 @endif
                                 @if($item->approval_status !== 'approved')
