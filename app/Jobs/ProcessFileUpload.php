@@ -79,6 +79,7 @@ class ProcessFileUpload implements ShouldQueue
                 }
 
                 Storage::disk('local')->put($folderPath, $file);
+                Log::info('File stored at: ' . $folderPath);
 
                 $fullPath = storage_path('app/' . $folderPath);
                 if (file_exists($fullPath)) {
