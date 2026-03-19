@@ -48,6 +48,7 @@ class AnalyticsController extends Controller
             'stats','viewsPerDay','byDevice','byPlatform','byCountry',
             'topContent','revenuePerDay','likesStats','likesPerDay','topLiked',
             'subsStats','subsPerDay','subsByPlan','churnRate',
+            'gatewayStats',
             'ratingsStats','topRated','recentComments',
             'partners','period','module_action'
         ));
