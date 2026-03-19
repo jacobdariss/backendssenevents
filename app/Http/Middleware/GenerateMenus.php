@@ -67,6 +67,15 @@ class GenerateMenus
                     ]);
                 }
 
+                // Notifications partenaire
+                $this->mainRoute($menu, [
+                    'title'  => __('partner::partner.notifications'),
+                    'url'    => url('/app/partner-notifications'),
+                    'icon'   => 'ph ph-bell',
+                    'active' => ['app/partner-notifications'],
+                    'order'  => 98,
+                ]);
+
                 // Analytics partenaire
                 $this->mainRoute($menu, [
                     'title'  => __('analytics::analytics.title'),

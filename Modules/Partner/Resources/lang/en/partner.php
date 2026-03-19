@@ -134,4 +134,16 @@ return [
     'contract_delete_confirm' => 'Delete this contract permanently?',
     'contract_deleted' => 'Contract deleted.',
 
+    // Notifications
+    'notif_approved_subject' => 'Your content ":name" has been approved',
+    'notif_rejected_subject' => 'Your content ":name" has been rejected',
+    'notif_hello' => 'Hello :name,',
+    'notif_approved_line' => 'Your content ":name" (:type) has been approved and is now visible on the platform.',
+    'notif_rejected_line' => 'Your content ":name" (:type) has unfortunately been rejected.',
+    'notif_rejection_reason' => 'Rejection reason',
+    'notif_view_dashboard' => 'View my dashboard',
+    'notifications' => 'Notifications',
+    'mark_all_read' => 'Mark all as read',
+    'no_notifications' => 'No notifications',
+
 ];

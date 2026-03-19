@@ -134,4 +134,16 @@ return [
     'contract_delete_confirm' => 'Supprimer ce contrat définitivement ?',
     'contract_deleted' => 'Contrat supprimé.',
 
+    // Notifications
+    'notif_approved_subject' => 'Votre contenu ":name" a été approuvé',
+    'notif_rejected_subject' => 'Votre contenu ":name" a été refusé',
+    'notif_hello' => 'Bonjour :name,',
+    'notif_approved_line' => 'Votre contenu ":name" (:type) a été approuvé et est maintenant visible sur la plateforme.',
+    'notif_rejected_line' => 'Votre contenu ":name" (:type) a malheureusement été refusé.',
+    'notif_rejection_reason' => 'Motif de refus',
+    'notif_view_dashboard' => 'Voir mon tableau de bord',
+    'notifications' => 'Notifications',
+    'mark_all_read' => 'Tout marquer comme lu',
+    'no_notifications' => 'Aucune notification',
+
 ];

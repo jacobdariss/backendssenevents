@@ -11,6 +11,8 @@ use Modules\Season\Models\Season;
 use Modules\Video\Models\Video;
 use Modules\LiveTV\Models\LiveTvChannel;
 use Illuminate\Support\Facades\Schema;
+use Modules\Partner\Notifications\ContentStatusNotification;
+use App\Models\User;
 
 class PartnerValidationController extends Controller
 {
@@ -147,6 +149,8 @@ class PartnerValidationController extends Controller
 
         $model->update($updateData);
 
+        $this->notifyPartner($model, 'approved');
+
         return response()->json(['status' => true, 'message' => __('partner::partner.content_approved')]);
     }
 
@@ -167,11 +171,35 @@ class PartnerValidationController extends Controller
 
         $model->update($updateData);
 
+        $this->notifyPartner($model, 'rejected', $request->input('rejection_reason'));
+
         $message = $request->filled('rejection_reason')
             ? __('partner::partner.content_rejected_reason')
             : __('partner::partner.content_rejected');
 
         return response()->json(['status' => true, 'message' => $message]);
+    }
+
+
+    private function notifyPartner($model, string $status, ?string $reason = null): void
+    {
+        try {
+            $partnerId = $model->partner_id ?? null;
+            if (!$partnerId) return;
+
+            $partner = \Modules\Partner\Models\Partner::find($partnerId);
+            if (!$partner || !$partner->user_id) return;
+
+            $user = User::find($partner->user_id);
+            if (!$user || !$user->email) return;
+
+            $contentName = $model->name ?? 'Contenu #'.$model->id;
+            $contentType = class_basename($model);
+
+            $user->notify(new ContentStatusNotification($status, $contentName, $contentType, $reason));
+        } catch (\Exception $e) {
+            \Log::error('Partner notification failed: ' . $e->getMessage());
+        }
     }
 
     private function resolveModel(string $contentType, int $id)

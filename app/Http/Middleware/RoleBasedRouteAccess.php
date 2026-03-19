@@ -48,6 +48,7 @@ class RoleBasedRouteAccess
                 'app/partner-tvshows',
                 'app/partner-livetv',
                 'app/partner-analytics',
+                'app/partner-notifications',
                 'app/setting/security',
             ];
             $isAllowed = false;
