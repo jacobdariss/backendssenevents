@@ -62,7 +62,7 @@
 
             <div>
                 <!-- Folder Navigation -->
-                <div class="mb-3" id="folder-navigation" style="display: none;">
+                <div class="mb-3" id="folder-navigation" style="display: none;"{{ isset($partnerFolder) && !empty($partnerFolder) ? ' data-partner-restricted="true"' : '' }}>
                     <div class="d-flex align-items-center justify-content-between">
                         <h3 class="mb-0" id="current-folder-name"></h3>
                         <div class="d-flex align-items-center gap-3">
@@ -435,7 +435,7 @@
                 }
 
                 // Update UI
-                document.getElementById('folder-navigation').style.display = 'block';
+                if (!FileManager.config.partnerFolder) document.getElementById('folder-navigation').style.display = 'block';
                 (function() {
                     const el = document.getElementById('current-folder-name');
                     const transKey = 'folder_' + folderName.toLowerCase();
@@ -470,7 +470,7 @@
                     FileManager.state.infiniteInitDone = false;
 
                     // Keep folder view visible, update header and reload contents
-                    document.getElementById('folder-navigation').style.display = 'block';
+                    if (!FileManager.config.partnerFolder) document.getElementById('folder-navigation').style.display = 'block';
                     (function() {
                         const base = parent.split('/').pop();
                         const el = document.getElementById('current-folder-name');
