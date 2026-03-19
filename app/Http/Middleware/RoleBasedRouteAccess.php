@@ -61,6 +61,10 @@ class RoleBasedRouteAccess
             if (in_array($path, ['app/logout', 'app/my-profile']) || str_starts_with($path, 'app/my-profile') || str_starts_with($path, 'app/profile')) {
                 $isAllowed = true;
             }
+            // Allow media library access for file uploads
+            if (str_starts_with($path, 'app/media-library')) {
+                $isAllowed = true;
+            }
             if (!$isAllowed) {
                 return redirect()->route('partner.dashboard');
             }
