@@ -45,7 +45,7 @@ Route::group(['prefix' => 'app', 'middleware' => ['auth','admin']], function () 
     Route::get('language/{language}', [LanguageController::class, 'switch'])->name('language.switch');
     Route::post('set-user-setting', [BackendController::class, 'setUserSetting'])->name('backend.setUserSetting');
     Route::post('check-in-trash', [SearchController::class, 'check_in_trash'])->name('check-in-trash');
-    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin']], function () {
+    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin','admin.timeout']], function () {
         Route::post('update-player-id', [UserController::class, 'update_player_id'])->name('update-player-id');
         Route::get('get_search_data', [SearchController::class, 'get_search_data'])->name('get_search_data');
 
@@ -107,7 +107,7 @@ Route::group(['prefix' => 'app', 'middleware' => ['auth','admin']], function () 
     * These routes need view-backend permission
     * --------------------------------------------------------------------
     */
-    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin']], function () {
+    Route::group(['as' => 'backend.', 'middleware' => ['auth','admin','admin.timeout']], function () {
 
         Route::get('/dashboard', [BackendController::class, 'index'])->name('home');
         Route::get('/daterange', [BackendController::class, 'daterange'])->name('daterange');
@@ -180,7 +180,7 @@ Route::group(['prefix' => 'app', 'middleware' => ['auth','admin']], function () 
     Route::get('currencies_data', [SettingsController::class, 'getCurrencyData'])->name('backend.currencies.getCurrencyData');
 
 
-    Route::group(['as' => 'backend.', 'middleware' => ['auth', 'admin']], function () {
+    Route::group(['as' => 'backend.', 'middleware' => ['auth', 'admin', 'admin.timeout']], function () {
         Route::post('/clear-cache-config', function () {
             \Artisan::call('config:clear');
             \Artisan::call('cache:clear');
@@ -208,6 +208,6 @@ Route::middleware(['web'])->group(function () {
 require base_path('Modules/Partner/Routes/web.php');
 
 // Journal d'audit
-Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'admin']], function () {
+Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'admin', 'admin.timeout']], function () {
     Route::get('audit-log', [App\Http\Controllers\Backend\AuditLogController::class, 'index'])->name('audit-log.index');
 });
