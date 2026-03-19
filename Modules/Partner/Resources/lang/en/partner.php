@@ -120,4 +120,18 @@ return [
     'image_required'        => 'This image is required.',
 
     'preview_video' => 'Preview Video',
+    // Contract
+    'contract_title' => 'Contract & Agreement',
+    'contract_hint' => 'Upload the signed contract with the partner (PDF, Word).',
+    'contract_status' => 'Contract status',
+    'contract_none' => 'No contract',
+    'contract_pending' => 'Awaiting signature',
+    'contract_signed' => 'Signed',
+    'contract_signed_at' => 'Signed on',
+    'contract_file' => 'Contract file',
+    'contract_formats' => 'Accepted: PDF, DOC, DOCX (max 10 MB)',
+    'contract_current' => 'Current contract',
+    'contract_delete_confirm' => 'Delete this contract permanently?',
+    'contract_deleted' => 'Contract deleted.',
+
 ];

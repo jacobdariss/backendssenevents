@@ -88,6 +88,7 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'a
     });
 
     Route::resource('partners', PartnerController::class)->names('partners');
+    Route::delete('partners/{id}/contract', [PartnerController::class, 'deleteContract'])->name('partners.contract.delete');
 
     // Partner content validation
     Route::prefix('partner-validation')->name('partner-validation.')->group(function () {

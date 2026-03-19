@@ -5,6 +5,7 @@ namespace Modules\Partner\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Modules\Partner\Http\Requests\PartnerRequest;
 use Modules\Partner\Services\PartnerService;
 use Modules\Partner\Models\Partner;
@@ -126,6 +127,16 @@ class PartnerController extends Controller
 
         $data['allowed_content_types'] = $request->input('content_types', []);
 
+        // Gestion upload contrat
+        if ($request->hasFile('contract_file') && $request->file('contract_file')->isValid()) {
+            $file      = $request->file('contract_file');
+            $filename  = 'contract_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/partners/contracts', $filename);
+            $data['contract_url'] = 'partners/contracts/' . $filename;
+        } else {
+            unset($data['contract_file']);
+        }
+
         $partner = $this->partnerService->getPartnerById($id);
 
         // Create user account if partner doesn't have one and admin requests it
@@ -146,6 +157,16 @@ class PartnerController extends Controller
 
         $message = __('messages.update_form', ['form' => __('partner.title')]);
         return redirect()->route('backend.partners.index')->with('success', $message);
+    }
+
+    public function deleteContract(int $id)
+    {
+        $partner = $this->partnerService->getPartnerById($id);
+        if ($partner->contract_url) {
+            Storage::delete('public/' . $partner->contract_url);
+            $partner->update(['contract_url' => null, 'contract_status' => 'none', 'contract_signed_at' => null]);
+        }
+        return redirect()->back()->with('success', __('partner::partner.contract_deleted'));
     }
 
     public function destroy(int $id)

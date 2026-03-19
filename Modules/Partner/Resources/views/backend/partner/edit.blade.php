@@ -172,6 +172,78 @@
     </div>
 
     <div class="d-grid d-sm-flex justify-content-sm-end gap-3 mt-3">
+
+    {{-- ── Contrat & Accord ────────────────────────────────────────────────── --}}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="ph ph-file-pdf me-2"></i>{{ __('partner::partner.contract_title') }}</h6>
+            <small class="text-muted">{{ __('partner::partner.contract_hint') }}</small>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+
+                {{-- Statut du contrat --}}
+                <div class="col-md-4">
+                    {{ html()->label(__('partner::partner.contract_status'), 'contract_status')->class('form-label') }}
+                    {{ html()->select('contract_status', [
+                        'none'    => __('partner::partner.contract_none'),
+                        'pending' => __('partner::partner.contract_pending'),
+                        'signed'  => __('partner::partner.contract_signed'),
+                    ], old('contract_status', $partner->contract_status ?? 'none'))->class('form-control select2') }}
+                </div>
+
+                {{-- Date de signature --}}
+                <div class="col-md-4">
+                    {{ html()->label(__('partner::partner.contract_signed_at'), 'contract_signed_at')->class('form-label') }}
+                    {{ html()->date('contract_signed_at', old('contract_signed_at', $partner->contract_signed_at))->class('form-control') }}
+                </div>
+
+                {{-- Badge statut actuel --}}
+                <div class="col-md-4 d-flex align-items-end">
+                    @if($partner->contract_status === 'signed')
+                        <span class="badge bg-success fs-6 p-2"><i class="ph ph-check-circle me-1"></i>{{ __('partner::partner.contract_signed') }}</span>
+                    @elseif($partner->contract_status === 'pending')
+                        <span class="badge bg-warning text-dark fs-6 p-2"><i class="ph ph-clock me-1"></i>{{ __('partner::partner.contract_pending') }}</span>
+                    @else
+                        <span class="badge bg-secondary fs-6 p-2"><i class="ph ph-x-circle me-1"></i>{{ __('partner::partner.contract_none') }}</span>
+                    @endif
+                </div>
+
+                {{-- Upload PDF --}}
+                <div class="col-12">
+                    {{ html()->label(__('partner::partner.contract_file'), 'contract_file')->class('form-label') }}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="ph ph-file-pdf"></i></span>
+                        {{ html()->file('contract_file')->class('form-control')->attribute('accept', '.pdf,.doc,.docx') }}
+                    </div>
+                    <small class="text-muted">{{ __('partner::partner.contract_formats') }}</small>
+                </div>
+
+                {{-- Contrat existant --}}
+                @if($partner->contract_url)
+                <div class="col-12">
+                    <div class="d-flex align-items-center gap-3 p-3 border rounded">
+                        <i class="ph ph-file-pdf text-danger fs-3"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">{{ __('partner::partner.contract_current') }}</div>
+                            <small class="text-muted">{{ basename($partner->contract_url) }}</small>
+                        </div>
+                        <a href="{{ asset('storage/' . $partner->contract_url) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="ph ph-download me-1"></i>{{ __('messages.download') }}
+                        </a>
+                        <a href="{{ route('backend.partners.contract.delete', $partner->id) }}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('{{ __('partner::partner.contract_delete_confirm') }}')">
+                            <i class="ph ph-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                @endif
+
+            </div>
+        </div>
+    </div>
+
         {{ html()->submit(trans('messages.save'))->class('btn btn-md btn-primary float-right')->id('submit-button') }}
     </div>
     {{ html()->form()->close() }}

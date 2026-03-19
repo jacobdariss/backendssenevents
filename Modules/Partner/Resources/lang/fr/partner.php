@@ -120,4 +120,18 @@ return [
     'image_required'        => 'Cette image est obligatoire.',
 
     'preview_video' => 'Voir la vidéo',
+    // Contract
+    'contract_title' => 'Contrat & Accord',
+    'contract_hint' => 'Téléversez le contrat signé avec le partenaire (PDF, Word).',
+    'contract_status' => 'Statut du contrat',
+    'contract_none' => 'Aucun contrat',
+    'contract_pending' => 'En attente de signature',
+    'contract_signed' => 'Signé',
+    'contract_signed_at' => 'Date de signature',
+    'contract_file' => 'Fichier contrat',
+    'contract_formats' => 'Formats acceptés : PDF, DOC, DOCX (max 10 Mo)',
+    'contract_current' => 'Contrat actuel',
+    'contract_delete_confirm' => 'Supprimer ce contrat définitivement ?',
+    'contract_deleted' => 'Contrat supprimé.',
+
 ];
