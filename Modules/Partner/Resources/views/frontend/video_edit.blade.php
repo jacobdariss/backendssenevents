@@ -35,7 +35,7 @@
 
                 {{-- Thumbnail --}}
                 <div class="col-md-6">
-                    <label class="form-label">{{ __('video.lbl_thumbnail') }}</label>
+                    <label class="form-label">{{ __('movie.lbl_thumbnail') }}</label>
                     <div class="input-group btn-file-upload">
                         {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))
                             ->class('input-group-text form-control')->type('button')
@@ -55,7 +55,7 @@
 
                 {{-- Poster --}}
                 <div class="col-md-6">
-                    <label class="form-label">{{ __('video.lbl_poster') }}</label>
+                    <label class="form-label">{{ __('movie.lbl_poster') }}</label>
                     <div class="input-group btn-file-upload">
                         {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))
                             ->class('input-group-text form-control')->type('button')
@@ -82,7 +82,7 @@
 
                 {{-- Duration --}}
                 <div class="col-md-3">
-                    <label class="form-label">{{ __('video.lbl_duration') }} <span class="text-danger">*</span></label>
+                    <label class="form-label">{{ __('movie.lbl_duration') }} <span class="text-danger">*</span></label>
                     {{ html()->text('duration', old('duration', $video->duration))->class('form-control')->attribute('required') }}
                     @error('duration')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
@@ -104,28 +104,28 @@
                 {{-- Plan --}}
                 <div class="col-md-4">
                     <label class="form-label">{{ __('movie.lbl_select_plan') }}</label>
-                    {{ html()->select('plan_id', $plan->pluck('name', 'id')->prepend(__('placeholder.lbl_select'), ''), old('plan_id', $video->plan_id))
+                    {{ html()->select('plan_id', $plan->pluck('name', 'id')->prepend(__('movie.lbl_select'), ''), old('plan_id', $video->plan_id))
                         ->class('form-control select2') }}
                 </div>
 
                 {{-- Upload type --}}
                 <div class="col-md-4">
-                    <label class="form-label">{{ __('video.lbl_video_upload_type') }} <span class="text-danger">*</span></label>
-                    {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select'), ''), old('video_upload_type', $video->video_upload_type))
+                    <label class="form-label">{{ __('movie.lbl_video_upload_type') }} <span class="text-danger">*</span></label>
+                    {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('movie.lbl_select'), ''), old('video_upload_type', $video->video_upload_type))
                         ->class('form-control select2')->attribute('required') }}
                 </div>
 
                 {{-- Video URL --}}
                 <div class="col-md-12">
-                    <label class="form-label">{{ __('video.lbl_video_url') }}</label>
+                    <label class="form-label">{{ __('movie.video_url_input') }}</label>
                     <input type="text" name="video_url_input" class="form-control"
-                           placeholder="{{ __('placeholder.lbl_enter_url') }}"
+                           placeholder="{{ __('movie.video_url_input') }}"
                            value="{{ old('video_url_input', $video->video_url_input) }}">
                 </div>
 
                 {{-- Description --}}
                 <div class="col-md-12">
-                    <label class="form-label">{{ __('movie.lbl_movie_description') }} <span class="text-danger">*</span></label>
+                    <label class="form-label">{{ __('movie.lbl_description') }} <span class="text-danger">*</span></label>
                     {{ html()->textarea('description', old('description', $video->description))->class('form-control')->rows(4)->attribute('required') }}
                     @error('description')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
