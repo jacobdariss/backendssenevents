@@ -8,6 +8,7 @@ use Modules\Entertainment\Models\EntertainmentView;
 use Modules\Frontend\Models\PayperviewTransaction;
 use Modules\Partner\Models\Partner;
 use Modules\Entertainment\Models\Like;
+use Modules\Entertainment\Models\Review;
 
 class AnalyticsService
 {
@@ -169,6 +170,67 @@ class AnalyticsService
             ->limit($limit)
             ->get();
     }
+
+    // ─── Notations (ratings) ────────────────────────────────────────────────
+    public function ratingsStats(Carbon $from, Carbon $to, ?int $partnerId = null): array
+    {
+        $q = Review::whereBetween('reviews.created_at', [$from, $to])
+            ->where('reviews.rating', '>', 0);
+        if ($partnerId) {
+            $q->join('entertainments', 'entertainments.id', '=', 'reviews.entertainment_id')
+              ->where('entertainments.partner_id', $partnerId);
+        }
+        $total  = $q->count();
+        $avg    = $total > 0 ? round($q->avg('reviews.rating'), 2) : 0;
+
+        // Distribution 1→5
+        $dist = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $q2 = Review::whereBetween('reviews.created_at', [$from, $to])->where('reviews.rating', $i);
+            if ($partnerId) {
+                $q2->join('entertainments', 'entertainments.id', '=', 'reviews.entertainment_id')
+                   ->where('entertainments.partner_id', $partnerId);
+            }
+            $dist[$i] = $q2->count();
+        }
+
+        return [
+            'total'        => $total,
+            'average'      => $avg,
+            'distribution' => $dist,
+        ];
+    }
+
+    public function topRatedContent(Carbon $from, Carbon $to, ?int $partnerId = null, int $limit = 10): \Illuminate\Support\Collection
+    {
+        $q = Review::select('reviews.entertainment_id',
+                DB::raw('AVG(reviews.rating) as avg_rating'),
+                DB::raw('COUNT(*) as review_count'))
+            ->whereBetween('reviews.created_at', [$from, $to])
+            ->where('reviews.rating', '>', 0);
+        if ($partnerId) {
+            $q->join('entertainments', 'entertainments.id', '=', 'reviews.entertainment_id')
+              ->where('entertainments.partner_id', $partnerId);
+        }
+        return $q->groupBy('reviews.entertainment_id')
+            ->having('review_count', '>=', 1)
+            ->orderByDesc('avg_rating')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function recentComments(Carbon $from, Carbon $to, ?int $partnerId = null, int $limit = 10): \Illuminate\Support\Collection
+    {
+        $q = Review::with(['entertainment:id,name'])
+            ->whereBetween('created_at', [$from, $to])
+            ->whereNotNull('review')
+            ->where('review', '!=', '');
+        if ($partnerId) {
+            $q->whereHas('entertainment', fn($e) => $e->where('partner_id', $partnerId));
+        }
+        return $q->latest()->limit($limit)->get();
+    }
+
 
     public function globalStats(Carbon $from, Carbon $to): array
     {

@@ -144,6 +144,82 @@
         </div>
     </div>
 </div>
+{{-- Notations & Commentaires --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-star me-2"></i>{{ __('analytics::analytics.ratings') }}</h6></div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="display-5 fw-bold text-warning">{{ $ratingsStats['average'] }}</div>
+                    <div class="text-muted small">/ 5 — {{ number_format($ratingsStats['total']) }} {{ __('analytics::analytics.reviews') }}</div>
+                    <div class="mt-1">
+                        @for($i=1;$i<=5;$i++)
+                        <i class="ph {{ $i <= round($ratingsStats['average']) ? 'ph-star-fill text-warning' : 'ph-star text-muted' }}"></i>
+                        @endfor
+                    </div>
+                </div>
+                @foreach([5,4,3,2,1] as $star)
+                @php $pct = $ratingsStats['total'] > 0 ? round($ratingsStats['distribution'][$star] / $ratingsStats['total'] * 100) : 0; @endphp
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="small text-muted" style="width:20px">{{ $star }}★</span>
+                    <div class="progress flex-grow-1" style="height:6px">
+                        <div class="progress-bar bg-warning" style="width:{{ $pct }}%"></div>
+                    </div>
+                    <span class="small text-muted" style="width:30px">{{ $pct }}%</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-trophy me-2"></i>{{ __('analytics::analytics.top_rated') }}</h6></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>{{ __('messages.name') }}</th>
+                        <th class="text-end">Note</th>
+                        <th class="text-end">Avis</th>
+                    </tr></thead>
+                    <tbody>
+                        @forelse($topRated as $row)
+                        <tr>
+                            <td class="small">{{ $row->content_name }}</td>
+                            <td class="text-end">
+                                <span class="badge bg-warning text-dark">★ {{ number_format($row->avg_rating, 1) }}</span>
+                            </td>
+                            <td class="text-end text-muted small">{{ $row->review_count }}</td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="3" class="text-center text-muted py-3 small">{{ __('messages.no_record_found') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-chat-dots me-2"></i>{{ __('analytics::analytics.recent_comments') }}</h6></div>
+            <div class="card-body p-0" style="max-height:320px;overflow-y:auto">
+                @forelse($recentComments as $comment)
+                <div class="p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="small fw-semibold">{{ $comment->entertainment?->name ?? '—' }}</span>
+                        <span class="badge bg-warning text-dark ms-2 flex-shrink-0">★ {{ $comment->rating }}</span>
+                    </div>
+                    <p class="small text-muted mb-1">{{ Str::limit($comment->review, 100) }}</p>
+                    <span class="text-muted" style="font-size:11px">{{ $comment->created_at?->diffForHumans() }}</span>
+                </div>
+                @empty
+                <div class="text-center text-muted py-4 small">{{ __('messages.no_record_found') }}</div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Likes / Dislikes --}}
 <div class="row g-3 mb-4">
     <div class="col-md-4">

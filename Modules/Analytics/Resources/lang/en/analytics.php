@@ -26,4 +26,9 @@ return [
     'likes_over_time' => 'Likes over time',
     'top_liked'       => 'Most liked content',
 
+    'ratings' => 'Ratings',
+    'reviews' => 'reviews',
+    'top_rated' => 'Top rated',
+    'recent_comments' => 'Recent comments',
+
 ];

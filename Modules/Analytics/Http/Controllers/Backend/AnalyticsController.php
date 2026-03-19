@@ -30,6 +30,9 @@ class AnalyticsController extends Controller
         $byCountry     = $this->analytics->viewsByCountry($from, $to);
         $topContent    = $this->analytics->topContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $revenuePerDay = $this->analytics->revenuePerDay($from, $to);
+        $ratingsStats  = $this->analytics->ratingsStats($from, $to);
+        $topRated      = $this->analytics->topRatedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $recentComments= $this->analytics->recentComments($from, $to, null, 8);
         $likesStats    = $this->analytics->likesStats($from, $to);
         $likesPerDay   = $this->analytics->likesPerDay($from, $to);
         $topLiked      = $this->analytics->topLikedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
@@ -39,6 +42,7 @@ class AnalyticsController extends Controller
         return view('analytics::backend.analytics.index', compact(
             'stats','viewsPerDay','byDevice','byPlatform','byCountry',
             'topContent','revenuePerDay','likesStats','likesPerDay','topLiked',
+            'ratingsStats','topRated','recentComments',
             'partners','period','module_action'
         ));
     }
@@ -59,6 +63,9 @@ class AnalyticsController extends Controller
         $byPlatform  = $this->analytics->viewsByPlatform($from, $to, $partnerId);
         $byCountry   = $this->analytics->viewsByCountry($from, $to, $partnerId);
         $topContent  = $this->analytics->topContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $ratingsStats = $this->analytics->ratingsStats($from, $to, $partnerId);
+        $topRated     = $this->analytics->topRatedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $recentComments = $this->analytics->recentComments($from, $to, $partnerId, 8);
         $likesStats  = $this->analytics->likesStats($from, $to, $partnerId);
         $likesPerDay = $this->analytics->likesPerDay($from, $to, $partnerId);
         $topLiked    = $this->analytics->topLikedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
@@ -67,6 +74,7 @@ class AnalyticsController extends Controller
         return view('analytics::backend.analytics.partner', compact(
             'partner','stats','viewsPerDay','byDevice','byPlatform',
             'byCountry','topContent','likesStats','likesPerDay','topLiked',
+            'ratingsStats','topRated','recentComments',
             'period','module_action'
         ));
     }

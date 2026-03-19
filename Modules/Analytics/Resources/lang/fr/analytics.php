@@ -26,4 +26,9 @@ return [
     'likes_over_time' => 'Évolution des likes',
     'top_liked'       => 'Contenus les plus aimés',
 
+    'ratings' => 'Notations',
+    'reviews' => 'avis',
+    'top_rated' => 'Mieux notés',
+    'recent_comments' => 'Commentaires récents',
+
 ];
