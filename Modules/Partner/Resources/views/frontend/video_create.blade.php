@@ -183,57 +183,7 @@
 
 @push('after-scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    if (typeof tinymce !== 'undefined') {
-        tinymce.init({
-            selector: '#description',
-            plugins: 'link image code',
-            toolbar: 'undo redo | styleselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify | removeformat | code | image',
-        });
-    }
-    if ($.fn.select2) {
-        $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
-    }
-    const typeSelect = document.getElementById('video_upload_type');
-    if (typeSelect) {
-        handleVideoUrlTypeChange(typeSelect.value);
-        typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
-    }
-});
-
-    // Trailer URL type handler
-    function handleTrailerUrlTypeChange(val) {
-        const fileInput  = document.getElementById('url_file_input');
-        const urlInput   = document.getElementById('url_input');
-        const embedInput = document.getElementById('trailer_embed_input_section');
-        const trailerUrl = document.querySelector('input[name="trailer_url"]');
-        const trailerFile = document.querySelector('input[name="trailer_video"]');
-
-        if (!fileInput || !urlInput || !embedInput) return;
-        fileInput.classList.add('d-none');
-        urlInput.classList.add('d-none');
-        embedInput.classList.add('d-none');
-        trailerUrl?.removeAttribute('required');
-        trailerFile?.removeAttribute('required');
-
-        switch(val) {
-            case 'Local':    fileInput.classList.remove('d-none'); break;
-            case 'Embedded': embedInput.classList.remove('d-none'); break;
-            case 'URL': case 'YouTube': case 'HLS': case 'Vimeo': case 'x265':
-                urlInput.classList.remove('d-none');
-                trailerUrl?.setAttribute('required', 'required');
-                break;
-        }
-    }
-
-    const trailerTypeSelect = document.getElementById('trailer_url_type');
-    if (trailerTypeSelect) {
-        handleTrailerUrlTypeChange(trailerTypeSelect.value);
-        trailerTypeSelect.addEventListener('change', function() { handleTrailerUrlTypeChange(this.value); });
-        if (typeof $ !== 'undefined' && $.fn.select2) {
-            $('#trailer_url_type').on('select2:select', function(e) { handleTrailerUrlTypeChange(e.target.value); });
-        }
-    }
+// ── Définitions des fonctions (avant DOMContentLoaded) ────────────────────
 
 function showPlanSelection(show) {
     const planDiv = document.getElementById('planSelection');
@@ -251,5 +201,62 @@ function handleVideoUrlTypeChange(val) {
     else if (val === 'Embedded') { if(embedSection) embedSection.classList.remove('d-none'); }
     else if (val !== '') { if(urlSection) urlSection.classList.remove('d-none'); }
 }
+
+function handleTrailerUrlTypeChange(val) {
+    const fileInput  = document.getElementById('url_file_input');
+    const urlInput   = document.getElementById('url_input');
+    const embedInput = document.getElementById('trailer_embed_input_section');
+    const trailerUrl = document.querySelector('input[name="trailer_url"]');
+    const trailerFile = document.querySelector('input[name="trailer_video"]');
+    if (!fileInput || !urlInput || !embedInput) return;
+    fileInput.classList.add('d-none');
+    urlInput.classList.add('d-none');
+    embedInput.classList.add('d-none');
+    trailerUrl?.removeAttribute('required');
+    trailerFile?.removeAttribute('required');
+    switch(val) {
+        case 'Local':    fileInput.classList.remove('d-none'); break;
+        case 'Embedded': embedInput.classList.remove('d-none'); break;
+        case 'URL': case 'YouTube': case 'HLS': case 'Vimeo': case 'x265':
+            urlInput.classList.remove('d-none');
+            trailerUrl?.setAttribute('required', 'required');
+            break;
+    }
+}
+
+// ── Init au chargement ─────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function () {
+    // TinyMCE
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: '#description',
+            plugins: 'link image code',
+            toolbar: 'undo redo | styleselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify | removeformat | code | image',
+        });
+    }
+
+    // Select2
+    if ($.fn.select2) {
+        $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
+    }
+
+    // Video upload type
+    const typeSelect = document.getElementById('video_upload_type');
+    if (typeSelect) {
+        handleVideoUrlTypeChange(typeSelect.value);
+        typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
+    }
+
+    // Trailer URL type
+    const trailerTypeSelect = document.getElementById('trailer_url_type');
+    if (trailerTypeSelect) {
+        handleTrailerUrlTypeChange(trailerTypeSelect.value);
+        trailerTypeSelect.addEventListener('change', function() { handleTrailerUrlTypeChange(this.value); });
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+            $('#trailer_url_type').on('select2:select', function(e) { handleTrailerUrlTypeChange(e.target.value); });
+        }
+    }
+});
 </script>
 @endpush
