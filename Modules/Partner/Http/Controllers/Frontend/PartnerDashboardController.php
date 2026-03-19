@@ -143,4 +143,22 @@ class PartnerDashboardController extends Controller
             return Entertainment::where('partner_id', $partnerId)->count();
         } catch (\Exception $e) { return 0; }
     }
+    public function notifications(Request $request)
+    {
+        $partner = $this->currentPartner();
+        if (!$partner || !$partner->user_id) return redirect()->route('partner.dashboard');
+
+        $user          = \Auth::user();
+        $notifications = $user->notifications()->latest()->paginate(20);
+        $unreadCount   = $user->unreadNotifications()->count();
+
+        return view('partner::frontend.notifications', compact('partner', 'notifications', 'unreadCount'));
+    }
+
+    public function markNotificationsRead(Request $request)
+    {
+        \Auth::user()->unreadNotifications->markAsRead();
+        return redirect()->back()->with('success', __('partner::partner.mark_all_read'));
+    }
+
 }
