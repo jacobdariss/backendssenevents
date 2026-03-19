@@ -67,6 +67,9 @@ class Video extends BaseModel
         'enable_clips',
         'bunny_trailer_url',
         'bunny_video_url',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
     ];
 
     protected $casts = [
@@ -328,4 +331,9 @@ class Video extends BaseModel
         return $query;
     }
 
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
+    }
 }
