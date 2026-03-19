@@ -185,6 +185,82 @@
 </div>
 @endif
 
+{{-- Abonnements --}}
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="ph ph-credit-card me-2"></i>{{ __('analytics::analytics.subscriptions') }}</h6></div>
+    <div class="card-body">
+
+        {{-- KPIs abonnements --}}
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="border rounded p-3 text-center">
+                    <div class="fs-4 fw-bold text-primary">{{ number_format($subsStats['new']) }}</div>
+                    <div class="text-muted small">{{ __('analytics::analytics.new_subscriptions') }}</div>
+                    @if($subsStats['growth'] != 0)
+                    <div class="small {{ $subsStats['growth'] > 0 ? 'text-success' : 'text-danger' }}">
+                        <i class="ph {{ $subsStats['growth'] > 0 ? 'ph-trend-up' : 'ph-trend-down' }}"></i>
+                        {{ $subsStats['growth'] > 0 ? '+' : '' }}{{ $subsStats['growth'] }}% vs période préc.
+                    </div>
+                    @endif
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="border rounded p-3 text-center">
+                    <div class="fs-4 fw-bold text-success">{{ number_format($subsStats['active']) }}</div>
+                    <div class="text-muted small">{{ __('analytics::analytics.active_subscriptions') }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="border rounded p-3 text-center">
+                    <div class="fs-4 fw-bold text-danger">{{ $churnRate }}%</div>
+                    <div class="text-muted small">{{ __('analytics::analytics.churn_rate') }}</div>
+                    <div class="text-muted small">{{ number_format($subsStats['expired']) }} expirés</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="border rounded p-3 text-center">
+                    <div class="fs-4 fw-bold text-warning">{{ number_format($subsStats['revenue'], 0, ',', ' ') }} FCFA</div>
+                    <div class="text-muted small">{{ __('analytics::analytics.subscription_revenue') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            {{-- Courbe abonnements --}}
+            <div class="col-md-8">
+                <div class="card-body p-0">
+                    <p class="small text-muted mb-2">{{ __('analytics::analytics.subs_over_time') }}</p>
+                    <div style="position:relative;height:180px">
+                        <canvas id="subsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            {{-- Par plan --}}
+            <div class="col-md-4">
+                <p class="small text-muted mb-2">{{ __('analytics::analytics.by_plan') }}</p>
+                <table class="table table-sm mb-0">
+                    <thead><tr>
+                        <th>Plan</th>
+                        <th class="text-end">Abonnés</th>
+                        <th class="text-end">FCFA</th>
+                    </tr></thead>
+                    <tbody>
+                        @forelse($subsByPlan as $plan)
+                        <tr>
+                            <td class="small">{{ $plan->name ?? '—' }}</td>
+                            <td class="text-end small fw-bold">{{ number_format($plan->count) }}</td>
+                            <td class="text-end small text-muted">{{ number_format($plan->revenue, 0, ',', ' ') }}</td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="3" class="text-center text-muted small py-2">{{ __('messages.no_record_found') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Notations & Commentaires --}}
 <div class="row g-3 mb-4">
     <div class="col-md-4">
@@ -367,6 +443,29 @@ new Chart(document.getElementById('platformChart'), {
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
 });
 @endif
+// Abonnements chart
+const subsData = @json($subsPerDay);
+if (document.getElementById('subsChart') && subsData.length) {
+    new Chart(document.getElementById('subsChart'), {
+        type: 'bar',
+        data: {
+            labels: subsData.map(d => d.date),
+            datasets: [
+                { label: 'Nouveaux abonnés', data: subsData.map(d => d.count), backgroundColor: 'rgba(99,102,241,0.7)', yAxisID: 'y' },
+                { label: 'Revenus (FCFA)', data: subsData.map(d => d.revenue), type:'line', borderColor:'#ffc107', backgroundColor:'transparent', yAxisID: 'y1', tension:0.4 }
+            ]
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom' } },
+            scales:{
+                y:{ beginAtZero:true, position:'left' },
+                y1:{ beginAtZero:true, position:'right', grid:{ drawOnChartArea:false } }
+            }
+        }
+    });
+}
+
 // Likes chart
 const likesData = @json($likesPerDay);
 if (document.getElementById('likesChart') && likesData.length) {

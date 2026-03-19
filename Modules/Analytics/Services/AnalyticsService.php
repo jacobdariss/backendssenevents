@@ -9,6 +9,8 @@ use Modules\Frontend\Models\PayperviewTransaction;
 use Modules\Partner\Models\Partner;
 use Modules\Entertainment\Models\Like;
 use Modules\Entertainment\Models\Review;
+use Modules\Subscriptions\Models\Subscription;
+use Modules\Subscriptions\Models\Plan;
 
 class AnalyticsService
 {
@@ -174,6 +176,59 @@ class AnalyticsService
             ->limit($limit)
             ->get();
     }
+
+    // ─── Abonnements ─────────────────────────────────────────────────────────
+    public function subscriptionStats(Carbon $from, Carbon $to): array
+    {
+        $new      = Subscription::whereBetween('created_at', [$from, $to])->count();
+        $active   = Subscription::where('status', 'active')->count();
+        $expired  = Subscription::where('status', 'expired')->whereNotNull('end_date')->count();
+        $revenue  = (float) (Subscription::whereBetween('created_at', [$from, $to])
+                        ->where('status', 'active')->sum('total_amount') ?? 0);
+
+        $prevDays = Carbon::now()->subDays(60)->startOfDay();
+        $newPrev  = Subscription::whereBetween('created_at', [$prevDays, $from])->count();
+
+        return [
+            'new'         => $new,
+            'new_prev'    => $newPrev,
+            'active'      => $active,
+            'expired'     => $expired,
+            'revenue'     => round($revenue, 2),
+            'growth'      => $newPrev > 0 ? round(($new - $newPrev) / $newPrev * 100, 1) : 0,
+        ];
+    }
+
+    public function subscriptionsPerDay(Carbon $from, Carbon $to): \Illuminate\Support\Collection
+    {
+        return Subscription::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(total_amount) as revenue'))
+            ->whereBetween('created_at', [$from, $to])
+            ->groupBy('date')->orderBy('date')->get();
+    }
+
+    public function subscriptionsByPlan(Carbon $from, Carbon $to): \Illuminate\Support\Collection
+    {
+        return Subscription::select('name',
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(total_amount) as revenue'))
+            ->whereBetween('created_at', [$from, $to])
+            ->groupBy('name')
+            ->orderByDesc('count')
+            ->get();
+    }
+
+    public function churnRate(Carbon $from, Carbon $to): float
+    {
+        $expired = Subscription::whereBetween('end_date', [$from, $to])
+            ->where('status', 'expired')->count();
+        $total   = Subscription::where('status', 'active')
+            ->orWhere('status', 'expired')->count();
+        return $total > 0 ? round($expired / $total * 100, 1) : 0;
+    }
+
 
     // ─── Notations (ratings) ────────────────────────────────────────────────
     public function ratingsStats(Carbon $from, Carbon $to, ?int $partnerId = null): array

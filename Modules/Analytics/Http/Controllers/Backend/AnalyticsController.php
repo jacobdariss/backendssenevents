@@ -30,6 +30,10 @@ class AnalyticsController extends Controller
         $byCountry     = $this->analytics->viewsByCountry($from, $to);
         $topContent    = $this->analytics->topContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $revenuePerDay = $this->analytics->revenuePerDay($from, $to);
+        $subsStats     = $this->analytics->subscriptionStats($from, $to);
+        $subsPerDay    = $this->analytics->subscriptionsPerDay($from, $to);
+        $subsByPlan    = $this->analytics->subscriptionsByPlan($from, $to);
+        $churnRate     = $this->analytics->churnRate($from, $to);
         $ratingsStats  = $this->analytics->ratingsStats($from, $to);
         $topRated      = $this->analytics->topRatedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $recentComments= $this->analytics->recentComments($from, $to, null, 8);
@@ -42,6 +46,7 @@ class AnalyticsController extends Controller
         return view('analytics::backend.analytics.index', compact(
             'stats','viewsPerDay','byDevice','byPlatform','byCountry',
             'topContent','revenuePerDay','likesStats','likesPerDay','topLiked',
+            'subsStats','subsPerDay','subsByPlan','churnRate',
             'ratingsStats','topRated','recentComments',
             'partners','period','module_action'
         ));

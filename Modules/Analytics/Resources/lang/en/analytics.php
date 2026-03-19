@@ -31,4 +31,12 @@ return [
     'top_rated' => 'Top rated',
     'recent_comments' => 'Recent comments',
 
+    'subscriptions' => 'Subscriptions',
+    'new_subscriptions' => 'New subscriptions',
+    'active_subscriptions' => 'Active subscriptions',
+    'churn_rate' => 'Churn rate',
+    'subscription_revenue' => 'Subscription revenue',
+    'subs_over_time' => 'Subscriptions over time',
+    'by_plan' => 'By plan',
+
 ];

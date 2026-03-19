@@ -31,4 +31,12 @@ return [
     'top_rated' => 'Mieux notés',
     'recent_comments' => 'Commentaires récents',
 
+    'subscriptions' => 'Abonnements',
+    'new_subscriptions' => 'Nouveaux abonnements',
+    'active_subscriptions' => 'Abonnements actifs',
+    'churn_rate' => 'Taux de résiliation',
+    'subscription_revenue' => 'Revenus abonnements',
+    'subs_over_time' => 'Évolution des abonnements',
+    'by_plan' => 'Par plan',
+
 ];
