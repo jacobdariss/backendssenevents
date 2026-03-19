@@ -174,5 +174,10 @@ $(document).ready(function () {
     if ($.fn.select2) { $('.select2').select2({ language: { noResults: () => "{{ __('messages.no_results_found') }}" } }); }
     const ts = $('#video_upload_type'); if(ts.length) { handleVideoUrlTypeChange(ts.val()); ts.on('change select2:select', function(){ handleVideoUrlTypeChange($(this).val()); }); }
 });
+    // Synchroniser TinyMCE avant soumission
+    document.getElementById('form-submit')?.addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') tinymce.triggerSave();
+    });
+
 </script>
 @endpush

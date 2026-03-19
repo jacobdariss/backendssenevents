@@ -187,5 +187,10 @@ $(document).ready(function () {
     const t = $('input[name="type"]:checked').val() || 't_url';
     showStreamtypeSelection(t);
 });
+    // Synchroniser TinyMCE avant soumission
+    document.getElementById('form-submit')?.addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') tinymce.triggerSave();
+    });
+
 </script>
 @endpush

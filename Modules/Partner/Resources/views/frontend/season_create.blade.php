@@ -122,5 +122,10 @@ $(document).ready(function () {
     if (typeof tinymce !== 'undefined') { tinymce.init({ selector: '#description', plugins: 'link image code', toolbar: 'undo redo | bold italic | link | code' }); }
     if ($.fn.select2) { $('.select2').select2(); }
 });
+    // Synchroniser TinyMCE avant soumission
+    document.getElementById('form-submit')?.addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') tinymce.triggerSave();
+    });
+
 </script>
 @endpush

@@ -214,7 +214,7 @@
                 {{-- Description --}}
                 <div class="col-md-12">
                     {{ html()->label(__('movie.lbl_description') . ' <span class="text-danger">*</span>', 'description')->class('form-label') }}
-                    {{ html()->textarea('description', old('description', $item->description))->class('form-control')->id('description')->rows(5)->attribute('required') }}
+                    {{ html()->textarea('description', old('description', $item->description))->class('form-control')->id('description')->rows(5) }}
                     @error('description')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
@@ -270,5 +270,10 @@ $(document).ready(function () {
     const ts = $('#video_upload_type'); if(ts.length) { handleVideoUrlTypeChange(ts.val()); ts.on('change select2:select', function(){ handleVideoUrlTypeChange($(this).val()); }); }
     const tr = $('#trailer_url_type'); if(tr.length) { handleTrailerUrlTypeChange(tr.val()); tr.on('change select2:select', function(){ handleTrailerUrlTypeChange($(this).val()); }); }
 });
+    // Synchroniser TinyMCE avant soumission
+    document.getElementById('form-submit')?.addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') tinymce.triggerSave();
+    });
+
 </script>
 @endpush

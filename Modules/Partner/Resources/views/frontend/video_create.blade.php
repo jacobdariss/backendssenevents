@@ -10,7 +10,7 @@
 
 <x-back-button-component route="partner.videos" />
 
-{{ html()->form('POST', route('partner.videos.store'))->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->class('requires-validation')->open() }}
+{{ html()->form('POST', route('partner.videos.store'))->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->open() }}
 
     @if($errors->any())
         <div class="alert alert-danger mb-3">
@@ -200,7 +200,7 @@
                 {{-- Description --}}
                 <div class="col-md-12">
                     {{ html()->label(__('movie.lbl_description') . ' <span class="text-danger">*</span>', 'description')->class('form-label') }}
-                    {{ html()->textarea('description', old('description'))->class('form-control')->id('description')->rows(5)->attribute('required') }}
+                    {{ html()->textarea('description', old('description'))->class('form-control')->id('description')->rows(5) }}
                     @error('description')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
@@ -303,5 +303,10 @@ $(document).ready(function () {
         trailerSelect.on('change select2:select', function() { handleTrailerUrlTypeChange($(this).val()); });
     }
 });
+    // Synchroniser TinyMCE avant soumission
+    document.getElementById('form-submit')?.addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') tinymce.triggerSave();
+    });
+
 </script>
 @endpush
