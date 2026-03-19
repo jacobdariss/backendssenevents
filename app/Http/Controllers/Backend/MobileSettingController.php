@@ -334,26 +334,12 @@ class MobileSettingController extends Controller
             //     }
             //     break;
             case 'popular-videos':
-                // Most watched videos from user_watch_histories table where entertainment_type = 'video'
-                $mostWatchedVideoIds = UserWatchHistory::select('entertainment_id', DB::raw('COUNT(*) as watch_count'))
-                    ->where('entertainment_type', 'video')
-                    ->groupBy('entertainment_id')
-                    ->orderByRaw('COUNT(*) DESC')
-                    ->pluck('entertainment_id');
-
-                if ($mostWatchedVideoIds->isNotEmpty()) {
-                    $value = Video::where('status', 1)
-                        ->whereNull('deleted_at')
-                        ->whereIn('id', $mostWatchedVideoIds)
-                        ->get()
-                        ->sortBy(function ($video) use ($mostWatchedVideoIds) {
-                            $index = $mostWatchedVideoIds->search($video->id);
-                            return $index !== false ? $index : 999999;
-                        })
-                        ->values();
-                } else {
-                    $value = collect();
-                }
+                // Show ALL active videos (including partner videos) so admin can select them
+                $value = Video::where('status', 1)
+                    ->whereNull('deleted_at')
+                    ->whereDate('release_date', '<=', now())
+                    ->orderBy('release_date', 'desc')
+                    ->get();
 
                 if (!empty($selectedIds)) {
                     $selected_values = Video::whereIn('id', $selectedIds)
@@ -523,23 +509,12 @@ class MobileSettingController extends Controller
                 break;
 
             case 'popular-videos':
-                $mostWatchedVideoIds = UserWatchHistory::select('entertainment_id', DB::raw('COUNT(*) as watch_count'))
-                    ->where('entertainment_type', 'video')
-                    ->groupBy('entertainment_id')
-                    ->orderByRaw('COUNT(*) DESC')
-                    ->pluck('entertainment_id');
-
-                if ($mostWatchedVideoIds->isNotEmpty()) {
-                    $value = Video::where('status', 1)
-                        ->whereNull('deleted_at')
-                        ->whereIn('id', $mostWatchedVideoIds)
-                        ->get()
-                        ->sortBy(function ($video) use ($mostWatchedVideoIds) {
-                            $index = $mostWatchedVideoIds->search($video->id);
-                            return $index !== false ? $index : 999999;
-                        })
-                        ->values();
-                }
+                // All active videos (including approved partner videos)
+                $value = Video::where('status', 1)
+                    ->whereNull('deleted_at')
+                    ->whereDate('release_date', '<=', now())
+                    ->orderBy('release_date', 'desc')
+                    ->get();
                 break;
 
             case 'top-channels':
