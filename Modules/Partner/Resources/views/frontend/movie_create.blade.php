@@ -141,11 +141,12 @@
                     </div>
                 </div>
 
-                {{-- Upload type + URL --}}
+                @if($content_type === 'movie')
+                {{-- Upload type + URL — Films uniquement --}}
                 <div class="col-12"><div class="row g-3">
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_video_upload_type') . ' <span class="text-danger">*</span>', 'video_upload_type')->class('form-label') }}
-                    {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_video_type'), '')->merge(['Embedded' => 'Embedded']), old('video_upload_type', ''))->class('form-control select2')->id('video_upload_type')->attributes($content_type === 'movie' ? ['required' => true] : []) }}
+                    {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_video_type'), '')->merge(['Embedded' => 'Embedded']), old('video_upload_type', ''))->class('form-control select2')->id('video_upload_type')->attribute('required') }}
                     @error('video_upload_type')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
                 <div class="col-md-8">
@@ -168,6 +169,7 @@
                     </div>
                 </div>
                 </div></div>
+                @endif
 
                 {{-- Trailer --}}
                 <div class="col-12"><div class="row g-3">

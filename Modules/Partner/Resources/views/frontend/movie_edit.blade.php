@@ -154,6 +154,7 @@
                         </div>
                     </div>
                 </div>
+                @if($content_type === 'movie')
 
                 {{-- Upload type + URL --}}
                 <div class="col-12"><div class="row g-3">
@@ -182,6 +183,7 @@
                     </div>
                 </div>
                 </div></div>
+                @endif
 
                 {{-- Trailer --}}
                 <div class="col-12"><div class="row g-3">
