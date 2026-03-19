@@ -105,7 +105,7 @@ class GenerateMenus
                 'url'    => url('/app/analytics'),
                 'icon'   => 'ph ph-chart-pie-slice',
                 'active' => ['app/analytics', 'app/analytics/*'],
-                'order'  => 1,
+                'order'  => 0,
             ]);
 
 
