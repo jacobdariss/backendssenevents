@@ -41,16 +41,15 @@ class GenerateMenus
                 return;
             }
 
-            if (auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])) {
-                $this->staticMenu($menu, ['title' =>  __('sidebar.main'), 'order' => 0]);
-                $this->mainRoute($menu, [
-                    'icon' => 'ph ph-squares-four',
-                    'title' => __('sidebar.dashboard'),
-                    'route' => 'backend.home',
-                    'active' => ['app', 'app/dashboard'],
-                    'order' => 0,
-                ]);
-            }
+            // Dashboard — visible pour tous les admins
+            $this->staticMenu($menu, ['title' =>  __('sidebar.main'), 'order' => 0]);
+            $this->mainRoute($menu, [
+                'icon' => 'ph ph-squares-four',
+                'title' => __('sidebar.dashboard'),
+                'route' => 'backend.home',
+                'active' => ['app', 'app/dashboard'],
+                'order' => 0,
+            ]);
 
 
             $this->mainRoute($menu, [
