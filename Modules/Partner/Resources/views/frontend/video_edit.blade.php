@@ -144,6 +144,8 @@
 
                 </div>{{-- end video wrapper --}}
 
+                <div class="col-12"></div>{{-- line break --}}
+
                 {{-- Trailer URL type --}}
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_trailer_url_type') . ' <span class="text-danger">*</span>', 'trailer_url_type')->class('form-label') }}
