@@ -122,7 +122,7 @@
                             // Créer le dossier image du partenaire directement
                             $partnerImageDir = storage_path('app/public/' . $partnerFolder . '/image');
                             if (!is_dir($partnerImageDir)) {
-                                mkdir($partnerImageDir, 0775, true);
+                                mkdir($partnerImageDir, 0777, true);
                             }
                             // Pointer directement vers le dossier image — pas de navigation
                             $partnerFolder = $partnerFolder . '/image';

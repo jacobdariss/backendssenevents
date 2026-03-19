@@ -51,6 +51,11 @@ php artisan view:cache
 
 # 7. Permissions storage
 chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
+chmod -R 777 storage/app/public
+# Créer les dossiers nécessaires
+mkdir -p storage/app/public/partners
+chmod -R 777 storage/app/public/partners
 
 echo -e "${GREEN}✅ Déploiement réussi ! Branche: $BRANCH${NC}"
 echo -e "${GREEN}   Commit: $(git log --oneline -1)${NC}"

@@ -419,7 +419,7 @@ private function getFileType($extension)
 
                 // Auto-create partner folder if it doesn't exist
                 if ($folder && str_starts_with($folder, 'partners/') && !is_dir($fullPath)) {
-                    mkdir($fullPath, 0775, true);
+                    mkdir($fullPath, 0777, true);
                 }
 
                 if (is_dir($fullPath)) {
