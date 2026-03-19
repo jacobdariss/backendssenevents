@@ -208,7 +208,7 @@
         </div>
         <div class="card-footer text-end">
             <a href="{{ $content_type === 'movie' ? route('partner.movies') : route('partner.tvshows') }}" class="btn btn-secondary me-2">{{ __('messages.cancel') }}</a>
-            <button type="submit" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" onclick="if(typeof tinymce!=='undefined')tinymce.triggerSave();document.getElementById('form-submit').submit();">
                 <i class="ph ph-paper-plane-tilt me-1"></i>{{ __('partner::partner.submit_for_validation') }}
             </button>
         </div>
