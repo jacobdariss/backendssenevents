@@ -57,12 +57,36 @@ class AuthenticatedSessionController extends Controller
 
                 $user = Auth::user();
 
-                // Si le 2FA admin est désactivé → connexion directe
-                if (!setting('admin_2fa_enabled', true)) {
-                    // Partenaire → dashboard partenaire
-                    if ($user->hasRole('partner')) {
+                // ── Partenaire : flow 2FA dédié ──────────────────────────────
+                if ($user->hasRole('partner')) {
+                    if (!setting('partner_2fa_enabled', true)) {
+                        $request->session()->regenerate();
                         return redirect()->route('partner.dashboard');
                     }
+
+                    $otp = (string) random_int(100000, 999999);
+                    $request->session()->put('partner_2fa_pending_user_id', $user->id);
+                    $request->session()->put('partner_2fa_otp', $otp);
+                    $request->session()->put('partner_2fa_expires_at', now()->addMinutes(10)->timestamp);
+                    $request->session()->put('partner_2fa_remember', (bool) $request->remember_me);
+                    Auth::logout();
+
+                    $emailSent = false;
+                    try {
+                        Mail::to($user->email)->send(new sendOtp(['body' => $otp]));
+                        $emailSent = true;
+                    } catch (\Exception $e) {
+                        Log::error('Partner 2FA OTP failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+                        Log::info('Partner 2FA OTP', ['user_id' => $user->id, 'otp' => $otp]);
+                    }
+
+                    return redirect()->route('partner.2fa')
+                        ->with('email_sent', $emailSent)
+                        ->with('email', $user->email);
+                }
+
+                // ── Admin : flow 2FA standard ─────────────────────────────────
+                if (!setting('admin_2fa_enabled', true)) {
                     return redirect()->intended('/app/dashboard');
                 }
 
@@ -82,7 +106,6 @@ class AuthenticatedSessionController extends Controller
                     $emailSent = true;
                 } catch (\Exception $e) {
                     Log::error('2FA OTP send failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-                    // Log OTP in case email is not configured (dev/debug)
                     Log::info('2FA OTP (email failed)', ['user_id' => $user->id, 'otp' => $otp]);
                 }
 
