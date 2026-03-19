@@ -78,6 +78,9 @@ class Entertainment extends BaseModel
     'enable_clips',
     'bunny_video_url',
     'bunny_trailer_url',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
 ];
 
     protected $casts = [
@@ -1675,4 +1678,9 @@ public static function get_movie($movieId, $user_id, $profile_id, $device_id)
         return parent::save($options);
     }
 
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
+    }
 }

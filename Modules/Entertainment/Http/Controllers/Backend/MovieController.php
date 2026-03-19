@@ -17,6 +17,7 @@ use App\Services\ChatGTPService;
 use Modules\World\Models\Country;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
+use Modules\Partner\Models\Partner;
 
 class MovieController extends Controller
 {
@@ -163,9 +164,9 @@ class MovieController extends Controller
             $mediaUrls = getMediaUrls();
             $assets = ['textarea'];
             $page_type='movie';
-            return view('entertainment::backend.entertainment.create', compact('assets',
-                'upload_url_type', 'plan', 'movie_language','subtitle_language','genres', 'numberOptions', 'actors', 'directors','countries', 'video_quality', 'type', 'module_title', 'mediaUrls', 'download_url_type', 'page_type'
-            ));
+            $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('entertainment::backend.entertainment.create', compact('assets',
+                'upload_url_type', 'plan', 'movie_language','subtitle_language','genres', 'numberOptions', 'actors', 'directors','countries', 'video_quality', 'type', 'module_title', 'mediaUrls', 'download_url_type', 'page_type', 'partners'));
          }
 
          public function generateDescription(Request $request)

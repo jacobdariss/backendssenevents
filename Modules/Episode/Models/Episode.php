@@ -62,6 +62,9 @@ class Episode extends BaseModel
                         'short_description',
                         'bunny_trailer_url',
                         'bunny_video_url',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
                     ];
 
     protected $casts = [
@@ -284,4 +287,9 @@ class Episode extends BaseModel
         return $this->hasMany(Review::class, 'entertainment_id', 'id');
     }
 
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
+    }
 }

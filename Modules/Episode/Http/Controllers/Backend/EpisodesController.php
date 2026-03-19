@@ -20,6 +20,7 @@ use Modules\Entertainment\Models\Subtitle;
 use Illuminate\Support\Facades\Storage;
 use Modules\NotificationTemplate\Jobs\SendBulkNotification;
 use Illuminate\Support\Facades\DB;
+use Modules\Partner\Models\Partner;
 
 class EpisodesController extends Controller
 {
@@ -184,6 +185,7 @@ class EpisodesController extends Controller
         $mediaUrls = getMediaUrls();
         $page_type='episode';
 
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
         return view('episode::backend.episode.create', compact(
             'upload_url_type',
             'assets',
@@ -198,14 +200,22 @@ class EpisodesController extends Controller
             'movie_language',
             'subtitle_language',
             'download_url_type',
-            'page_type'
-        ));
+            'page_type', 'partners'));
     }
 
    public function store(EpisodeRequest $request)
 {
     // Get all request data
     $data = $request->all();
+        // Attribution partenaire
+        if ($request->filled('partner_id')) {
+            $data['partner_id']      = $request->partner_id;
+            $data['approval_status'] = 'pending';
+        } else {
+            $data['partner_id']      = null;
+            $data['approval_status'] = null;
+        }
+
 
 
     // Handle pay-per-view logic
@@ -470,7 +480,8 @@ class EpisodesController extends Controller
     ];
 
     // Return the edit view with necessary data
-    return view('episode::backend.episode.edit', compact(
+    $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('episode::backend.episode.edit', compact(
         'data',
         'tmdb_id',  // Pass tmdb_id to the view
         'upload_url_type',
@@ -486,8 +497,7 @@ class EpisodesController extends Controller
         'mediaUrls',
         'seo',
         'download_url_type',
-        'page_type'
-    ));
+        'page_type', 'partners'));
 }
 
 

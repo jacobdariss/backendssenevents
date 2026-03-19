@@ -326,7 +326,7 @@ class TvShowService
 
     public function getFilteredData(array $filter, string $type)
     {
-        $query = $this->entertainmentRepository->query();
+        $query = $this->entertainmentRepository->query()->with('partner');
 
         if($type!=null){
 

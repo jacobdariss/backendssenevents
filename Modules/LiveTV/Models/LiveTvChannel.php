@@ -17,7 +17,10 @@ class LiveTvChannel extends BaseModel
      */
     protected $table = 'live_tv_channel';
     protected $fillable = [
-        'name','slug','category_id','poster_url','thumb_url','access','plan_id','description','status','poster_tv_url'
+        'name','slug','category_id','poster_url','thumb_url','access','plan_id','description','status','poster_tv_url',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
     ];
     // protected $appends = ['poster_url'];
 
@@ -171,5 +174,10 @@ class LiveTvChannel extends BaseModel
             $item->base_url = $item->poster_url;
             return $item;
         });
+    }
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
     }
 }

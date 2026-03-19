@@ -15,6 +15,7 @@ use Modules\Subscriptions\Models\Plan;
 use App\Services\ChatGTPService;
 use Carbon\Carbon;
 use Modules\NotificationTemplate\Jobs\SendBulkNotification;
+use Modules\Partner\Models\Partner;
 
 
 class SeasonsController extends Controller
@@ -138,7 +139,8 @@ class SeasonsController extends Controller
         $mediaUrls =  getMediaUrls();
         $page_type='season';
 
-        return view('season::backend.season.create', compact('upload_url_type','assets','plan','tvshows','module_title','mediaUrls','imported_tvshow','seasons','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('season::backend.season.create', compact('upload_url_type','assets','plan','tvshows','module_title','mediaUrls','imported_tvshow','seasons','page_type', 'partners'));
 
     }
 
@@ -148,6 +150,15 @@ class SeasonsController extends Controller
     public function store(SeasonRequest $request)
 {
     $data = $request->all();
+        // Attribution partenaire
+        if ($request->filled('partner_id')) {
+            $data['partner_id']      = $request->partner_id;
+            $data['approval_status'] = 'pending';
+        } else {
+            $data['partner_id']      = null;
+            $data['approval_status'] = null;
+        }
+
 
     $data['poster_url'] = !empty($data['tmdb_id']) ? $data['poster_url'] : extractFileNameFromUrl($data['poster_url'],'season');
     $data['poster_tv_url'] = !empty($data['tmdb_id']) ? $data['poster_tv_url'] : extractFileNameFromUrl($data['poster_tv_url'],'season');
@@ -276,7 +287,8 @@ class SeasonsController extends Controller
         'short_description' => $data->short_description
     ];
 
-    return view('season::backend.season.edit', compact(
+    $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('season::backend.season.edit', compact(
         'data',
         'tmdb_id',
         'upload_url_type',
@@ -286,8 +298,7 @@ class SeasonsController extends Controller
         'mediaUrls',
         'assets',
         'seo',
-        'page_type'
-    ));
+        'page_type', 'partners'));
 }
 
 
