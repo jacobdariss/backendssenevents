@@ -218,6 +218,7 @@
     const FileManager = {
         // Configuration
         config: {
+            partnerFolder: '{{ isset($partnerFolder) ? $partnerFolder : "" }}',
             baseUrl: (function() {
                 const metaTag = BASE_URL;
                 if (metaTag) {
@@ -402,6 +403,12 @@
         // Navigation functions
         navigation: {
             openFolder: (folderName) => {
+                // Si dossier partenaire restreint, ne pas sortir du dossier autorisé
+                const partnerFolder = FileManager.config.partnerFolder;
+                if (partnerFolder && !folderName.startsWith(partnerFolder)) {
+                    console.warn('Partner restricted: access denied to', folderName);
+                    return;
+                }
                 FileManager.cleanup();
                 FileManager.state.currentFolder = folderName;
                 FileManager.state.nextOffset = 0;
@@ -432,13 +439,19 @@
 
             goBackToFolders: () => {
                 FileManager.cleanup();
+                const partnerRootFolder = FileManager.config.partnerFolder;
                 const current = FileManager.state.currentFolder || '';
                 const hasParent = current && current.includes('/');
 
                 if (hasParent) {
                     // Navigate one level up (parent folder)
                     const parent = current.substring(0, current.lastIndexOf('/'));
-                    FileManager.state.currentFolder = parent;
+                    // Don't go above partner root
+                    if (partnerRootFolder && !parent.startsWith(partnerRootFolder) && parent !== partnerRootFolder) {
+                        FileManager.state.currentFolder = partnerRootFolder;
+                    } else {
+                        FileManager.state.currentFolder = parent;
+                    }
                     FileManager.state.nextOffset = 0;
                     FileManager.state.infiniteInitDone = false;
 
@@ -460,7 +473,7 @@
                     FileManager.loadFolderContents(parent);
                 } else {
                     // At root level → show root folders
-                    FileManager.state.currentFolder = '';
+                    FileManager.state.currentFolder = partnerRootFolder || '';
                     FileManager.state.nextOffset = 0;
                     FileManager.state.infiniteInitDone = false;
 
@@ -991,6 +1004,19 @@
         }
     });
     window.getFolderFromUrl = FileManager.utils.getFolderFromUrl;
+
+    // Auto-ouvrir le dossier partenaire si restreint
+    if (FileManager.config.partnerFolder) {
+        // Quand la modal s'ouvre, naviguer directement dans le dossier partenaire
+        const mediaModal = document.getElementById('exampleModal');
+        if (mediaModal) {
+            mediaModal.addEventListener('shown.bs.modal', function() {
+                if (FileManager.config.partnerFolder && !FileManager.state.currentFolder) {
+                    FileManager.navigation.openFolder(FileManager.config.partnerFolder);
+                }
+            });
+        }
+    }
 
     // File upload handling
     document.getElementById('file_url_media')?.addEventListener('change', function() {
