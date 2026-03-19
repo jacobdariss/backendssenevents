@@ -192,8 +192,6 @@
 
 @push('after-scripts')
 <script>
-// ── Définitions des fonctions (avant DOMContentLoaded) ────────────────────
-
 function showPlanSelection(show) {
     const planDiv = document.getElementById('planSelection');
     if (planDiv) planDiv.classList.toggle('d-none', !show);
@@ -216,13 +214,11 @@ function handleTrailerUrlTypeChange(val) {
     const urlInput   = document.getElementById('url_input');
     const embedInput = document.getElementById('trailer_embed_input_section');
     const trailerUrl = document.querySelector('input[name="trailer_url"]');
-    const trailerFile = document.querySelector('input[name="trailer_video"]');
     if (!fileInput || !urlInput || !embedInput) return;
     fileInput.classList.add('d-none');
     urlInput.classList.add('d-none');
     embedInput.classList.add('d-none');
     trailerUrl?.removeAttribute('required');
-    trailerFile?.removeAttribute('required');
     switch(val) {
         case 'Local':    fileInput.classList.remove('d-none'); break;
         case 'Embedded': embedInput.classList.remove('d-none'); break;
@@ -233,9 +229,7 @@ function handleTrailerUrlTypeChange(val) {
     }
 }
 
-// ── Init au chargement ─────────────────────────────────────────────────────
-
-document.addEventListener('DOMContentLoaded', function () {
+$(document).ready(function () {
     // TinyMCE
     if (typeof tinymce !== 'undefined') {
         tinymce.init({
@@ -250,21 +244,18 @@ document.addEventListener('DOMContentLoaded', function () {
         $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
     }
 
-    // Video upload type
-    const typeSelect = document.getElementById('video_upload_type');
-    if (typeSelect) {
-        handleVideoUrlTypeChange(typeSelect.value);
-        typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
+    // Video upload type — init + change
+    const typeSelect = $('#video_upload_type');
+    if (typeSelect.length) {
+        handleVideoUrlTypeChange(typeSelect.val());
+        typeSelect.on('change select2:select', function() { handleVideoUrlTypeChange($(this).val()); });
     }
 
-    // Trailer URL type
-    const trailerTypeSelect = document.getElementById('trailer_url_type');
-    if (trailerTypeSelect) {
-        handleTrailerUrlTypeChange(trailerTypeSelect.value);
-        trailerTypeSelect.addEventListener('change', function() { handleTrailerUrlTypeChange(this.value); });
-        if (typeof $ !== 'undefined' && $.fn.select2) {
-            $('#trailer_url_type').on('select2:select', function(e) { handleTrailerUrlTypeChange(e.target.value); });
-        }
+    // Trailer URL type — init + change
+    const trailerSelect = $('#trailer_url_type');
+    if (trailerSelect.length) {
+        handleTrailerUrlTypeChange(trailerSelect.val());
+        trailerSelect.on('change select2:select', function() { handleTrailerUrlTypeChange($(this).val()); });
     }
 });
 </script>
