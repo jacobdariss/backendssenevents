@@ -12,6 +12,7 @@ use Modules\Video\Models\Video;
 use Modules\LiveTV\Models\LiveTvChannel;
 use Illuminate\Support\Facades\Schema;
 use Modules\Partner\Notifications\ContentStatusNotification;
+use App\Models\AuditLog;
 use App\Models\User;
 
 class PartnerValidationController extends Controller
@@ -176,6 +177,7 @@ class PartnerValidationController extends Controller
         clearDashboardCache();
 
         $this->notifyPartner($model, 'approved');
+        AuditLog::log('content_approved', $model, json_encode(['content_type' => $contentType]));
 
         return response()->json(['status' => true, 'message' => __('partner::partner.content_approved')]);
     }
@@ -201,6 +203,7 @@ class PartnerValidationController extends Controller
         clearDashboardCache();
 
         $this->notifyPartner($model, 'rejected', $request->input('rejection_reason'));
+        AuditLog::log('content_rejected', $model, json_encode(['reason' => $request->input('rejection_reason'), 'content_type' => $contentType]));
 
         $message = $request->filled('rejection_reason')
             ? __('partner::partner.content_rejected_reason')

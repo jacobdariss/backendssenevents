@@ -3,10 +3,11 @@
 namespace Modules\Partner\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ContentStatusNotification extends Notification
+class ContentStatusNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

@@ -21,6 +21,9 @@
                 </select>
             </div>
         </form>
+                    <a href="{{ route('backend.finance.export', ['period' => $period]) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="ph ph-download-simple me-1"></i>Export CSV
+            </a>
     </div>
 </div>
 

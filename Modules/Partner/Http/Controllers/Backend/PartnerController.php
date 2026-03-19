@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Models\AuditLog;
 use Modules\Partner\Http\Requests\PartnerRequest;
 use Modules\Partner\Services\PartnerService;
 use Modules\Partner\Models\Partner;
@@ -185,7 +186,9 @@ class PartnerController extends Controller
 
     public function destroy(int $id)
     {
+        $partner = $this->partnerService->getPartnerById($id);
         $this->partnerService->deletePartner($id);
+        AuditLog::log('partner_deleted', $partner);
         $message = __('messages.delete_form', ['form' => __('partner.title')]);
         return response()->json(['message' => $message, 'status' => true], 200);
     }

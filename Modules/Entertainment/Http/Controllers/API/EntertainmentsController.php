@@ -1877,7 +1877,7 @@ class EntertainmentsController extends Controller
         $cacheKey = 'coming_soon_'. md5(json_encode($request->all())).($request->is_ajax ? '_html' : '_json');
 
 
-        $responseData = cache()->remember($cacheKey, 10, function () use ($request, $perPage, $todayDate,$device_type) {
+        $responseData = cache()->remember($cacheKey, 60, function () use ($request, $perPage, $todayDate,$device_type) {
 
             switch ($request->type) {
                 case 'all':
@@ -2763,7 +2763,7 @@ class EntertainmentsController extends Controller
         $userId = $request->user_id ?? auth()->id() ;
         $cacheKey = 'common_content_detail_v3_'.$id . '_' . $request->profile_id . '_' . $request->type . '_' . ($userId ?? 0);
 
-         $responseData = cacheApiResponse($cacheKey, 10, function () use ($request, $id,$device_type, $userId) {
+         $responseData = cacheApiResponse($cacheKey, 60, function () use ($request, $id,$device_type, $userId) {
 
 
             $user_id = isset($request->user_id) ? $request->user_id : 0;

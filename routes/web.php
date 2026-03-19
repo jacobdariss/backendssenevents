@@ -206,3 +206,8 @@ Route::middleware(['web'])->group(function () {
 
 // Partner Module Routes
 require base_path('Modules/Partner/Routes/web.php');
+
+// Journal d'audit
+Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'admin']], function () {
+    Route::get('audit-log', [App\Http\Controllers\Backend\AuditLogController::class, 'index'])->name('audit-log.index');
+});
