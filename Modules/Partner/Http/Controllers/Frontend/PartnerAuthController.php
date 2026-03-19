@@ -51,7 +51,8 @@ class PartnerAuthController extends Controller
             'status'     => 1,
         ]);
 
-        $user->assignRole('partner');
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'partner', 'guard_name' => 'web'], ['title' => 'Partner', 'is_fixed' => true]);
+            $user->assignRole('partner');
 
         Partner::create([
             'user_id'     => $user->id,

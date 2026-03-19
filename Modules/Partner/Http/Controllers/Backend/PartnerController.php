@@ -87,6 +87,7 @@ class PartnerController extends Controller
                 'password'   => Hash::make($request->account_password),
                 'user_type'  => 'partner',
             ]);
+            \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'partner', 'guard_name' => 'web'], ['title' => 'Partner', 'is_fixed' => true]);
             $user->assignRole('partner');
             $data['user_id'] = $user->id;
         }
@@ -136,6 +137,7 @@ class PartnerController extends Controller
                 'password'   => Hash::make($request->account_password),
                 'user_type'  => 'partner',
             ]);
+            \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'partner', 'guard_name' => 'web'], ['title' => 'Partner', 'is_fixed' => true]);
             $user->assignRole('partner');
             $data['user_id'] = $user->id;
         }
