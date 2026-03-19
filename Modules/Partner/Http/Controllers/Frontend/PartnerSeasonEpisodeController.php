@@ -219,21 +219,19 @@ class PartnerSeasonEpisodeController extends Controller
 
         // Traitement vidéo — même logique que l'admin
         $videoType = $data['video_upload_type'] ?? null;
-        $videoUrl  = $data['video_url_input'] ?? null;
         if ($videoType === 'Embedded') {
             $data['video_url_input'] = $data['embed_code'] ?? '';
         } elseif ($videoType === 'Local') {
-            $data['video_url_input'] = basename($videoUrl ?? '');
-        } else {
-            $data['video_url_input'] = $videoUrl;
+            $data['video_url_input'] = basename($data['video_file'] ?? '');
         }
+        // Sinon (YouTube, HLS, etc.) : video_url_input vient directement du champ texte
 
         // Traitement bande annonce
         $trailerType = $data['trailer_url_type'] ?? null;
         if ($trailerType === 'Embedded') {
             $data['trailer_url'] = $data['trailer_embedded'] ?? '';
         } elseif ($trailerType === 'Local') {
-            $data['trailer_url'] = basename($data['trailer_url'] ?? '');
+            $data['trailer_url'] = basename($data['trailer_file'] ?? '');
         }
 
         // Images — extraire uniquement le nom de fichier
@@ -302,21 +300,19 @@ class PartnerSeasonEpisodeController extends Controller
 
         // Traitement vidéo — même logique que l'admin
         $videoType = $data['video_upload_type'] ?? null;
-        $videoUrl  = $data['video_url_input'] ?? null;
         if ($videoType === 'Embedded') {
             $data['video_url_input'] = $data['embed_code'] ?? '';
         } elseif ($videoType === 'Local') {
-            $data['video_url_input'] = basename($videoUrl ?? '');
-        } else {
-            $data['video_url_input'] = $videoUrl;
+            $data['video_url_input'] = basename($data['video_file'] ?? '');
         }
+        // Sinon (YouTube, HLS, etc.) : video_url_input vient directement du champ texte
 
         // Traitement bande annonce
         $trailerType = $data['trailer_url_type'] ?? null;
         if ($trailerType === 'Embedded') {
             $data['trailer_url'] = $data['trailer_embedded'] ?? '';
         } elseif ($trailerType === 'Local') {
-            $data['trailer_url'] = basename($data['trailer_url'] ?? '');
+            $data['trailer_url'] = basename($data['trailer_file'] ?? '');
         }
 
         foreach (['poster_url', 'poster_tv_url'] as $field) {

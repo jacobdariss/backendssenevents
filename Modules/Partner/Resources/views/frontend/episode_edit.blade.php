@@ -117,7 +117,7 @@
                             {{ html()->text('video_file_input')->class('form-control')->attribute('data-bs-toggle','modal')->attribute('data-bs-target','#exampleModal')->attribute('data-image-container','selectedImageContainerVideourl')->attribute('data-hidden-input','file_url_video') }}
                         </div>
                         <div class="mt-2" id="selectedImageContainerVideourl"></div>
-                        {{ html()->hidden('video_url_input')->id('file_url_video') }}
+                        {{ html()->hidden('video_file')->id('file_url_video') }}
                     </div>
                 </div>
             </div></div>
@@ -144,7 +144,7 @@
                             {{ html()->text('trailer_file_input')->class('form-control')->attribute('data-bs-toggle','modal')->attribute('data-bs-target','#exampleModal')->attribute('data-image-container','selectedImageContainerTrailer')->attribute('data-hidden-input','file_url_trailer') }}
                         </div>
                         <div class="mt-2" id="selectedImageContainerTrailer"></div>
-                        {{ html()->hidden('trailer_url')->id('file_url_trailer') }}
+                        {{ html()->hidden('trailer_file')->id('file_url_trailer') }}
                     </div>
                 </div>
             </div></div>
