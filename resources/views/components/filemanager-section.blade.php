@@ -124,7 +124,9 @@
                             if (!is_dir($partnerImageDir)) {
                                 mkdir($partnerImageDir, 0777, true);
                             }
-                            // Pointer directement vers le dossier image — pas de navigation
+                            // Montrer directement le contenu de partners/{id}/image
+                            $partnerFolder = $partnerFolder . '/image';
+                            // Ne pas ajouter de dossier affiché — on navigue directement via JS
                             $folders[] = $formatFolder($partnerFolder);
                         } elseif ($activeDisk === 'local') {
                             $root = storage_path('app/public');
@@ -418,6 +420,11 @@
                 }
                 FileManager.cleanup();
                 FileManager.state.currentFolder = folderName;
+                // Afficher un nom simplifié dans le breadcrumb
+                const folderNameEl = document.getElementById('current-folder-name');
+                if (folderNameEl && FileManager.config.partnerFolder) {
+                    folderNameEl.textContent = '{{ __("messages.my_media") }}';
+                }
                 FileManager.state.nextOffset = 0;
                 FileManager.state.infiniteInitDone = false;
 
