@@ -208,12 +208,16 @@ class EpisodesController extends Controller
     // Get all request data
     $data = $request->all();
         // Attribution partenaire
-        if (\Schema::hasColumn('episodes', 'partner_id') && $request->filled('partner_id')) {
-            $data['partner_id']      = $request->partner_id;
-            if (\Schema::hasColumn('episodes', 'approval_status')) $data['approval_status'] = 'pending';
+        // Partner fields — only set if columns exist in DB
+        if (\Schema::hasColumn('episodes', 'partner_id')) {
+            $data['partner_id'] = $request->filled('partner_id') ? $request->partner_id : null;
         } else {
-            $data['partner_id']      = null;
-            if (\Schema::hasColumn('episodes', 'approval_status')) $data['approval_status'] = null;
+            unset($data['partner_id']);
+        }
+        if (\Schema::hasColumn('episodes', 'approval_status')) {
+            $data['approval_status'] = $request->filled('partner_id') ? 'pending' : null;
+        } else {
+            unset($data['approval_status']);
         }
 
 
