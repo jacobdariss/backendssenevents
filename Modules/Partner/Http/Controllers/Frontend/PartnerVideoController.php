@@ -33,8 +33,9 @@ class PartnerVideoController extends Controller
         $page_type       = 'video';
         $partnerFolder   = 'partners/' . $partner->id;
 
+        \$assets = ['textarea'];
         return view('partner::frontend.video_create', compact(
-            'partner', 'upload_url_type', 'video_quality', 'plan', 'mediaUrls', 'page_type', 'partnerFolder'
+            'partner', 'upload_url_type', 'video_quality', 'plan', 'mediaUrls', 'page_type', 'partnerFolder', 'assets'
         ));
     }
 
@@ -93,8 +94,9 @@ class PartnerVideoController extends Controller
         $video->poster_url    = $video->poster_url    ? setBaseUrlWithFileName($video->poster_url,    'image', 'video') : null;
         $video->poster_tv_url = $video->poster_tv_url ? setBaseUrlWithFileName($video->poster_tv_url, 'image', 'video') : null;
 
+        \$assets = ['textarea'];
         return view('partner::frontend.video_edit', compact(
-            'partner', 'video', 'upload_url_type', 'video_quality', 'plan', 'mediaUrls', 'page_type', 'partnerFolder'
+            'partner', 'video', 'upload_url_type', 'video_quality', 'plan', 'mediaUrls', 'page_type', 'partnerFolder', 'assets'
         ));
     }
 

@@ -191,14 +191,5 @@ document.addEventListener('DOMContentLoaded', function () {
         $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
     }
 });
-
-    // TinyMCE description
-    if (typeof tinymce !== 'undefined') {
-        tinymce.init({
-            selector: '#description',
-            plugins: 'link image code',
-            toolbar: 'undo redo | styleselect | bold italic | link | alignleft aligncenter alignright | removeformat | code',
-        });
-    }
 </script>
 @endpush
