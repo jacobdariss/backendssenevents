@@ -188,7 +188,7 @@ class AdminManagementController extends Controller
     {
         $role = Role::findOrFail($id);
 
-        if ($role->is_fixed) {
+        if (in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin', 'demo_admin'])) {
             return response()->json([
                 'status'  => false,
                 'message' => __('messages.permission_denied'),

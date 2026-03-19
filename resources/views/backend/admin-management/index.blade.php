@@ -13,7 +13,8 @@
         @forelse ($roles as $role)
             @if ($role->name !== 'admin' && $role->name !== 'user')
             <div class="border-bottom">
-                @if($role->is_fixed || in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin']))
+                @php $isProtected = in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin', 'demo_admin']); @endphp
+                @if($isProtected)
                 {{-- Rôle fixe : non éditable --}}
                 <div class="d-flex align-items-center justify-content-between px-4 py-3">
                     <div class="d-flex align-items-center gap-2">
@@ -122,7 +123,7 @@
                         <tr id="role-row-{{ $role->id }}">
                             <td>
                                 <strong>{{ ucfirst($role->title) }}</strong>
-                                @if($role->is_fixed)
+                                @if(in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin', 'demo_admin']))
                                     <span class="badge bg-secondary ms-1">{{ __('messages.fixed') }}</span>
                                 @endif
                             </td>
@@ -132,7 +133,7 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                @if(!$role->is_fixed && !in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin']))
+                                @if(!in_array($role->name, ['admin', 'super_admin', 'superadmin', 'super-admin', 'demo_admin']))
                                 <button class="btn btn-sm btn-outline-danger"
                                         onclick="deleteRole({{ $role->id }}, this)">
                                     <i class="fas fa-trash"></i>

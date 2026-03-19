@@ -17,7 +17,7 @@ class GenerateMenus
     public function handle()
     {
         return \Menu::make('menu', function ($menu) {
-            if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('demo_admin')) {
+            if (auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])) {
                 $this->staticMenu($menu, ['title' =>  __('sidebar.main'), 'order' => 0]);
                 $this->mainRoute($menu, [
                     'icon' => 'ph ph-squares-four',
@@ -357,7 +357,7 @@ class GenerateMenus
                 'order' => 0,
             ]);
 
-            if(auth()->user()->hasRole('admin')){
+            if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])){
 
             $this->childMain($mobile_setting, [
                 'icon' => 'ph ph-app-window',
@@ -416,7 +416,7 @@ class GenerateMenus
                 'order' => 0,
             ]);
 
-            if(auth()->user()->hasRole('admin')){
+            if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])){
 
             $this->mainRoute($menu, [
                 'icon' => 'ph ph-faders',
