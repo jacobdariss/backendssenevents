@@ -48,13 +48,6 @@ class PartnerVideoController extends Controller
             'name'              => 'required|string|max:255',
             'video_upload_type' => 'required',
         ]);
-
-        \Log::info('video store data', [
-            'video_upload_type' => $request->video_upload_type,
-            'video_url_input'   => $request->video_url_input,
-            'video_file'        => $request->video_file,
-            'all_keys'          => array_keys($request->all()),
-        ]);
         $data = $request->except(['_token']);
         $data['partner_id']      = $partner->id;
         $data['approval_status'] = 'pending';

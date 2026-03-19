@@ -64,8 +64,6 @@ class PartnerSeasonEpisodeController extends Controller
             'season_number' => 'required|integer|min:1',
         ]);
 
-        \Log::info('=== EPISODE STORE ===', $request->all());
-
         $data = $request->except(['_token']);
         $data['entertainment_id'] = $tvshow->id;
         $data['partner_id']       = $partner->id;
@@ -200,8 +198,6 @@ class PartnerSeasonEpisodeController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        \Log::info('=== EPISODE STORE ===', $request->all());
-
         $data = $request->except(['_token']);
         $data['entertainment_id'] = $tvshow->id;
         $data['season_id']        = $season->id;
@@ -242,14 +238,6 @@ class PartnerSeasonEpisodeController extends Controller
         }
 
         $episode = Episode::create($data);
-        \Log::info('=== EPISODE CREATED ===', [
-            'id'               => $episode->id,
-            'video_upload_type'=> $episode->video_upload_type,
-            'video_url_input'  => $episode->video_url_input,
-            'trailer_url_type' => $episode->trailer_url_type,
-            'trailer_url'      => $episode->trailer_url,
-            'data_sent'        => array_keys($data),
-        ]);
 
         return redirect()->route('partner.tvshow.season.episodes', [$tvshowId, $seasonId])
             ->with('success', __('partner::partner.episode_created'));
