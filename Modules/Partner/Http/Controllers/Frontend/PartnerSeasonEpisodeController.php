@@ -62,7 +62,6 @@ class PartnerSeasonEpisodeController extends Controller
         $request->validate([
             'name'          => 'required|string|max:255',
             'season_number' => 'required|integer|min:1',
-            'access'        => 'required|in:free,pay-per-view',
         ]);
 
         $data = $request->except(['_token']);
@@ -123,7 +122,6 @@ class PartnerSeasonEpisodeController extends Controller
         $request->validate([
             'name'          => 'required|string|max:255',
             'season_number' => 'required|integer|min:1',
-            'access'        => 'required|in:free,pay-per-view',
         ]);
 
         $data = $request->except(['_token', '_method']);
@@ -197,9 +195,7 @@ class PartnerSeasonEpisodeController extends Controller
         $season = Season::where('id', $seasonId)->where('partner_id', $partner->id)->firstOrFail();
 
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'video_upload_type' => 'required',
-            'access'            => 'required|in:free,pay-per-view',
+            'name' => 'required|string|max:255',
         ]);
 
         $data = $request->except(['_token']);
@@ -257,9 +253,7 @@ class PartnerSeasonEpisodeController extends Controller
         $episode = Episode::where('id', $episodeId)->where('partner_id', $partner->id)->firstOrFail();
 
         $request->validate([
-            'name'              => 'required|string|max:255',
-            'video_upload_type' => 'required',
-            'access'            => 'required|in:free,pay-per-view',
+            'name' => 'required|string|max:255',
         ]);
 
         $data = $request->except(['_token', '_method']);
