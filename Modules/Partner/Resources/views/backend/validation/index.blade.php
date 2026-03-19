@@ -126,6 +126,9 @@
                                 <button class="btn btn-sm btn-success btn-approve"
                                     data-type="{{ $row['content_type'] }}"
                                     data-id="{{ $item->id }}"
+                                    data-access="{{ $item->access ?? 'free' }}"
+                                    data-proposed-price="{{ $item->partner_proposed_price ?? '' }}"
+                                    data-name="{{ $item->name }}"
                                     title="{{ __('partner::partner.approve') }}">
                                     <i class="ph ph-check-circle"></i> {{ __('partner::partner.approve') }}
                                 </button>
@@ -149,6 +152,55 @@
 </div>
 @endif
 @endsection
+
+{{-- Modal d'approbation avec prix --}}
+<div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ph ph-check-circle text-success me-2"></i>{{ __('partner::partner.approve') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3" id="approve-content-name"></p>
+
+                {{-- Section PPV (visible seulement si access = pay-per-view) --}}
+                <div id="approve-ppv-section">
+                    <div class="alert alert-warning py-2 small mb-3">
+                        <i class="ph ph-currency-dollar me-1"></i>
+                        {{ __('partner::partner.admin_price_review_info') }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ __('partner::partner.proposed_by_partner') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">FCFA</span>
+                            <input type="text" id="approve-proposed-price" class="form-control" disabled>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            {{ __('partner::partner.price_set_by_admin') }}
+                            <span class="text-muted small">({{ __('messages.optional') }} — laisser vide = prix partenaire)</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">FCFA</span>
+                            <input type="number" id="approve-final-price" class="form-control"
+                                   step="0.01" min="0" placeholder="{{ __('partner::partner.leave_blank_keep_proposed') }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                <button type="button" class="btn btn-success" id="approve-confirm-btn">
+                    <i class="ph ph-check-circle me-1"></i>{{ __('partner::partner.approve') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @push('after-scripts')
 <script>
@@ -189,12 +241,57 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => toast.remove(), 3000);
     }
 
+    let pendingApproveData = null;
+
     document.querySelectorAll('.btn-approve').forEach(btn => {
         btn.addEventListener('click', function () {
-            const type = this.dataset.type;
-            const id   = this.dataset.id;
-            handleAction('{{ url("app/partner-validation/approve") }}/' + type + '/' + id, 'row-' + type + '-' + id);
+            const type          = this.dataset.type;
+            const id            = this.dataset.id;
+            const access        = this.dataset.access;
+            const proposedPrice = this.dataset.proposedPrice;
+            const name          = this.dataset.name;
+
+            pendingApproveData = { type, id, rowId: 'row-' + type + '-' + id };
+
+            // Remplir la modal
+            document.getElementById('approve-content-name').textContent = name;
+            const ppvSection = document.getElementById('approve-ppv-section');
+
+            if (access === 'pay-per-view') {
+                ppvSection.style.display = '';
+                document.getElementById('approve-proposed-price').value = proposedPrice ? Number(proposedPrice).toLocaleString('fr-FR') + ' FCFA' : '—';
+                document.getElementById('approve-final-price').value = '';
+            } else {
+                ppvSection.style.display = 'none';
+            }
+
+            new bootstrap.Modal(document.getElementById('approveModal')).show();
         });
+    });
+
+    document.getElementById('approve-confirm-btn').addEventListener('click', function () {
+        if (!pendingApproveData) return;
+        const finalPrice = document.getElementById('approve-final-price').value;
+        const body = {};
+        if (finalPrice) body.final_price = finalPrice;
+
+        fetch('{{ url("app/partner-validation/approve") }}/' + pendingApproveData.type + '/' + pendingApproveData.id, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(r => r.json())
+        .then(data => {
+            bootstrap.Modal.getInstance(document.getElementById('approveModal'))?.hide();
+            if (data.status) {
+                const row = document.getElementById(pendingApproveData.rowId);
+                if (row) { row.style.transition='opacity .3s'; row.style.opacity='0'; setTimeout(()=>row.remove(),300); }
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message, 'danger');
+            }
+        })
+        .catch(() => showToast('{{ __("messages.something_went_wrong") }}', 'danger'));
     });
 
     document.querySelectorAll('.btn-reject').forEach(btn => {

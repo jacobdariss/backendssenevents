@@ -85,4 +85,7 @@ return [
     'proposed_by_partner'   => 'Proposé par le partenaire',
     'price_set_by_admin'    => 'Fixé par l\'admin',
 
+    'admin_price_review_info'    => 'Vous pouvez garder le prix proposé par le partenaire ou en définir un autre.',
+    'leave_blank_keep_proposed'   => 'Laisser vide pour garder le prix du partenaire',
+
 ];

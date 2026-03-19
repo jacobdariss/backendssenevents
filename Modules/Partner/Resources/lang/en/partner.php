@@ -85,4 +85,7 @@ return [
     'proposed_by_partner'   => 'Proposed by partner',
     'price_set_by_admin'    => 'Set by admin',
 
+    'admin_price_review_info'    => 'You can keep the partner\'s proposed price or set a different one.',
+    'leave_blank_keep_proposed'   => 'Leave blank to keep partner\'s price',
+
 ];

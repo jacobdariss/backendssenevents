@@ -107,7 +107,16 @@ class PartnerValidationController extends Controller
             return response()->json(['status' => false, 'message' => __('messages.not_found')], 404);
         }
 
-        $model->update(['approval_status' => 'approved', 'status' => 1]);
+        $updateData = ['approval_status' => 'approved', 'status' => 1];
+
+        // Si admin fixe un prix final (PPV), on l'utilise. Sinon on valide le prix propose par le partenaire
+        if ($request->filled('final_price') && is_numeric($request->input('final_price'))) {
+            $updateData['price'] = (float) $request->input('final_price');
+        } elseif (!empty($model->partner_proposed_price) && empty($model->price)) {
+            $updateData['price'] = $model->partner_proposed_price;
+        }
+
+        $model->update($updateData);
 
         return response()->json(['status' => true, 'message' => __('partner::partner.content_approved')]);
     }
