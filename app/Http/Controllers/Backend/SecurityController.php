@@ -10,7 +10,10 @@ class SecurityController extends Controller
 {
     public function index()
     {
-        return view('backend.security.index');
+        // Variables requises par le layout setting::backend.setting.index
+        $module_title = 'messages.security';
+
+        return view('backend.security.index', compact('module_title'));
     }
 
     public function toggle2FA(Request $request)
