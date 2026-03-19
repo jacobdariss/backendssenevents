@@ -70,6 +70,50 @@ class PartnerDashboardController extends Controller
         return view('partner::frontend.videos', compact('partner', 'videos', 'status', 'approvalStatus'));
     }
 
+    public function movies(Request $request)
+    {
+        $partner = $this->currentPartner();
+        if (!$partner) return redirect()->route('partner.dashboard');
+
+        $query = \Modules\Entertainment\Models\Entertainment::where('partner_id', $partner->id)
+            ->where('type', 'movie')->latest();
+        $items = $query->paginate(20);
+
+        return view('partner::frontend.content_list', compact('partner', 'items') + [
+            'content_type' => 'movie',
+            'title'        => __('movie.movies'),
+        ]);
+    }
+
+    public function tvshows(Request $request)
+    {
+        $partner = $this->currentPartner();
+        if (!$partner) return redirect()->route('partner.dashboard');
+
+        $query = \Modules\Entertainment\Models\Entertainment::where('partner_id', $partner->id)
+            ->where('type', 'tv_show')->latest();
+        $items = $query->paginate(20);
+
+        return view('partner::frontend.content_list', compact('partner', 'items') + [
+            'content_type' => 'tvshow',
+            'title'        => __('movie.tvshows'),
+        ]);
+    }
+
+    public function livetv(Request $request)
+    {
+        $partner = $this->currentPartner();
+        if (!$partner) return redirect()->route('partner.dashboard');
+
+        $query = \Modules\LiveTV\Models\LiveTvChannel::where('partner_id', $partner->id)->latest();
+        $items = $query->paginate(20);
+
+        return view('partner::frontend.content_list', compact('partner', 'items') + [
+            'content_type' => 'livetv',
+            'title'        => __('frontend.livetv'),
+        ]);
+    }
+
     // ── helpers ──────────────────────────────────────────────────
 
     private function countVideos(int $partnerId, int $status): int

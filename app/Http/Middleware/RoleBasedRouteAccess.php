@@ -44,6 +44,9 @@ class RoleBasedRouteAccess
             $partnerAllowed = [
                 'app/partner-dashboard',
                 'app/partner-videos',
+                'app/partner-movies',
+                'app/partner-tvshows',
+                'app/partner-livetv',
                 'app/partner-analytics',
                 'app/setting/security',
             ];

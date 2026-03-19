@@ -30,8 +30,11 @@ Route::prefix('partner')->name('partner.')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::group(['prefix' => 'app', 'as' => 'partner.', 'middleware' => ['auth', 'role:partner']], function () {
-    Route::get('partner-dashboard',          [PartnerDashboardController::class, 'index'])->name('dashboard');
-    Route::get('partner-videos',             [PartnerDashboardController::class, 'videos'])->name('videos');
+    Route::get('partner-dashboard', [PartnerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('partner-videos',    [PartnerDashboardController::class, 'videos'])->name('videos');
+    Route::get('partner-movies',    [PartnerDashboardController::class, 'movies'])->name('movies');
+    Route::get('partner-tvshows',   [PartnerDashboardController::class, 'tvshows'])->name('tvshows');
+    Route::get('partner-livetv',    [PartnerDashboardController::class, 'livetv'])->name('livetv');
 });
 
 /*

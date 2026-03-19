@@ -30,13 +30,49 @@ class GenerateMenus
                     'order'  => 1,
                 ]);
 
-                $this->mainRoute($menu, [
-                    'icon'   => 'ph ph-video',
-                    'title'  => __('video.title'),
-                    'url'    => url('/app/partner-videos'),
-                    'active' => ['app/partner-videos', 'app/partner-videos/*'],
-                    'order'  => 2,
-                ]);
+                // Menus dynamiques selon les types de contenu autorisés
+                $partner = \Modules\Partner\Models\Partner::where('user_id', auth()->id())->first();
+                $allowedTypes = $partner ? ($partner->allowed_content_types ?? []) : [];
+
+                if (in_array('video', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-video',
+                        'title'  => __('video.title'),
+                        'url'    => url('/app/partner-videos'),
+                        'active' => ['app/partner-videos', 'app/partner-videos/*'],
+                        'order'  => 2,
+                    ]);
+                }
+
+                if (in_array('movie', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-film-strip',
+                        'title'  => __('movie.movies'),
+                        'url'    => url('/app/partner-movies'),
+                        'active' => ['app/partner-movies', 'app/partner-movies/*'],
+                        'order'  => 3,
+                    ]);
+                }
+
+                if (in_array('tvshow', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-monitor-play',
+                        'title'  => __('movie.tvshows'),
+                        'url'    => url('/app/partner-tvshows'),
+                        'active' => ['app/partner-tvshows', 'app/partner-tvshows/*'],
+                        'order'  => 4,
+                    ]);
+                }
+
+                if (in_array('livetv', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-broadcast',
+                        'title'  => __('frontend.livetv'),
+                        'url'    => url('/app/partner-livetv'),
+                        'active' => ['app/partner-livetv', 'app/partner-livetv/*'],
+                        'order'  => 5,
+                    ]);
+                }
 
                 return;
             }
