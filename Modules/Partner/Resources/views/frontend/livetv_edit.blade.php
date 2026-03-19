@@ -8,7 +8,7 @@
     <div class="alert alert-success mb-3">{{ session('success') }}</div>
 @endif
 
-{{ html()->form('PUT', route('partner.livetv.update', \$item->id))->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->open() }}
+{{ html()->form('PUT', route('partner.livetv.update', $item->id))->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->open() }}
 
 @method('PUT')
 
@@ -19,7 +19,7 @@
     </div>
 @endif
 
-@if(\$errors->any())
+@if($errors->any())
     <div class="alert alert-danger mb-3">
         <ul class="mb-0">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
     </div>
@@ -40,7 +40,7 @@
                 <div class="uploaded-image" id="selectedImageContainerPoster">
                         @if($item->poster_url)<img src="{{ $item->poster_url }}" class="img-fluid mt-1 box-preview-image">@endif
                     </div>
-                {{ html()->hidden('poster_url')->id('file_url_poster')->value(old('poster_url', \$item->poster_url)) }}
+                {{ html()->hidden('poster_url')->id('file_url_poster')->value(old('poster_url', $item->poster_url)) }}
             </div>
 
             {{-- Poster TV --}}
@@ -53,7 +53,7 @@
                 <div class="uploaded-image" id="selectedImageContainerPosterTv">
                         @if($item->poster_tv_url)<img src="{{ $item->poster_tv_url }}" class="img-fluid mt-1 box-preview-image">@endif
                     </div>
-                {{ html()->hidden('poster_tv_url')->id('file_url_poster_tv')->value(old('poster_tv_url', \$item->poster_tv_url)) }}
+                {{ html()->hidden('poster_tv_url')->id('file_url_poster_tv')->value(old('poster_tv_url', $item->poster_tv_url)) }}
             </div>
 
             {{-- Thumbnail --}}
@@ -66,20 +66,20 @@
                 <div class="uploaded-image" id="selectedImageContainerThumbnail">
                         @if($item->thumb_url)<img src="{{ $item->thumb_url }}" class="img-fluid mt-1 box-preview-image">@endif
                     </div>
-                {{ html()->hidden('thumbnail_url')->id('file_url_thumbnail')->value(old('thumbnail_url', \$item->thumb_url)) }}
+                {{ html()->hidden('thumbnail_url')->id('file_url_thumbnail')->value(old('thumbnail_url', $item->thumb_url)) }}
             </div>
 
             {{-- Name --}}
             <div class="col-md-6">
                 {{ html()->label(__('movie.lbl_name') . ' <span class="text-danger">*</span>', 'name')->class('form-label') }}
-                {{ html()->text('name', old('name', \$item->name))->class('form-control')->attribute('required') }}
+                {{ html()->text('name', old('name', $item->name))->class('form-control')->attribute('required') }}
                 @error('name')<span class="text-danger small">{{ $message }}</span>@enderror
             </div>
 
             {{-- Category --}}
             <div class="col-md-6">
                 {{ html()->label(__('livetv.title') . ' <span class="text-danger">*</span>', 'category_id')->class('form-label') }}
-                {{ html()->select('category_id', $tvcategory->pluck('name', 'id')->prepend(__('placeholder.lbl_select'), ''), old('category_id', \$item->category_id))->class('form-control select2')->attribute('required') }}
+                {{ html()->select('category_id', $tvcategory->pluck('name', 'id')->prepend(__('placeholder.lbl_select'), ''), old('category_id', $item->category_id))->class('form-control select2')->attribute('required') }}
                 @error('category_id')<span class="text-danger small">{{ $message }}</span>@enderror
             </div>
 
@@ -91,7 +91,7 @@
                         <div>
                             <input class="form-check-input" type="radio" name="access" value="free"
                                 onchange="togglePpvFields(this.value)"
-                                {{ old('access', \$item->access ?? 'free') == 'free' ? 'checked' : '' }}>
+                                {{ old('access', $item->access ?? 'free') == 'free' ? 'checked' : '' }}>
                             <span class="form-check-label">{{ __('movie.lbl_free') }}</span>
                         </div>
                     </label>
@@ -99,7 +99,7 @@
                         <div>
                             <input class="form-check-input" type="radio" name="access" value="pay-per-view"
                                 onchange="togglePpvFields(this.value)"
-                                {{ old('access', \$item->access) == 'pay-per-view' ? 'checked' : '' }}>
+                                {{ old('access', $item->access) == 'pay-per-view' ? 'checked' : '' }}>
                             <span class="form-check-label">{{ __('messages.lbl_pay_per_view') }}</span>
                         </div>
                     </label>
@@ -107,13 +107,13 @@
             </div>
 
             {{-- PPV Fields --}}
-            <div class="col-12 {{ old('access', \$item->access) == 'pay-per-view' ? '' : 'd-none' }}" id="ppv_fields">
+            <div class="col-12 {{ old('access', $item->access) == 'pay-per-view' ? '' : 'd-none' }}" id="ppv_fields">
                 <div class="row g-3">
                     <div class="col-md-4">
                         {{ html()->label(__('messages.lbl_price') . ' <span class="text-danger">*</span>', 'price')->class('form-label') }}
                         <div class="input-group">
                             <span class="input-group-text">FCFA</span>
-                            {{ html()->number('price', old('price', \$item->price))->class('form-control')->attribute('step', '0.01')->attribute('min', 0)->id('price') }}
+                            {{ html()->number('price', old('price', $item->price))->class('form-control')->attribute('step', '0.01')->attribute('min', 0)->id('price') }}
                         </div>
                     </div>
                     <div class="col-8">
@@ -130,7 +130,7 @@
                 <div class="d-flex gap-3">
                     <label class="form-check form-control cursor-pointer w-auto m-0">
                         <input class="form-check-input" type="radio" name="type" value="t_url"
-                            onchange="showStreamtypeSelection('t_url')" {{ old('type', optional(\$streamMapping) && optional(\$streamMapping)->embedded ? 't_embedded' : 't_url') == 't_url' ? 'checked' : '' }}>
+                            onchange="showStreamtypeSelection('t_url')" {{ old('type', optional($streamMapping) && optional($streamMapping)->embedded ? 't_embedded' : 't_url') == 't_url' ? 'checked' : '' }}>
                         <span class="form-check-label">{{ __('messages.lbl_url') }}</span>
                     </label>
                     <label class="form-check form-control cursor-pointer w-auto m-0">
@@ -141,31 +141,31 @@
                 </div>
             </div>
 
-            <div class="col-md-4 {{ old('type', optional(\$streamMapping) && optional(\$streamMapping)->embedded ? 't_embedded' : 't_url') == 't_url' ? '' : 'd-none' }}" id="type_url">
+            <div class="col-md-4 {{ old('type', optional($streamMapping) && optional($streamMapping)->embedded ? 't_embedded' : 't_url') == 't_url' ? '' : 'd-none' }}" id="type_url">
                 {{ html()->label(__('movie.lbl_stream_type'), 'stream_type')->class('form-label') }}
-                {{ html()->select('stream_type', $url->pluck('name', 'value')->prepend(__('placeholder.lbl_select_video_type'), ''), old('stream_type', optional(\$streamMapping)->stream_type))->class('form-control select2') }}
+                {{ html()->select('stream_type', $url->pluck('name', 'value')->prepend(__('placeholder.lbl_select_video_type'), ''), old('stream_type', optional($streamMapping)->stream_type))->class('form-control select2') }}
             </div>
 
             <div class="col-md-4 {{ old('type') == 't_embedded' ? '' : 'd-none' }}" id="type_embedded">
                 {{ html()->label(__('movie.lbl_stream_type'), 'stream_type_embedded')->class('form-label') }}
-                {{ html()->select('stream_type', $embedded->pluck('name', 'value')->prepend(__('placeholder.lbl_select_video_type'), ''), old('stream_type', optional(\$streamMapping)->stream_type))->class('form-control select2') }}
+                {{ html()->select('stream_type', $embedded->pluck('name', 'value')->prepend(__('placeholder.lbl_select_video_type'), ''), old('stream_type', optional($streamMapping)->stream_type))->class('form-control select2') }}
             </div>
 
             <div class="col-md-8">
-                <div id="stream_url_section" class="{{ old('type', optional(\$streamMapping) && optional(\$streamMapping)->embedded ? 't_embedded' : 't_url') == 't_url' ? '' : 'd-none' }}">
+                <div id="stream_url_section" class="{{ old('type', optional($streamMapping) && optional($streamMapping)->embedded ? 't_embedded' : 't_url') == 't_url' ? '' : 'd-none' }}">
                     {{ html()->label(__('movie.server_url') . ' <span class="text-danger">*</span>', 'server_url')->class('form-label') }}
-                    {{ html()->text('server_url', old('server_url', optional(\$streamMapping)->server_url))->class('form-control')->placeholder('https://...') }}
+                    {{ html()->text('server_url', old('server_url', optional($streamMapping)->server_url))->class('form-control')->placeholder('https://...') }}
                 </div>
                 <div id="stream_embedded_section" class="{{ old('type') == 't_embedded' ? '' : 'd-none' }}">
                     {{ html()->label(__('movie.lbl_embed_code') . ' <span class="text-danger">*</span>', 'embedded')->class('form-label') }}
-                    {{ html()->textarea('embedded', old('embedded', optional(\$streamMapping)->embedded))->class('form-control')->placeholder('<iframe ...></iframe>') }}
+                    {{ html()->textarea('embedded', old('embedded', optional($streamMapping)->embedded))->class('form-control')->placeholder('<iframe ...></iframe>') }}
                 </div>
             </div>
 
             {{-- Description --}}
             <div class="col-md-12">
                 {{ html()->label(__('movie.lbl_description') . ' <span class="text-danger">*</span>', 'description')->class('form-label') }}
-                {{ html()->textarea('description', old('description', \$item->description))->class('form-control')->id('description')->rows(5)->attribute('required') }}
+                {{ html()->textarea('description', old('description', $item->description))->class('form-control')->id('description')->rows(5)->attribute('required') }}
                 @error('description')<span class="text-danger small">{{ $message }}</span>@enderror
             </div>
 
