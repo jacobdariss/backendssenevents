@@ -119,10 +119,13 @@
                         $isPartnerRestricted = isset($partnerFolder) && !empty($partnerFolder);
 
                         if ($isPartnerRestricted) {
-                            $partnerRoot = storage_path('app/public/' . $partnerFolder);
-                            if (!is_dir($partnerRoot)) {
-                                mkdir($partnerRoot, 0775, true);
+                            // Créer le dossier image du partenaire directement
+                            $partnerImageDir = storage_path('app/public/' . $partnerFolder . '/image');
+                            if (!is_dir($partnerImageDir)) {
+                                mkdir($partnerImageDir, 0775, true);
                             }
+                            // Pointer directement vers le dossier image — pas de navigation
+                            $partnerFolder = $partnerFolder . '/image';
                             $folders[] = $formatFolder($partnerFolder);
                         } elseif ($activeDisk === 'local') {
                             $root = storage_path('app/public');
@@ -404,10 +407,15 @@
         navigation: {
             openFolder: (folderName) => {
                 // Si dossier partenaire restreint, ne pas sortir du dossier autorisé
+                // Guard: ne pas naviguer en dehors du dossier partenaire
+                // partnerFolder peut être 'partners/1/image' maintenant
                 const partnerFolder = FileManager.config.partnerFolder;
-                if (partnerFolder && !folderName.startsWith(partnerFolder)) {
-                    console.warn('Partner restricted: access denied to', folderName);
-                    return;
+                if (partnerFolder) {
+                    const partnerBase = partnerFolder.replace('/image', '');
+                    if (!folderName.startsWith(partnerBase)) {
+                        console.warn('Partner restricted:', folderName);
+                        return;
+                    }
                 }
                 FileManager.cleanup();
                 FileManager.state.currentFolder = folderName;

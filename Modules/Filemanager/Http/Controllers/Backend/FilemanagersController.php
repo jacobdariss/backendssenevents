@@ -160,6 +160,10 @@ class FilemanagersController extends Controller
     }
     $message = trans('filemanager.file_added');
 
+    // Si requête AJAX (depuis modal partenaire ou XMLHttpRequest), retourner JSON
+    if (request()->expectsJson() || request()->ajax() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+        return response()->json(['success' => true, 'message' => $message]);
+    }
     return redirect()->route('backend.media-library.index')->with('success', $message);
 }
 
