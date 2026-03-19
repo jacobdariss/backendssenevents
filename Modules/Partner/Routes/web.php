@@ -91,6 +91,10 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'a
     Route::delete('partners/{id}/contract', [PartnerController::class, 'deleteContract'])->name('partners.contract.delete');
 
     // Partner content validation
+    // Notifications
+    Route::get('partner-notifications',          [PartnerDashboardController::class, 'notifications'])->name('notifications');
+    Route::post('partner-notifications/read',    [PartnerDashboardController::class, 'markNotificationsRead'])->name('notifications.read');
+
     Route::prefix('partner-validation')->name('partner-validation.')->group(function () {
         Route::get('/', [PartnerValidationController::class, 'index'])->name('index');
         Route::post('approve/{contentType}/{id}', [PartnerValidationController::class, 'approve'])->name('approve');
