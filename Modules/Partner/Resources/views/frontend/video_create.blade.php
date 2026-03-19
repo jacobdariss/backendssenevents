@@ -121,14 +121,14 @@
                 {{-- Duration --}}
                 <div class="col-md-3">
                     {{ html()->label(__('movie.lbl_duration') . ' <span class="text-danger">*</span>', 'duration')->class('form-label') }}
-                    {{ html()->text('duration', old('duration'))->class('form-control')->placeholder('00:30:00')->attribute('required') }}
+                    {{ html()->text('duration', old('duration'))->class('form-control')->placeholder('00:30:00') }}
                     @error('duration')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
                 {{-- Release date --}}
                 <div class="col-md-3">
                     {{ html()->label(__('movie.lbl_release_date') . ' <span class="text-danger">*</span>', 'release_date')->class('form-label') }}
-                    {{ html()->date('release_date', old('release_date'))->class('form-control')->attribute('required') }}
+                    {{ html()->date('release_date', old('release_date'))->class('form-control') }}
                     @error('release_date')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
@@ -171,7 +171,7 @@
                 {{-- Trailer URL type --}}
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_trailer_url_type') . ' <span class="text-danger">*</span>', 'trailer_url_type')->class('form-label') }}
-                    {{ html()->select('trailer_url_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_type'), ''), old('trailer_url_type', ''))->class('form-control select2')->id('trailer_url_type')->attribute('required') }}
+                    {{ html()->select('trailer_url_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_type'), ''), old('trailer_url_type', ''))->class('form-control select2')->id('trailer_url_type') }}
                     @error('trailer_url_type')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 

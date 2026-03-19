@@ -45,16 +45,8 @@ class PartnerVideoController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $request->validate([
-            'name'              => 'required|string|max:255|unique:videos,name',
-            'description'       => 'required|string',
-            'duration'          => 'required',
-            'release_date'      => 'required',
-            'access'            => 'required|in:free,pay-per-view',
+            'name'              => 'required|string|max:255',
             'video_upload_type' => 'required',
-            'price'             => 'required_if:access,pay-per-view|numeric|min:0',
-            'purchase_type'     => 'required_if:access,pay-per-view',
-            'access_duration'   => 'required_if:purchase_type,rental|nullable|integer|min:1',
-            'available_for'     => 'required_if:access,pay-per-view|nullable|integer|min:1',
         ]);
 
         \Log::info('video store data', [
