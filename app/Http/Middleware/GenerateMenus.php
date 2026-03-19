@@ -68,11 +68,11 @@ class GenerateMenus
                 }
 
                 // Analytics partenaire
-                $this->staticMenu($menu, [
+                $this->mainRoute($menu, [
                     'title'  => __('analytics::analytics.title'),
                     'url'    => url('/app/partner-analytics'),
                     'icon'   => 'ph ph-chart-pie-slice',
-                    'active' => ['app/partner-analytics'],
+                    'active' => ['app/partner-analytics', 'app/partner-analytics/*'],
                     'order'  => 99,
                 ]);
 
@@ -126,12 +126,12 @@ class GenerateMenus
             ]);
 
             // Analytics admin
-            $this->staticMenu($menu, [
-                'title'      => __('analytics::analytics.title'),
-                'url'        => url('/app/analytics'),
-                'icon'       => 'ph ph-chart-pie-slice',
-                'active'     => ['app/analytics', 'app/analytics/*'],
-                'order'      => 5,
+            $this->mainRoute($menu, [
+                'title'  => __('analytics::analytics.title'),
+                'url'    => url('/app/analytics'),
+                'icon'   => 'ph ph-chart-pie-slice',
+                'active' => ['app/analytics', 'app/analytics/*'],
+                'order'  => 5,
             ]);
 
             if(isenablemodule('movie')==1){
