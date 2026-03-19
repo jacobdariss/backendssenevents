@@ -19,4 +19,11 @@ return [
     'views'            => 'Views',
     'partners'         => 'Partners',
     'see_details'      => 'See details',
+    'likes_dislikes' => 'Likes / Dislikes',
+    'likes'           => 'Likes',
+    'dislikes'        => 'Dislikes',
+    'like_rate'       => 'Like rate',
+    'likes_over_time' => 'Likes over time',
+    'top_liked'       => 'Most liked content',
+
 ];

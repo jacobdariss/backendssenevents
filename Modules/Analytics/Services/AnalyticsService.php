@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Entertainment\Models\EntertainmentView;
 use Modules\Frontend\Models\PayperviewTransaction;
 use Modules\Partner\Models\Partner;
+use Modules\Entertainment\Models\Like;
 
 class AnalyticsService
 {
@@ -113,6 +114,60 @@ class AnalyticsService
         if ($partnerId) $q->where('partner_id', $partnerId);
         return $q->groupBy('content_type', 'entertainment_id', 'episode_id', 'video_id')
             ->orderByDesc('views')->limit($limit)->get();
+    }
+
+    // ─── Likes / Dislikes ────────────────────────────────────────────────────
+    public function likesStats(Carbon $from, Carbon $to, ?int $partnerId = null): array
+    {
+        $baseQuery = Like::whereBetween('likes.created_at', [$from, $to]);
+
+        if ($partnerId) {
+            $baseQuery->join('entertainments', 'entertainments.id', '=', 'likes.entertainment_id')
+                      ->where('entertainments.partner_id', $partnerId);
+        }
+
+        $likes    = (clone $baseQuery)->where('is_like', 1)->count();
+        $dislikes = (clone $baseQuery)->where('is_like', 0)->count();
+        $total    = $likes + $dislikes;
+
+        return [
+            'likes'       => $likes,
+            'dislikes'    => $dislikes,
+            'total'       => $total,
+            'like_rate'   => $total > 0 ? round($likes / $total * 100, 1) : 0,
+        ];
+    }
+
+    public function likesPerDay(Carbon $from, Carbon $to, ?int $partnerId = null): \Illuminate\Support\Collection
+    {
+        $q = Like::select(
+                DB::raw('DATE(likes.created_at) as date'),
+                DB::raw('SUM(likes.is_like = 1) as likes'),
+                DB::raw('SUM(likes.is_like = 0) as dislikes'))
+            ->whereBetween('likes.created_at', [$from, $to]);
+        if ($partnerId) {
+            $q->join('entertainments', 'entertainments.id', '=', 'likes.entertainment_id')
+              ->where('entertainments.partner_id', $partnerId);
+        }
+        return $q->groupBy('date')->orderBy('date')->get();
+    }
+
+    public function topLikedContent(Carbon $from, Carbon $to, ?int $partnerId = null, int $limit = 10): \Illuminate\Support\Collection
+    {
+        $q = Like::select('likes.entertainment_id',
+                DB::raw('SUM(likes.is_like = 1) as likes'),
+                DB::raw('SUM(likes.is_like = 0) as dislikes'),
+                DB::raw('COUNT(*) as total'))
+            ->whereBetween('likes.created_at', [$from, $to])
+            ->where('likes.is_like', 1);
+        if ($partnerId) {
+            $q->join('entertainments', 'entertainments.id', '=', 'likes.entertainment_id')
+              ->where('entertainments.partner_id', $partnerId);
+        }
+        return $q->groupBy('entertainment_id')
+            ->orderByDesc('likes')
+            ->limit($limit)
+            ->get();
     }
 
     public function globalStats(Carbon $from, Carbon $to): array

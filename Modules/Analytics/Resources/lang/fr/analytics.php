@@ -19,4 +19,11 @@ return [
     'views'            => 'Vues',
     'partners'         => 'Partenaires',
     'see_details'      => 'Voir détails',
+    'likes_dislikes' => 'Likes / Dislikes',
+    'likes'           => 'Likes',
+    'dislikes'        => 'Dislikes',
+    'like_rate'       => 'Taux de like',
+    'likes_over_time' => 'Évolution des likes',
+    'top_liked'       => 'Contenus les plus aimés',
+
 ];

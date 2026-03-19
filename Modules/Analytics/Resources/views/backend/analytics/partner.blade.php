@@ -144,6 +144,78 @@
         </div>
     </div>
 </div>
+{{-- Likes / Dislikes --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-thumbs-up me-2"></i>{{ __('analytics::analytics.likes_dislikes') }}</h6></div>
+            <div class="card-body">
+                <div class="d-flex justify-content-around text-center mb-3">
+                    <div>
+                        <div class="fs-3 fw-bold text-success">{{ number_format($likesStats['likes']) }}</div>
+                        <div class="text-muted small"><i class="ph ph-thumbs-up me-1"></i>{{ __('analytics::analytics.likes') }}</div>
+                    </div>
+                    <div class="border-end"></div>
+                    <div>
+                        <div class="fs-3 fw-bold text-danger">{{ number_format($likesStats['dislikes']) }}</div>
+                        <div class="text-muted small"><i class="ph ph-thumbs-down me-1"></i>{{ __('analytics::analytics.dislikes') }}</div>
+                    </div>
+                    <div class="border-end"></div>
+                    <div>
+                        <div class="fs-3 fw-bold text-primary">{{ $likesStats['like_rate'] }}%</div>
+                        <div class="text-muted small">{{ __('analytics::analytics.like_rate') }}</div>
+                    </div>
+                </div>
+                <div class="progress" style="height:8px">
+                    <div class="progress-bar bg-success" style="width:{{ $likesStats['like_rate'] }}%"></div>
+                    <div class="progress-bar bg-danger" style="width:{{ 100 - $likesStats['like_rate'] }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-trend-up me-2"></i>{{ __('analytics::analytics.likes_over_time') }}</h6></div>
+            <div class="card-body"><canvas id="likesChart" height="90"></canvas></div>
+        </div>
+    </div>
+</div>
+
+{{-- Top contenus likés --}}
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="ph ph-heart me-2"></i>{{ __('analytics::analytics.top_liked') }}</h6></div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr>
+                <th>{{ __('messages.name') }}</th>
+                <th class="text-end text-success"><i class="ph ph-thumbs-up"></i></th>
+                <th class="text-end text-danger"><i class="ph ph-thumbs-down"></i></th>
+                <th class="text-end">{{ __('analytics::analytics.like_rate') }}</th>
+            </tr></thead>
+            <tbody>
+                @forelse($topLiked as $row)
+                @php $total = $row->likes + $row->dislikes ?: 1; @endphp
+                <tr>
+                    <td>{{ $row->content_name }}</td>
+                    <td class="text-end fw-bold text-success">{{ number_format($row->likes) }}</td>
+                    <td class="text-end text-danger">{{ number_format($row->dislikes) }}</td>
+                    <td class="text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <div class="progress flex-grow-1" style="height:6px;max-width:80px">
+                                <div class="progress-bar bg-success" style="width:{{ round($row->likes/$total*100) }}%"></div>
+                            </div>
+                            <span class="small">{{ round($row->likes/$total*100) }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="4" class="text-center text-muted py-4">{{ __('messages.no_record_found') }}</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
 @endsection
 
 @push('after-scripts')
@@ -161,5 +233,21 @@ new Chart(document.getElementById('deviceChart'), {
     options: { responsive:true, plugins:{ legend:{ position:'bottom' } } }
 });
 @endif
+// Likes chart
+const likesData = @json($likesPerDay);
+if (document.getElementById('likesChart') && likesData.length) {
+    new Chart(document.getElementById('likesChart'), {
+        type: 'bar',
+        data: {
+            labels: likesData.map(d => d.date),
+            datasets: [
+                { label: 'Likes', data: likesData.map(d => d.likes), backgroundColor: 'rgba(25,135,84,0.7)' },
+                { label: 'Dislikes', data: likesData.map(d => d.dislikes), backgroundColor: 'rgba(220,53,69,0.7)' }
+            ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { x: { stacked: false }, y: { beginAtZero: true } } }
+    });
+}
+
 </script>
 @endpush
