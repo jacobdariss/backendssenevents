@@ -192,7 +192,7 @@ class FinanceService
                 'transaction_id' => $s->identifier ?? '—',
             ]);
 
-        return $ppv->merge($subs)->sortByDesc('date')->take($limit);
+        return $ppv->merge($subs)->sortByDesc(fn($t) => $t['date'])->take($limit);
     }
 
     // ─── Abonnements détaillés ────────────────────────────────────────────────
