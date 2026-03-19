@@ -140,20 +140,18 @@ class FilemanagersController extends Controller
 
     if (!empty($jobs)) {
 
-        Bus::batch($jobs)->dispatch();
-        Log::info('batch dispatched', ['count' => count($jobs)]);
-
-        // foreach ($jobs as $job) {
-        //      ProcessFileUpload::dispatchSync(
-        //         $job->filemanager,
-        //         $job->filePath,
-        //         $job->diskType,
-        //         $job->originalName,
-        //         $job->page_type,
-        //         $job->fileType
-        //     );
-        // }
-        // Log::info('jobs dispatched synchronously', ['count' => count($jobs)]);
+        // Exécution synchrone — pas de queue worker sur Plesk
+        foreach ($jobs as $job) {
+            ProcessFileUpload::dispatchSync(
+                $job->filemanager,
+                $job->filePath,
+                $job->diskType,
+                $job->originalName,
+                $job->page_type,
+                $job->fileType
+            );
+        }
+        Log::info('jobs dispatched synchronously', ['count' => count($jobs)]);
 
     } else {
         Log::warning('no jobs queued for upload');
