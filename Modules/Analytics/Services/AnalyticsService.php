@@ -52,7 +52,9 @@ class AnalyticsService
 
     public function viewsByDevice(Carbon $from, Carbon $to, ?int $partnerId = null): \Illuminate\Support\Collection
     {
-        $q = EntertainmentView::select('device_type', DB::raw('COUNT(*) as views'))
+        $q = EntertainmentView::select(
+                DB::raw("COALESCE(NULLIF(device_type,''), 'Inconnu') as device_type"),
+                DB::raw('COUNT(*) as views'))
             ->whereBetween('created_at', [$from, $to]);
         if ($partnerId) $q->where('partner_id', $partnerId);
         return $q->groupBy('device_type')->orderByDesc('views')->get();
@@ -60,7 +62,9 @@ class AnalyticsService
 
     public function viewsByPlatform(Carbon $from, Carbon $to, ?int $partnerId = null): \Illuminate\Support\Collection
     {
-        $q = EntertainmentView::select('platform', DB::raw('COUNT(*) as views'))
+        $q = EntertainmentView::select(
+                DB::raw("COALESCE(NULLIF(platform,''), 'Inconnu') as platform"),
+                DB::raw('COUNT(*) as views'))
             ->whereBetween('created_at', [$from, $to]);
         if ($partnerId) $q->where('partner_id', $partnerId);
         return $q->groupBy('platform')->orderByDesc('views')->get();

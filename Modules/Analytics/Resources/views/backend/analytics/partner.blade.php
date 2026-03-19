@@ -78,11 +78,11 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header"><h6 class="mb-0"><i class="ph ph-device-mobile me-2"></i>{{ __('analytics::analytics.by_device') }}</h6></div>
             <div class="card-body d-flex align-items-center justify-content-center">
                 @if($byDevice->count())
-                    <canvas id="deviceChart" height="180"></canvas>
+                    <canvas id="deviceChart" height="90" style="max-height:150px"></canvas>
                 @else
                     <p class="text-muted small">{{ __('messages.no_record_found') }}</p>
                 @endif
@@ -306,7 +306,7 @@ new Chart(document.getElementById('viewsChart'), {
 new Chart(document.getElementById('deviceChart'), {
     type: 'doughnut',
     data: { labels: @json($byDevice->pluck('device_type')), datasets: [{ data: @json($byDevice->pluck('views')), backgroundColor: C }] },
-    options: { responsive:true, plugins:{ legend:{ position:'bottom' } } }
+    options: { responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' } }, layout:{ padding:0 } }
 });
 @endif
 // Likes chart
