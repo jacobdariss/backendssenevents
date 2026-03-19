@@ -130,6 +130,7 @@
                     {{ html()->hidden('video_url_input')->id('file_url_video')->value(old('video_url_input')) }}
                 </div>
 
+                </div>{{-- end video wrapper --}}
 
                 {{-- Trailer URL type --}}
                 <div class="col-md-4">

@@ -116,20 +116,23 @@
                     @error('video_upload_type')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
+                {{-- Video URL / File / Embed wrapper (col-md-8 sur même ligne que le select) --}}
+                <div class="col-md-8">
+
                 {{-- Embed code --}}
-                <div class="col-md-8 {{ !in_array(old('video_upload_type', $video->video_upload_type), ['Local', 'URL', 'YouTube', 'HLS', 'Vimeo', 'x265', '']) ? '' : 'd-none' }}" id="embed_code_input_section">
+                <div class="{{ !in_array(old('video_upload_type', $video->video_upload_type), ['Local', 'URL', 'YouTube', 'HLS', 'Vimeo', 'x265', '']) ? '' : 'd-none' }}" id="embed_code_input_section">
                     {{ html()->label(__('movie.lbl_embed_code'), 'embed_code')->class('form-label') }}
                     {{ html()->textarea('embed_code', old('embed_code', $video->video_url_input))->class('form-control')->id('embed_code')->placeholder('<iframe ...></iframe>') }}
                 </div>
 
                 {{-- Video URL --}}
-                <div class="col-md-8 {{ in_array(old('video_upload_type', $video->video_upload_type), ['URL', 'YouTube', 'HLS', 'Vimeo', 'x265']) ? '' : 'd-none' }}" id="video_url_input_section">
+                <div class="{{ in_array(old('video_upload_type', $video->video_upload_type), ['URL', 'YouTube', 'HLS', 'Vimeo', 'x265']) ? '' : 'd-none' }}" id="video_url_input_section">
                     {{ html()->label(__('movie.video_url_input') . ' <span class="text-danger">*</span>', 'video_url_input')->class('form-label') }}
                     {{ html()->text('video_url_input', old('video_url_input', $video->video_url_input))->class('form-control')->id('video_url_input')->placeholder(__('placeholder.video_url_input')) }}
                 </div>
 
                 {{-- Video file --}}
-                <div class="col-md-8 {{ old('video_upload_type', $video->video_upload_type) === 'Local' ? '' : 'd-none' }}" id="video_file_input_section">
+                <div class="{{ old('video_upload_type', $video->video_upload_type) === 'Local' ? '' : 'd-none' }}" id="video_file_input_section">
                     {{ html()->label(__('movie.video_file_input'), 'video_file')->class('form-label') }}
                     <div class="input-group btn-video-link-upload">
                         {{ html()->button(__('placeholder.lbl_select_file') . '<i class="ph ph-upload"></i>')->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerVideourl')->attribute('data-hidden-input', 'file_url_video') }}
@@ -139,6 +142,7 @@
                     {{ html()->hidden('video_url_input')->id('file_url_video')->value(old('video_url_input', $video->video_url_input)) }}
                 </div>
 
+                </div>{{-- end video wrapper --}}
 
                 {{-- Trailer URL type --}}
                 <div class="col-md-4">
