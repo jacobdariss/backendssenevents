@@ -8,6 +8,7 @@ use Modules\Partner\Http\Controllers\Frontend\PartnerDashboardController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerVideoController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerContentController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerLiveTvController;
+use Modules\Partner\Http\Controllers\Frontend\PartnerSeasonEpisodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +51,19 @@ Route::group(['prefix' => 'app', 'as' => 'partner.', 'middleware' => ['auth', 'r
     Route::post('partner-tvshows/store',      [PartnerContentController::class, 'tvshowsStore'])->name('tvshows.store');
     Route::get('partner-tvshows/{id}/edit',   [PartnerContentController::class, 'tvshowsEdit'])->name('tvshows.edit');
     Route::put('partner-tvshows/{id}/update', [PartnerContentController::class, 'tvshowsUpdate'])->name('tvshows.update');
+
+    // ── Saisons & Épisodes ─────────────────────────────────────────────
+    Route::get('partner-tvshows/{tvshowId}/seasons',                     [PartnerSeasonEpisodeController::class, 'seasonList'])->name('tvshow.seasons');
+    Route::get('partner-tvshows/{tvshowId}/seasons/create',              [PartnerSeasonEpisodeController::class, 'seasonCreate'])->name('tvshow.season.create');
+    Route::post('partner-tvshows/{tvshowId}/seasons/store',              [PartnerSeasonEpisodeController::class, 'seasonStore'])->name('tvshow.season.store');
+    Route::get('partner-tvshows/{tvshowId}/seasons/{seasonId}/edit',     [PartnerSeasonEpisodeController::class, 'seasonEdit'])->name('tvshow.season.edit');
+    Route::put('partner-tvshows/{tvshowId}/seasons/{seasonId}/update',   [PartnerSeasonEpisodeController::class, 'seasonUpdate'])->name('tvshow.season.update');
+
+    Route::get('partner-tvshows/{tvshowId}/seasons/{seasonId}/episodes',               [PartnerSeasonEpisodeController::class, 'episodeList'])->name('tvshow.season.episodes');
+    Route::get('partner-tvshows/{tvshowId}/seasons/{seasonId}/episodes/create',        [PartnerSeasonEpisodeController::class, 'episodeCreate'])->name('tvshow.season.episode.create');
+    Route::post('partner-tvshows/{tvshowId}/seasons/{seasonId}/episodes/store',        [PartnerSeasonEpisodeController::class, 'episodeStore'])->name('tvshow.season.episode.store');
+    Route::get('partner-tvshows/{tvshowId}/seasons/{seasonId}/episodes/{epId}/edit',   [PartnerSeasonEpisodeController::class, 'episodeEdit'])->name('tvshow.season.episode.edit');
+    Route::put('partner-tvshows/{tvshowId}/seasons/{seasonId}/episodes/{epId}/update', [PartnerSeasonEpisodeController::class, 'episodeUpdate'])->name('tvshow.season.episode.update');
 
     Route::get('partner-livetv',              [PartnerDashboardController::class, 'livetv'])->name('livetv');
     Route::get('partner-livetv/create',       [PartnerLiveTvController::class, 'create'])->name('livetv.create');

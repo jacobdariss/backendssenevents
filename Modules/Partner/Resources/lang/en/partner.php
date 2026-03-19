@@ -95,4 +95,18 @@ return [
     'add_livetv'   => 'Add Live TV Channel',
     'edit_livetv'  => 'Edit Live TV Channel',
 
+    // Seasons & Episodes
+    'seasons'            => 'Seasons',
+    'episodes'           => 'Episodes',
+    'add_season'         => 'Add Season',
+    'edit_season'        => 'Edit Season',
+    'add_episode'        => 'Add Episode',
+    'edit_episode'       => 'Edit Episode',
+    'season_created'     => 'Season submitted for validation.',
+    'season_updated'     => 'Season updated and resubmitted for validation.',
+    'episode_created'    => 'Episode submitted for validation.',
+    'episode_updated'    => 'Episode updated and resubmitted for validation.',
+    'lbl_season_number'  => 'Season Number',
+    'lbl_episode_number' => 'Episode Number',
+
 ];

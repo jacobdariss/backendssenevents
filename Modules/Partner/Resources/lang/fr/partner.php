@@ -95,4 +95,18 @@ return [
     'add_livetv'   => 'Ajouter une chaîne TV en direct',
     'edit_livetv'  => 'Modifier la chaîne TV en direct',
 
+    // Saisons & Épisodes
+    'seasons'            => 'Saisons',
+    'episodes'           => 'Épisodes',
+    'add_season'         => 'Ajouter une saison',
+    'edit_season'        => 'Modifier la saison',
+    'add_episode'        => 'Ajouter un épisode',
+    'edit_episode'       => 'Modifier l\'épisode',
+    'season_created'     => 'Saison soumise pour validation.',
+    'season_updated'     => 'Saison mise à jour et soumise pour validation.',
+    'episode_created'    => 'Épisode soumis pour validation.',
+    'episode_updated'    => 'Épisode mis à jour et soumis pour validation.',
+    'lbl_season_number'  => 'Numéro de saison',
+    'lbl_episode_number' => 'Numéro d\'épisode',
+
 ];

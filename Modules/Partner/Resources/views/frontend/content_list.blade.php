@@ -91,6 +91,11 @@
                                 <i class="ph ph-pencil"></i>
                             </a>
                             @endif
+                            @if($content_type === 'tvshow')
+                            <a href="{{ route('partner.tvshow.seasons', $item->id) }}" class="btn btn-info btn-sm">
+                                <i class="ph ph-stack me-1"></i>{{ __('partner::partner.seasons') }}
+                            </a>
+                            @endif
                         </td>
                     </tr>
                     @empty
