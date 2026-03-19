@@ -258,12 +258,7 @@
                 data: 'updated_at',
                 name: 'updated_at',
                 title: "{{ __('messages.update_at') }}",
-                orderable: true,
-                visible: false,
-            },
-        ]
-
-                    {
+                orderable: true,            {
                 data: 'partner_name',
                 name: 'partner_name',
                 title: "{{ __('partner::partner.lbl_partner') }}",
@@ -274,6 +269,29 @@
                 data: 'approval_col',
                 name: 'approval_col',
                 title: "{{ __('partner::partner.validation_title') }}",
+                orderable: false,
+                searchable: false,
+            },
+        
+                visible: false,
+            },
+        ,
+            {
+                data: 'partner_name',
+                name: 'partner_name',
+                title: "{{ __('partner::partner.lbl_partner') }}",
+                orderable: false,
+                searchable: false,
+            },
+            {
+                data: 'approval_col',
+                name: 'approval_col',
+                title: "{{ __('partner::partner.validation_title') }}",
+                orderable: false,
+                searchable: false,
+            }
+        ]
+}",
                 orderable: false,
                 searchable: false,
             },
