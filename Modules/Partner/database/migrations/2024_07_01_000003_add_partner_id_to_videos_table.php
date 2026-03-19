@@ -8,14 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasColumn('videos', 'partner_id')) {
         Schema::table('videos', function (Blueprint $table) {
             $table->unsignedBigInteger('partner_id')->nullable()->after('id');
             $table->foreign('partner_id')->references('id')->on('partners')->onDelete('set null');
         });
+        }
     }
 
     public function down(): void
     {
+        if (!Schema::hasColumn('videos', 'partner_id')) {
         Schema::table('videos', function (Blueprint $table) {
             $table->dropForeign(['partner_id']);
             $table->dropColumn('partner_id');
