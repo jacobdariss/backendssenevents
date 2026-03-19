@@ -149,6 +149,28 @@ class PartnerValidationController extends Controller
 
         $model->update($updateData);
 
+        // Si c'est un épisode → approuver automatiquement la saison et la série parente
+        if ($contentType === 'episode' && $model->entertainment_id) {
+            // Approuver la série parente
+            \Modules\Entertainment\Models\Entertainment::where('id', $model->entertainment_id)
+                ->where('status', 0)
+                ->update(['approval_status' => 'approved', 'status' => 1]);
+
+            // Approuver la saison parente si elle existe
+            if ($model->season_id) {
+                \Modules\Season\Models\Season::where('id', $model->season_id)
+                    ->where('status', 0)
+                    ->update(['approval_status' => 'approved', 'status' => 1]);
+            }
+        }
+
+        // Si c'est une saison → approuver la série parente
+        if ($contentType === 'season' && $model->entertainment_id) {
+            \Modules\Entertainment\Models\Entertainment::where('id', $model->entertainment_id)
+                ->where('status', 0)
+                ->update(['approval_status' => 'approved', 'status' => 1]);
+        }
+
         // Vider le cache pour que le contenu approuvé apparaisse immédiatement
         clearRelatedCache(['setting', 'home_banners', 'genres', 'genres_v2'], null);
         clearDashboardCache();

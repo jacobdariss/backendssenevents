@@ -72,17 +72,21 @@ class MobileSettingController extends Controller
 
 
         $movieList = Entertainment::where('type', 'movie')
-            ->released()
             ->where('status', 1)
             ->whereNull('deleted_at')
+            ->where(function($q) {
+                $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+            })
             ->orderBy('name')
             ->pluck('name', 'id')
             ->toArray();
 
         $tvshowList = Entertainment::where('type', 'tvshow')
-            ->released()
             ->where('status', 1)
             ->whereNull('deleted_at')
+            ->where(function($q) {
+                $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+            })
             ->orderBy('name')
             ->pluck('name', 'id')
             ->toArray();
@@ -387,9 +391,11 @@ class MobileSettingController extends Controller
                 }
                 if ($type == 'movie' || $type == 'tvshow') {
                     $value = Entertainment::where('type', $type)
-                        ->released()
                         ->where('status', 1)
                         ->whereNull('deleted_at')
+                        ->where(function($q) {
+                            $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+                        })
                         ->orderBy('release_date', 'desc')
                         ->get();
 
@@ -545,9 +551,11 @@ class MobileSettingController extends Controller
             default:
                 if ($type === 'movie' || $type === 'tvshow') {
                     $value = Entertainment::where('type', $type)
-                        ->released()
                         ->where('status', 1)
                         ->whereNull('deleted_at')
+                        ->where(function($q) {
+                            $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+                        })
                         ->orderBy('release_date', 'desc')
                         ->get();
                 } elseif ($type === 'video') {
