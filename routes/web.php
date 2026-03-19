@@ -112,12 +112,6 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
         Route::get('/dashboard', [BackendController::class, 'index'])->name('home');
         Route::get('/daterange', [BackendController::class, 'daterange'])->name('daterange');
 
-        // Security (2FA + Permissions) — Super Admin only
-        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
-            Route::get('/', [SecurityController::class, 'index'])->name('index');
-            Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
-        });
-
         // Admin Management (Users & Roles)
         Route::group(['prefix' => 'admin-management', 'as' => 'admin-management.'], function () {
             Route::get('/', [AdminManagementController::class, 'index'])->name('index');
@@ -127,6 +121,12 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
             Route::post('roles', [AdminManagementController::class, 'storeRole'])->name('roles.store');
             Route::delete('roles/{id}', [AdminManagementController::class, 'destroyRole'])->name('roles.destroy');
         });
+        // Security (2FA + Permissions) — Super Admin only
+        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
+            Route::get('/', [SecurityController::class, 'index'])->name('index');
+            Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
+        });
+
         Route::get('google-auth', [BackendController::class, 'googleAuth'])->name('google-auth');
         Route::get('/get_revnue_chart_data/{type}', [BackendController::class, 'getRevenuechartData']);
         Route::get('/get_subscriber_chart_data/{type}', [BackendController::class, 'getSubscriberChartData']);
@@ -172,101 +172,6 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
         });
 
     });
-
-    Route::post('/auth/google', [SettingController::class, 'googleId']);
-    Route::get('callback', [SettingController::class, 'handleGoogleCallback']);
-    Route::post('/store-access-token', [SettingController::class, 'storeToken']);
-    Route::get('google-key', [SettingController::class, 'googleKey']);
-    Route::get('currencies_data', [SettingsController::class, 'getCurrencyData'])->name('backend.currencies.getCurrencyData');
-
-
-    Route::group(['as' => 'backend.', 'middleware' => ['auth', 'admin']], function () {
-        Route::post('/clear-cache-config', function () {
-            \Artisan::call('config:clear');
-            \Artisan::call('cache:clear');
-            return response()->json(['message' => 'Cache and Config cleared']);
-        })->name('config_clear');
-    });
-
-});
-
-Route::middleware(['web'])->group(function () {
-    // Public routes
-    Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
-    Route::post('login', 'Auth\LoginController@login');
-
-    // Protected routes with auth
-    Route::middleware(['auth'])->group(function () {
-        Route::post('logout', 'Auth\LoginController@logout')->name('logout');
-        // Other protected routes...
-    });
-});
-
-});
-
-
-Route::get('/dashboard', [BackendController::class, 'index'])->name('home');
-        Route::get('/daterange', [BackendController::class, 'daterange'])->name('daterange');
-
-        // Security (2FA + Permissions) — Super Admin only
-        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
-            Route::get('/', [SecurityController::class, 'index'])->name('index');
-            Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
-        });
-
-        // Admin Management (Users & Roles)
-        Route::group(['prefix' => 'admin-management', 'as' => 'admin-management.'], function () {
-            Route::get('/', [AdminManagementController::class, 'index'])->name('index');
-            Route::post('users', [AdminManagementController::class, 'storeAdmin'])->name('users.store');
-            Route::patch('users/{id}/role', [AdminManagementController::class, 'updateAdminRole'])->name('users.update-role');
-            Route::delete('users/{id}', [AdminManagementController::class, 'destroyAdmin'])->name('users.destroy');
-            Route::post('roles', [AdminManagementController::class, 'storeRole'])->name('roles.store');
-            Route::delete('roles/{id}', [AdminManagementController::class, 'destroyRole'])->name('roles.destroy');
-        });
-        Route::get('google-auth', [BackendController::class, 'googleAuth'])->name('google-auth');
-        Route::get('/get_revnue_chart_data/{type}', [BackendController::class, 'getRevenuechartData']);
-        Route::get('/get_subscriber_chart_data/{type}', [BackendController::class, 'getSubscriberChartData']);
-        Route::get('/get_genre_chart_data', [BackendController::class, 'getGenreChartData']);
-        Route::get('/get_mostwatch_chart_data/{type}', [BackendController::class, 'getMostwatchChartData']);
-        Route::get('/get_toprated_chart_data', [BackendController::class, 'getTopRatedChartData']);
-
-        Route::group(['prefix' => ''], function () {
-
-            /*
-            *
-            *  Users Routes
-            *
-            * ---------------------------------------------------------------------
-            */
-            Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
-                Route::get('user-list', [UserController::class, 'user_list'])->name('user_list');
-                Route::get('emailConfirmationResend/{id}', [UserController::class, 'emailConfirmationResend'])->name('emailConfirmationResend');
-                Route::post('create-customer', [UserController::class, 'create_customer'])->name('create_customer');
-                Route::post('information', [UserController::class, 'update'])->name('information');
-                Route::post('change-password', [UserController::class, 'change_password'])->name('change_password');
-                Route::post('import', [UserController::class, 'import'])->name('import');
-                Route::get('download-sample', [UserController::class, 'downloadSample'])->name('download_sample');
-
-            });
-        });
-        Route::get('my-profile/{vue_capture?}', [UserController::class, 'myProfile'])->name('my-profile')->where('vue_capture', '^(?!storage).*$');
-        Route::get('my-info', [UserController::class, 'authData'])->name('authData');
-        Route::post('my-profile/change-password', [UserController::class, 'change_password'])->name('change_password');
-        Route::get('app-configuration', [App\Http\Controllers\Backend\API\SettingController::class, 'appConfiguraton']);
-        Route::get('data-configuration', [App\Http\Controllers\Backend\API\SettingController::class, 'Configuraton']);
-
-
-        Route::resource("mobile-setting", MobileSettingController::class);
-        Route::group(['prefix' => 'mobile-setting', 'as' => 'mobile-setting.'], function () {
-            Route::get('get-dropdown-value/{id}', [MobileSettingController::class, 'getDropdownValue'])->name('get-dropdown-value');
-
-            Route::post('/mobile-setting/store', [MobileSettingController::class, 'store'])->name('storedata');
-            Route::post('/mobile-setting/addnewrequest', [MobileSettingController::class, 'addNewRequest'])->name('addNewRequest');
-            Route::post('/mobile-setting/addnewrequestsection', [MobileSettingController::class, 'addNewRequestSection'])->name('addNewRequestSection');
-            Route::post('update-position', [MobileSettingController::class, 'updatePosition'])->name('update-position');
-            Route::get('get-type-value/{slug}', [MobileSettingController::class, 'getTypeValue'])->name('get-type-value');
-        });
-);
 
     Route::post('/auth/google', [SettingController::class, 'googleId']);
     Route::get('callback', [SettingController::class, 'handleGoogleCallback']);
