@@ -84,7 +84,7 @@ class PartnerService
                 return '<input type="checkbox" class="form-check-input select-table-row" id="datatable-row-' . $row->id . '" name="datatable_ids[]" value="' . $row->id . '" data-type="partners" onclick="dataTableRowCheck(' . $row->id . ',this)">';
             })
             ->addColumn('logo', function ($data) {
-                $imageUrl = $data->logo_url ? setBaseUrlWithFileName($data->logo_url, 'image', 'partners') : asset('images/default.png');
+                $imageUrl = $data->logo_url ? setBaseUrlWithFileName($data->logo_url, 'image', 'partners') : asset('default-image/Default-Image.jpg');
                 return view('components.image-name', ['image' => $imageUrl, 'name' => $data->name])->render();
             })
             ->addColumn('videos_count', function ($data) {
