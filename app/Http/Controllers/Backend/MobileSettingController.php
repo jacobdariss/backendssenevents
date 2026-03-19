@@ -88,8 +88,11 @@ class MobileSettingController extends Controller
             ->toArray();
 
         $videoList = Video::where('status', 1)
-            ->whereDate('release_date', '<=', now())
             ->whereNull('deleted_at')
+            ->where(function($q) {
+                $q->whereNull('release_date')
+                  ->orWhereDate('release_date', '<=', now());
+            })
             ->orderBy('name')
             ->pluck('name', 'id')
             ->toArray();
@@ -334,11 +337,12 @@ class MobileSettingController extends Controller
             //     }
             //     break;
             case 'popular-videos':
-                // Show ALL active videos (including partner videos) so admin can select them
                 $value = Video::where('status', 1)
                     ->whereNull('deleted_at')
-                    ->whereDate('release_date', '<=', now())
-                    ->orderBy('release_date', 'desc')
+                    ->where(function($q) {
+                        $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+                    })
+                    ->orderByDesc('created_at')
                     ->get();
 
                 if (!empty($selectedIds)) {
@@ -509,11 +513,12 @@ class MobileSettingController extends Controller
                 break;
 
             case 'popular-videos':
-                // All active videos (including approved partner videos)
                 $value = Video::where('status', 1)
                     ->whereNull('deleted_at')
-                    ->whereDate('release_date', '<=', now())
-                    ->orderBy('release_date', 'desc')
+                    ->where(function($q) {
+                        $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+                    })
+                    ->orderByDesc('created_at')
                     ->get();
                 break;
 

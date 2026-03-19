@@ -216,7 +216,10 @@ class Video extends BaseModel
             ->with(['plan:id,level'])
             ->whereIn('id', $videoIdsArray)
             ->where('status', 1)
-            ->where('deleted_at', null);
+            ->where('deleted_at', null)
+            ->where(function($q) {
+                $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+            });
 
             if (request()->has('is_restricted')) {
                 $query->where('is_restricted', request()->is_restricted);
