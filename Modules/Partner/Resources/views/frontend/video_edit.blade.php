@@ -139,6 +139,34 @@
                     {{ html()->hidden('video_url_input')->id('file_url_video')->value(old('video_url_input', $video->video_url_input)) }}
                 </div>
 
+
+                {{-- Trailer URL type --}}
+                <div class="col-md-4">
+                    {{ html()->label(__('movie.lbl_trailer_url_type') . ' <span class="text-danger">*</span>', 'trailer_url_type')->class('form-label') }}
+                    {{ html()->select('trailer_url_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_type'), ''), old('trailer_url_type', '$video->trailer_url_type ?? '''))->class('form-control select2')->id('trailer_url_type')->attribute('required') }}
+                    @error('trailer_url_type')<span class="text-danger small">{{ $message }}</span>@enderror
+                </div>
+
+                {{-- Trailer URL / File / Embed (affiché dynamiquement) --}}
+                <div class="col-md-8">
+                    <div id="url_input">
+                        {{ html()->label(__('movie.lbl_trailer_url') . ' <span class="text-danger">*</span>', 'trailer_url')->class('form-label') }}
+                        {{ html()->text('trailer_url', old('trailer_url', '$video->trailer_url ?? '''))->class('form-control')->placeholder(__('placeholder.lbl_trailer_url'))->id('trailer_url') }}
+                    </div>
+                    <div id="url_file_input" class="d-none">
+                        {{ html()->label(__('movie.lbl_trailer_video'), 'trailer_video')->class('form-label') }}
+                        <div class="input-group btn-video-link-upload">
+                            {{ html()->button(__('placeholder.lbl_select_file') . '<i class="ph ph-upload"></i>')->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainertailerurl')->attribute('data-hidden-input', 'file_url_trailer') }}
+                            {{ html()->text('trailer_input', old('trailer_url', '$video->trailer_url ?? '''))->class('form-control')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainertailerurl')->attribute('data-hidden-input', 'file_url_trailer') }}
+                        </div>
+                        <div class="mt-2" id="selectedImageContainertailerurl"></div>
+                        {{ html()->hidden('trailer_url')->id('file_url_trailer')->value(old('trailer_url', '$video->trailer_url ?? ''')) }}
+                    </div>
+                    <div id="trailer_embed_input_section" class="d-none">
+                        {{ html()->label(__('movie.lbl_embed_code'), 'trailer_embedded')->class('form-label') }}
+                        {{ html()->textarea('trailer_embedded', old('trailer_embedded'))->class('form-control')->id('trailer_embedded')->placeholder('<iframe ...></iframe>') }}
+                    </div>
+                </div>
                 {{-- Description --}}
                 <div class="col-md-12">
                     {{ html()->label(__('movie.lbl_description') . ' <span class="text-danger">*</span>', 'description')->class('form-label') }}
@@ -181,6 +209,40 @@ document.addEventListener('DOMContentLoaded', function () {
         typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
     }
 });
+
+    // Trailer URL type handler
+    function handleTrailerUrlTypeChange(val) {
+        const fileInput  = document.getElementById('url_file_input');
+        const urlInput   = document.getElementById('url_input');
+        const embedInput = document.getElementById('trailer_embed_input_section');
+        const trailerUrl = document.querySelector('input[name="trailer_url"]');
+        const trailerFile = document.querySelector('input[name="trailer_video"]');
+
+        if (!fileInput || !urlInput || !embedInput) return;
+        fileInput.classList.add('d-none');
+        urlInput.classList.add('d-none');
+        embedInput.classList.add('d-none');
+        trailerUrl?.removeAttribute('required');
+        trailerFile?.removeAttribute('required');
+
+        switch(val) {
+            case 'Local':    fileInput.classList.remove('d-none'); break;
+            case 'Embedded': embedInput.classList.remove('d-none'); break;
+            case 'URL': case 'YouTube': case 'HLS': case 'Vimeo': case 'x265':
+                urlInput.classList.remove('d-none');
+                trailerUrl?.setAttribute('required', 'required');
+                break;
+        }
+    }
+
+    const trailerTypeSelect = document.getElementById('trailer_url_type');
+    if (trailerTypeSelect) {
+        handleTrailerUrlTypeChange(trailerTypeSelect.value);
+        trailerTypeSelect.addEventListener('change', function() { handleTrailerUrlTypeChange(this.value); });
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+            $('#trailer_url_type').on('select2:select', function(e) { handleTrailerUrlTypeChange(e.target.value); });
+        }
+    }
 
 function showPlanSelection(show) {
     const planDiv = document.getElementById('planSelection');
