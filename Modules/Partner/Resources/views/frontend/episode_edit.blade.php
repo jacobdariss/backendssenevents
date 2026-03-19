@@ -25,7 +25,7 @@
                     {{ html()->text('poster_input')->class('form-control')->placeholder(__('placeholder.lbl_image'))->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerPoster') }}
                 </div>
                 <div class="uploaded-image" id="selectedImageContainerPoster">@if($episode->poster_url)<img src="{{ $episode->poster_url }}" class="img-fluid mt-1 box-preview-image" style="max-height:120px">@endif</div>
-                {{ html()->hidden('poster_url')->id('file_url_poster')->value(old('poster_url', \$episode->poster_url)) }}
+                {{ html()->hidden('poster_url')->id('file_url_poster')->value(old('poster_url', $episode->poster_url)) }}
                 <div id="poster_url_error" class="text-danger small d-none">{{ __('partner::partner.image_required') }}</div>
             </div>
             <div class="col-md-6 position-relative">
@@ -35,7 +35,7 @@
                     {{ html()->text('poster_tv_input')->class('form-control')->placeholder(__('placeholder.lbl_image'))->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerPosterTv') }}
                 </div>
                 <div class="uploaded-image" id="selectedImageContainerPosterTv">@if($episode->poster_tv_url)<img src="{{ $episode->poster_tv_url }}" class="img-fluid mt-1 box-preview-image" style="max-height:120px">@endif</div>
-                {{ html()->hidden('poster_tv_url')->id('file_url_poster_tv')->value(old('poster_tv_url', \$episode->poster_tv_url)) }}
+                {{ html()->hidden('poster_tv_url')->id('file_url_poster_tv')->value(old('poster_tv_url', $episode->poster_tv_url)) }}
                 <div id="poster_tv_url_error" class="text-danger small d-none">{{ __('partner::partner.image_required') }}</div>
             </div>
         </div>
@@ -54,16 +54,16 @@
 
             <div class="col-md-6">
                 {{ html()->label(__('episode.lbl_episode_name') . ' <span class="text-danger">*</span>', 'name')->class('form-label') }}
-                {{ html()->text('name', old('name', \$episode->name))->class('form-control')->attribute('required') }}
+                {{ html()->text('name', old('name', $episode->name))->class('form-control')->attribute('required') }}
                 @error('name')<span class="text-danger small">{{ $message }}</span>@enderror
             </div>
             <div class="col-md-3">
                 {{ html()->label(__('partner::partner.lbl_episode_number'), 'episode_number')->class('form-label') }}
-                {{ html()->number('episode_number', old('episode_number', \$episode->episode_number ?? 1))->class('form-control')->attribute('min', 1) }}
+                {{ html()->number('episode_number', old('episode_number', $episode->episode_number ?? 1))->class('form-control')->attribute('min', 1) }}
             </div>
             <div class="col-md-3">
                 {{ html()->label(__('movie.lbl_duration'), 'duration')->class('form-label') }}
-                {{ html()->text('duration', old('duration', \$episode->duration))->class('form-control')->placeholder('00:45:00') }}
+                {{ html()->text('duration', old('duration', $episode->duration))->class('form-control')->placeholder('00:45:00') }}
             </div>
 
             {{-- Accès --}}
@@ -71,22 +71,22 @@
                 {{ html()->label(__('movie.lbl_movie_access'), 'access')->class('form-label') }}
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <label class="form-check form-check-inline form-control cursor-pointer w-auto m-0"><div>
-                        <input class="form-check-input" type="radio" name="access" value="free" onchange="togglePpvFields(this.value)" {{ old('access', \$episode->access ?? 'free')=='free'?'checked':'' }}>
+                        <input class="form-check-input" type="radio" name="access" value="free" onchange="togglePpvFields(this.value)" {{ old('access', $episode->access ?? 'free')=='free'?'checked':'' }}>
                         <span class="form-check-label">{{ __('movie.lbl_free') }}</span>
                     </div></label>
                     <label class="form-check form-check-inline form-control cursor-pointer w-auto m-0"><div>
-                        <input class="form-check-input" type="radio" name="access" value="pay-per-view" onchange="togglePpvFields(this.value)" {{ old('access', \$episode->access)=='pay-per-view'?'checked':'' }}>
+                        <input class="form-check-input" type="radio" name="access" value="pay-per-view" onchange="togglePpvFields(this.value)" {{ old('access', $episode->access)=='pay-per-view'?'checked':'' }}>
                         <span class="form-check-label">{{ __('messages.lbl_pay_per_view') }}</span>
                     </div></label>
                 </div>
             </div>
 
-            <div class="col-12 {{ old('access', \$episode->access)=='pay-per-view'?'':'d-none' }}" id="ppv_fields">
+            <div class="col-12 {{ old('access', $episode->access)=='pay-per-view'?'':'d-none' }}" id="ppv_fields">
                 <div class="row g-3">
                     <div class="col-md-3">
                         {{ html()->label(__('messages.lbl_price').' <span class="text-danger">*</span>','price')->class('form-label') }}
                         <div class="input-group"><span class="input-group-text">FCFA</span>
-                        {{ html()->number('price',old('price', \$episode->price))->class('form-control')->attribute('step','0.01')->attribute('min',0)->id('price') }}
+                        {{ html()->number('price',old('price', $episode->price))->class('form-control')->attribute('step','0.01')->attribute('min',0)->id('price') }}
                         </div>
                     </div>
                     <div class="col-9 d-flex align-items-end">
@@ -99,7 +99,7 @@
             <div class="col-12"><div class="row g-3">
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_video_upload_type').' <span class="text-danger">*</span>','video_upload_type')->class('form-label') }}
-                    {{ html()->select('video_upload_type',$upload_url_type->pluck('name','name')->prepend(__('placeholder.lbl_select_video_type'),'')->merge(['Embedded'=>'Embedded']),old('video_upload_type', \$episode->video_upload_type ?? ''))->class('form-control select2')->id('video_upload_type') }}
+                    {{ html()->select('video_upload_type',$upload_url_type->pluck('name','name')->prepend(__('placeholder.lbl_select_video_type'),'')->merge(['Embedded'=>'Embedded']),old('video_upload_type', $episode->video_upload_type ?? ''))->class('form-control select2')->id('video_upload_type') }}
                 </div>
                 <div class="col-md-8">
                     <div class="d-none" id="embed_code_input_section">
@@ -108,7 +108,7 @@
                     </div>
                     <div class="d-none" id="video_url_input_section">
                         {{ html()->label(__('movie.video_url_input').' <span class="text-danger">*</span>','video_url_input')->class('form-label') }}
-                        {{ html()->text('video_url_input',old('video_url_input', \$episode->video_url_input))->class('form-control')->id('video_url_input')->placeholder(__('placeholder.video_url_input')) }}
+                        {{ html()->text('video_url_input',old('video_url_input', $episode->video_url_input))->class('form-control')->id('video_url_input')->placeholder(__('placeholder.video_url_input')) }}
                     </div>
                     <div class="d-none" id="video_file_input_section">
                         {{ html()->label(__('movie.video_file_input'),'video_file')->class('form-label') }}
@@ -126,7 +126,7 @@
             <div class="col-12"><div class="row g-3">
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_trailer_url_type').' <span class="text-danger">*</span>','trailer_url_type')->class('form-label') }}
-                    {{ html()->select('trailer_url_type',$upload_url_type->pluck('name','name')->prepend(__('placeholder.lbl_select_type'),''),old('trailer_url_type', \$episode->trailer_url_type ?? ''))->class('form-control select2')->id('trailer_url_type') }}
+                    {{ html()->select('trailer_url_type',$upload_url_type->pluck('name','name')->prepend(__('placeholder.lbl_select_type'),''),old('trailer_url_type', $episode->trailer_url_type ?? ''))->class('form-control select2')->id('trailer_url_type') }}
                 </div>
                 <div class="col-md-8">
                     <div class="d-none" id="trailer_embed_section">
@@ -135,7 +135,7 @@
                     </div>
                     <div class="d-none" id="trailer_url_section">
                         {{ html()->label(__('movie.lbl_trailer_url').' <span class="text-danger">*</span>','trailer_url')->class('form-label') }}
-                        {{ html()->text('trailer_url',old('trailer_url', \$episode->trailer_url))->class('form-control')->id('trailer_url')->placeholder('https://...') }}
+                        {{ html()->text('trailer_url',old('trailer_url', $episode->trailer_url))->class('form-control')->id('trailer_url')->placeholder('https://...') }}
                     </div>
                     <div class="d-none" id="trailer_file_section">
                         {{ html()->label(__('movie.video_file_input'),'trailer_file')->class('form-label') }}
@@ -152,7 +152,7 @@
             {{-- Description --}}
             <div class="col-12">
                 {{ html()->label(__('movie.lbl_description'),'description')->class('form-label') }}
-                {{ html()->textarea('description',old('description', \$episode->description))->class('form-control')->id('description')->rows(4) }}
+                {{ html()->textarea('description',old('description', $episode->description))->class('form-control')->id('description')->rows(4) }}
             </div>
 
         </div>
