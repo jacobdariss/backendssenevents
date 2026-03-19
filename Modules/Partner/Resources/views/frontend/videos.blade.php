@@ -4,11 +4,18 @@
 
 @section('content')
 
+@if(session('success'))
+    <div class="alert alert-success mb-3">{{ session('success') }}</div>
+@endif
+
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">
             <i class="ph ph-video me-2"></i>{{ __('video.title') }}
         </h4>
+        <a href="{{ route('partner.videos.create') }}" class="btn btn-primary btn-sm">
+            <i class="ph ph-plus-circle me-1"></i>{{ __('partner::partner.add_video') }}
+        </a>
     </div>
 
     {{-- Filtres --}}
@@ -41,6 +48,7 @@
                         <th>{{ __('messages.lbl_status') }}</th>
                         <th>{{ __('partner::partner.validation_title') }}</th>
                         <th>{{ __('messages.updated_at') }}</th>
+                        <th>{{ __('messages.action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -77,6 +85,12 @@
                             @endif
                         </td>
                         <td class="text-muted small">{{ $video->updated_at->format('d/m/Y') }}</td>
+                        <td>
+                            <a href="{{ route('partner.videos.edit', $video->id) }}"
+                               class="btn btn-warning-subtle btn-sm">
+                                <i class="ph ph-pencil"></i>
+                            </a>
+                        </td>
                     </tr>
                     @empty
                     <tr>

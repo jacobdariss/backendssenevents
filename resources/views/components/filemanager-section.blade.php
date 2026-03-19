@@ -115,7 +115,16 @@
                             ];
                         };
 
-                        if ($activeDisk === 'local') {
+                        // Si dossier partenaire restreint : créer le dossier si nécessaire et n'afficher que lui
+                        $isPartnerRestricted = isset($partnerFolder) && !empty($partnerFolder);
+
+                        if ($isPartnerRestricted) {
+                            $partnerRoot = storage_path('app/public/' . $partnerFolder);
+                            if (!is_dir($partnerRoot)) {
+                                mkdir($partnerRoot, 0775, true);
+                            }
+                            $folders[] = $formatFolder($partnerFolder);
+                        } elseif ($activeDisk === 'local') {
                             $root = storage_path('app/public');
                             if (is_dir($root)) {
                                 // Read only directories, skip dot entries, and excluded names

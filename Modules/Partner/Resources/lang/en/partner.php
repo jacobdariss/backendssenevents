@@ -71,4 +71,11 @@ return [
     'no_account'       => 'No account?',
     'not_a_partner'    => 'This account is not registered as a partner.',
 
+    // Video management
+    'add_video'              => 'Add Video',
+    'edit_video'             => 'Edit Video',
+    'submit_for_validation'  => 'Submit for validation',
+    'video_submitted'        => 'Video submitted for validation.',
+    'video_updated'          => 'Video updated and resubmitted for validation.',
+
 ];

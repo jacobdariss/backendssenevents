@@ -5,6 +5,7 @@ use Modules\Partner\Http\Controllers\Backend\PartnerController;
 use Modules\Partner\Http\Controllers\Backend\PartnerValidationController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerAuthController;
 use Modules\Partner\Http\Controllers\Frontend\PartnerDashboardController;
+use Modules\Partner\Http\Controllers\Frontend\PartnerVideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +32,11 @@ Route::prefix('partner')->name('partner.')->group(function () {
 */
 Route::group(['prefix' => 'app', 'as' => 'partner.', 'middleware' => ['auth', 'role:partner']], function () {
     Route::get('partner-dashboard', [PartnerDashboardController::class, 'index'])->name('dashboard');
-    Route::get('partner-videos',    [PartnerDashboardController::class, 'videos'])->name('videos');
+    Route::get('partner-videos',             [PartnerDashboardController::class, 'videos'])->name('videos');
+    Route::get('partner-videos/create',      [PartnerVideoController::class, 'create'])->name('videos.create');
+    Route::post('partner-videos/store',      [PartnerVideoController::class, 'store'])->name('videos.store');
+    Route::get('partner-videos/{id}/edit',   [PartnerVideoController::class, 'edit'])->name('videos.edit');
+    Route::put('partner-videos/{id}/update', [PartnerVideoController::class, 'update'])->name('videos.update');
     Route::get('partner-movies',    [PartnerDashboardController::class, 'movies'])->name('movies');
     Route::get('partner-tvshows',   [PartnerDashboardController::class, 'tvshows'])->name('tvshows');
     Route::get('partner-livetv',    [PartnerDashboardController::class, 'livetv'])->name('livetv');

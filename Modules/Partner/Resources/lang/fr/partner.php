@@ -71,4 +71,11 @@ return [
     'no_account'       => 'Pas de compte ?',
     'not_a_partner'    => 'Ce compte n\'est pas enregistré en tant que partenaire.',
 
+    // Gestion vidéo
+    'add_video'              => 'Ajouter une vidéo',
+    'edit_video'             => 'Modifier la vidéo',
+    'submit_for_validation'  => 'Soumettre pour validation',
+    'video_submitted'        => 'Vidéo soumise pour validation.',
+    'video_updated'          => 'Vidéo mise à jour et soumise pour validation.',
+
 ];

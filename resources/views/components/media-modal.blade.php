@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
 
-                @include('components.filemanager-section', compact('page_type'))
+                @include('components.filemanager-section', array_merge(compact('page_type'), isset($partnerFolder) ? ['partnerFolder' => $partnerFolder] : []))
             </div>
         </div>
     </div>
