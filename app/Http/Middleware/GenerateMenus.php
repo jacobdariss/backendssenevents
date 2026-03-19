@@ -99,6 +99,15 @@ class GenerateMenus
                 'order' => 0,
             ]);
 
+            // Analytics admin
+            $this->mainRoute($menu, [
+                'title'  => __('analytics::analytics.title'),
+                'url'    => url('/app/analytics'),
+                'icon'   => 'ph ph-chart-pie-slice',
+                'active' => ['app/analytics', 'app/analytics/*'],
+                'order'  => 1,
+            ]);
+
 
             $this->mainRoute($menu, [
                 'icon' => 'ph ph-images-square',
@@ -123,15 +132,6 @@ class GenerateMenus
                 'active' => ['app/genres','app/genres/*'],
                 'permission' => ['view_genres'],
                 'order' => 0,
-            ]);
-
-            // Analytics admin
-            $this->mainRoute($menu, [
-                'title'  => __('analytics::analytics.title'),
-                'url'    => url('/app/analytics'),
-                'icon'   => 'ph ph-chart-pie-slice',
-                'active' => ['app/analytics', 'app/analytics/*'],
-                'order'  => 5,
             ]);
 
             if(isenablemodule('movie')==1){
