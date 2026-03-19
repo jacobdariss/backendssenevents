@@ -6,9 +6,7 @@
 
 <x-back-button-component route="partner.videos" />
 
-<form method="POST" action="{{ route('partner.videos.update', $video->id) }}" id="form-submit" enctype="multipart/form-data">
-    @csrf
-    @method('PUT')
+{{ html()->form('PUT', route('partner.videos.update', $video->id))->attribute('enctype', 'multipart/form-data')->attribute('id', 'form-submit')->class('requires-validation')->open() }}
 
     @if($errors->any())
         <div class="alert alert-danger mb-3">
@@ -18,129 +16,187 @@
 
     @if($video->approval_status === 'rejected' && $video->rejection_reason)
         <div class="alert alert-danger d-flex gap-2 mb-3">
-            <i class="ph ph-warning fs-5"></i>
-            <div>
-                <strong>{{ __('partner::partner.rejection_reason') }} :</strong>
-                {{ $video->rejection_reason }}
-            </div>
+            <i class="ph ph-warning fs-5 mt-1"></i>
+            <div><strong>{{ __('partner::partner.rejection_reason') }} :</strong> {{ $video->rejection_reason }}</div>
         </div>
     @endif
 
     <div class="card mb-3">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="ph ph-pencil me-2"></i>{{ __('partner::partner.edit_video') }}</h5>
-        </div>
+        <div class="card-header"><h5 class="mb-0"><i class="ph ph-pencil me-2"></i>{{ __('partner::partner.edit_video') }}</h5></div>
         <div class="card-body">
-            <div class="row g-3">
+            <div class="row gy-3">
 
                 {{-- Thumbnail --}}
-                <div class="col-md-6">
-                    <label class="form-label">{{ __('movie.lbl_thumbnail') }}</label>
+                <div class="col-md-4 position-relative">
+                    {{ html()->label(__('movie.lbl_thumbnail'), 'thumbnail')->class('form-label') }}
                     <div class="input-group btn-file-upload">
-                        {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))
-                            ->class('input-group-text form-control')->type('button')
-                            ->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')
-                            ->attribute('data-image-container', 'selectedImageContainerThumbnail')
-                            ->attribute('data-hidden-input', 'file_url_thumbnail') }}
-                        {{ html()->text('thumbnail_input', $video->thumbnail_url)->class('form-control')->placeholder(__('placeholder.lbl_image'))
-                            ->attribute('data-image-container', 'selectedImageContainerThumbnail') }}
+                        {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerThumbnail')->attribute('data-hidden-input', 'file_url_thumbnail') }}
+                        {{ html()->text('thumbnail_input', $video->thumbnail_url)->class('form-control')->placeholder(__('placeholder.lbl_image'))->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerThumbnail') }}
                     </div>
-                    <div class="uploaded-image mt-2" id="selectedImageContainerThumbnail">
-                        @if($video->thumbnail_url)
-                            <img src="{{ $video->thumbnail_url }}" class="img-fluid mt-1" style="max-height:80px;">
-                        @endif
+                    <div class="uploaded-image" id="selectedImageContainerThumbnail">
+                        @if($video->thumbnail_url)<img src="{{ $video->thumbnail_url }}" class="img-fluid mt-1 box-preview-image">@endif
                     </div>
                     {{ html()->hidden('thumbnail_url')->id('file_url_thumbnail')->value($video->thumbnail_url) }}
                 </div>
 
                 {{-- Poster --}}
-                <div class="col-md-6">
-                    <label class="form-label">{{ __('movie.lbl_poster') }}</label>
+                <div class="col-md-4 position-relative">
+                    {{ html()->label(__('movie.lbl_poster'), 'poster')->class('form-label') }}
                     <div class="input-group btn-file-upload">
-                        {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))
-                            ->class('input-group-text form-control')->type('button')
-                            ->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')
-                            ->attribute('data-image-container', 'selectedImageContainerPoster')
-                            ->attribute('data-hidden-input', 'file_url_poster') }}
-                        {{ html()->text('poster_input', $video->poster_url)->class('form-control')->placeholder(__('placeholder.lbl_image'))
-                            ->attribute('data-image-container', 'selectedImageContainerPoster') }}
+                        {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerPoster')->attribute('data-hidden-input', 'file_url_poster') }}
+                        {{ html()->text('poster_input', $video->poster_url)->class('form-control')->placeholder(__('placeholder.lbl_image'))->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerPoster') }}
                     </div>
-                    <div class="uploaded-image mt-2" id="selectedImageContainerPoster">
-                        @if($video->poster_url)
-                            <img src="{{ $video->poster_url }}" class="img-fluid mt-1" style="max-height:80px;">
-                        @endif
+                    <div class="uploaded-image" id="selectedImageContainerPoster">
+                        @if($video->poster_url)<img src="{{ $video->poster_url }}" class="img-fluid mt-1 box-preview-image">@endif
                     </div>
                     {{ html()->hidden('poster_url')->id('file_url_poster')->value($video->poster_url) }}
                 </div>
 
+                {{-- Poster TV --}}
+                <div class="col-md-4 position-relative">
+                    {{ html()->label(__('movie.lbl_poster_tv'), 'poster_tv')->class('form-label') }}
+                    <div class="input-group btn-file-upload">
+                        {{ html()->button('<i class="ph ph-image"></i> ' . __('messages.lbl_choose_image'))->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerPosterTv')->attribute('data-hidden-input', 'file_url_poster_tv') }}
+                        {{ html()->text('poster_tv_input', $video->poster_tv_url)->class('form-control')->placeholder(__('placeholder.lbl_image'))->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerPosterTv') }}
+                    </div>
+                    <div class="uploaded-image" id="selectedImageContainerPosterTv">
+                        @if($video->poster_tv_url)<img src="{{ $video->poster_tv_url }}" class="img-fluid mt-1 box-preview-image">@endif
+                    </div>
+                    {{ html()->hidden('poster_tv_url')->id('file_url_poster_tv')->value($video->poster_tv_url) }}
+                </div>
+
                 {{-- Title --}}
                 <div class="col-md-6">
-                    <label class="form-label">{{ __('video.lbl_title') }} <span class="text-danger">*</span></label>
+                    {{ html()->label(__('video.lbl_title') . ' <span class="text-danger">*</span>', 'name')->class('form-label') }}
                     {{ html()->text('name', old('name', $video->name))->class('form-control')->attribute('required') }}
                     @error('name')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
+                {{-- Access --}}
+                <div class="col-md-6">
+                    {{ html()->label(__('movie.lbl_movie_access'), 'access')->class('form-label') }}
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        @foreach(['free' => __('movie.lbl_free'), 'paid' => __('movie.lbl_paid'), 'pay-per-view' => __('movie.lbl_pay_per_view')] as $val => $label)
+                        <label class="form-check form-check-inline form-control cursor-pointer w-auto m-0">
+                            <div>
+                                <input class="form-check-input" type="radio" name="access" value="{{ $val }}"
+                                    onchange="showPlanSelection(this.value === 'paid')"
+                                    {{ old('access', $video->access) == $val ? 'checked' : '' }}>
+                                <span class="form-check-label">{{ $label }}</span>
+                            </div>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Plan --}}
+                <div class="col-md-6 {{ old('access', $video->access) == 'free' ? 'd-none' : '' }}" id="planSelection">
+                    {{ html()->label(__('movie.lbl_select_plan'), 'plan_id')->class('form-label') }}
+                    {{ html()->select('plan_id', $plan->pluck('name', 'id')->prepend(__('placeholder.lbl_select_plan'), ''), old('plan_id', $video->plan_id))->class('form-control select2')->id('plan_id') }}
+                </div>
+
                 {{-- Duration --}}
                 <div class="col-md-3">
-                    <label class="form-label">{{ __('movie.lbl_duration') }} <span class="text-danger">*</span></label>
+                    {{ html()->label(__('movie.lbl_duration') . ' <span class="text-danger">*</span>', 'duration')->class('form-label') }}
                     {{ html()->text('duration', old('duration', $video->duration))->class('form-control')->attribute('required') }}
                     @error('duration')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
                 {{-- Release date --}}
                 <div class="col-md-3">
-                    <label class="form-label">{{ __('movie.lbl_release_date') }} <span class="text-danger">*</span></label>
+                    {{ html()->label(__('movie.lbl_release_date') . ' <span class="text-danger">*</span>', 'release_date')->class('form-label') }}
                     {{ html()->date('release_date', old('release_date', $video->release_date?->format('Y-m-d')))->class('form-control')->attribute('required') }}
                     @error('release_date')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
-                {{-- Access --}}
-                <div class="col-md-4">
-                    <label class="form-label">{{ __('movie.lbl_movie_access') }} <span class="text-danger">*</span></label>
-                    {{ html()->select('access', ['paid' => __('movie.lbl_paid'), 'free' => __('movie.lbl_free')], old('access', $video->access))
-                        ->class('form-control select2')->attribute('required') }}
-                </div>
-
-                {{-- Plan --}}
-                <div class="col-md-4">
-                    <label class="form-label">{{ __('movie.lbl_select_plan') }}</label>
-                    {{ html()->select('plan_id', $plan->pluck('name', 'id')->prepend(__('movie.lbl_select'), ''), old('plan_id', $video->plan_id))
-                        ->class('form-control select2') }}
-                </div>
-
                 {{-- Upload type --}}
-                <div class="col-md-4">
-                    <label class="form-label">{{ __('movie.lbl_video_upload_type') }} <span class="text-danger">*</span></label>
-                    {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('movie.lbl_select'), ''), old('video_upload_type', $video->video_upload_type))
-                        ->class('form-control select2')->attribute('required') }}
+                <div class="col-md-6">
+                    {{ html()->label(__('movie.lbl_video_upload_type') . ' <span class="text-danger">*</span>', 'video_upload_type')->class('form-label') }}
+                    {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_video_type'), '')->merge(['Embedded' => 'Embedded']), old('video_upload_type', $video->video_upload_type))->class('form-control select2')->id('video_upload_type')->attribute('required') }}
+                    @error('video_upload_type')<span class="text-danger small">{{ $message }}</span>@enderror
+                </div>
+
+                {{-- Embed code --}}
+                <div class="col-md-6 {{ !in_array(old('video_upload_type', $video->video_upload_type), ['Local', 'URL', 'YouTube', 'HLS', 'Vimeo', 'x265', '']) ? '' : 'd-none' }}" id="embed_code_input_section">
+                    {{ html()->label(__('movie.lbl_embed_code'), 'embed_code')->class('form-label') }}
+                    {{ html()->textarea('embed_code', old('embed_code', $video->video_url_input))->class('form-control')->id('embed_code')->placeholder('<iframe ...></iframe>') }}
                 </div>
 
                 {{-- Video URL --}}
-                <div class="col-md-12">
-                    <label class="form-label">{{ __('movie.video_url_input') }}</label>
-                    <input type="text" name="video_url_input" class="form-control"
-                           placeholder="{{ __('movie.video_url_input') }}"
-                           value="{{ old('video_url_input', $video->video_url_input) }}">
+                <div class="col-md-6 {{ in_array(old('video_upload_type', $video->video_upload_type), ['URL', 'YouTube', 'HLS', 'Vimeo', 'x265']) ? '' : 'd-none' }}" id="video_url_input_section">
+                    {{ html()->label(__('movie.video_url_input') . ' <span class="text-danger">*</span>', 'video_url_input')->class('form-label') }}
+                    {{ html()->text('video_url_input', old('video_url_input', $video->video_url_input))->class('form-control')->id('video_url_input')->placeholder(__('placeholder.video_url_input')) }}
+                </div>
+
+                {{-- Video file --}}
+                <div class="col-md-6 {{ old('video_upload_type', $video->video_upload_type) === 'Local' ? '' : 'd-none' }}" id="video_file_input_section">
+                    {{ html()->label(__('movie.video_file_input'), 'video_file')->class('form-label') }}
+                    <div class="input-group btn-video-link-upload">
+                        {{ html()->button(__('placeholder.lbl_select_file') . '<i class="ph ph-upload"></i>')->class('input-group-text form-control')->type('button')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerVideourl')->attribute('data-hidden-input', 'file_url_video') }}
+                        {{ html()->text('video_file_input', old('video_file_input', $video->video_url_input))->class('form-control')->attribute('data-bs-toggle', 'modal')->attribute('data-bs-target', '#exampleModal')->attribute('data-image-container', 'selectedImageContainerVideourl')->attribute('data-hidden-input', 'file_url_video') }}
+                    </div>
+                    <div class="mt-2" id="selectedImageContainerVideourl"></div>
+                    {{ html()->hidden('video_url_input')->id('file_url_video')->value(old('video_url_input', $video->video_url_input)) }}
                 </div>
 
                 {{-- Description --}}
                 <div class="col-md-12">
-                    <label class="form-label">{{ __('movie.lbl_description') }} <span class="text-danger">*</span></label>
-                    {{ html()->textarea('description', old('description', $video->description))->class('form-control')->rows(4)->attribute('required') }}
+                    {{ html()->label(__('movie.lbl_description') . ' <span class="text-danger">*</span>', 'description')->class('form-label') }}
+                    {{ html()->textarea('description', old('description', $video->description))->class('form-control')->id('description')->rows(5)->attribute('required') }}
                     @error('description')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
             </div>
         </div>
         <div class="card-footer text-end">
+            <a href="{{ route('partner.videos') }}" class="btn btn-secondary me-2">{{ __('messages.cancel') }}</a>
             <button type="submit" class="btn btn-primary">
                 <i class="ph ph-paper-plane-tilt me-1"></i>{{ __('partner::partner.submit_for_validation') }}
             </button>
         </div>
     </div>
 
-</form>
+{{ html()->form()->close() }}
 
 @include('components.media-modal', ['page_type' => $page_type, 'partnerFolder' => $partnerFolder])
 
 @endsection
+
+@push('after-scripts')
+<script>
+function showPlanSelection(show) {
+    const planDiv = document.getElementById('planSelection');
+    if (planDiv) planDiv.classList.toggle('d-none', !show);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    function handleVideoUrlTypeChange(val) {
+        const fileSection  = document.getElementById('video_file_input_section');
+        const urlSection   = document.getElementById('video_url_input_section');
+        const embedSection = document.getElementById('embed_code_input_section');
+
+        fileSection.classList.add('d-none');
+        urlSection.classList.add('d-none');
+        if (embedSection) embedSection.classList.add('d-none');
+
+        if (val === 'Local') {
+            fileSection.classList.remove('d-none');
+        } else if (val === 'Embedded') {
+            if (embedSection) embedSection.classList.remove('d-none');
+        } else if (val !== '') {
+            urlSection.classList.remove('d-none');
+        }
+    }
+
+    const typeSelect = document.getElementById('video_upload_type');
+    if (typeSelect) {
+        handleVideoUrlTypeChange(typeSelect.value);
+        typeSelect.addEventListener('change', function() { handleVideoUrlTypeChange(this.value); });
+    }
+
+    if ($.fn.select2) {
+        $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
+    }
+});
+</script>
+@endpush
