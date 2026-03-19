@@ -171,7 +171,24 @@ class LiveTvChannelController extends Controller
                 ';
             })
             ->editColumn('updated_at', fn($data) => $this->formatUpdatedAt($data->updated_at))
-            ->rawColumns(['action', 'status', 'check', 'image', 'plan_id','category_name'])
+            
+        ->addColumn('partner_name', function ($data) {
+            if (!empty($data->partner_id) && $data->partner) {
+                return '<span class="badge bg-primary-subtle text-primary">' . e($data->partner->name) . '</span>';
+            }
+            return '<span class="text-muted">—</span>';
+        })
+        ->addColumn('approval_col', function ($data) {
+            if (empty($data->partner_id)) return '—';
+            $status = $data->approval_status ?? 'pending';
+            $map = [
+                'pending'  => '<span class="badge bg-warning text-dark">Pending</span>',
+                'approved' => '<span class="badge bg-success">Approved</span>',
+                'rejected' => '<span class="badge bg-danger">Rejected</span>',
+            ];
+            return $map[$status] ?? '—';
+        })
+        ->rawColumns(['action', 'status', 'check', 'image', 'plan_id','category_name','partner_name','approval_col'])
             ->orderColumns(['id'], '-:column $1')
             ->make(true);
     }

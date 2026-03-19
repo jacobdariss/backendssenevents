@@ -271,7 +271,7 @@ class EpisodeService
 
     public function getFilteredData($filter)
     {
-        $query = $this->episodeRepository->query();
+        $query = $this->episodeRepository->query()->with('partner');
 
         if (isset($filter['name'])) {
             $query->where('name', $filter['name']);

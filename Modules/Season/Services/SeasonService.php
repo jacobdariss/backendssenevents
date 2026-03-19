@@ -137,7 +137,7 @@ class SeasonService
 
     public function getFilteredData(array $filter)
     {
-        $query = $this->seasonRepository->query();
+        $query = $this->seasonRepository->query()->with('partner');
 
          if (isset($filter['moive_name'])) {
               $query->where('name', 'like', '%' . $filter['moive_name'] . '%');
