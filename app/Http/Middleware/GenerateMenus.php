@@ -421,7 +421,7 @@ class GenerateMenus
             $this->mainRoute($menu, [
                 'icon' => 'ph ph-shield-check',
                 'title' => __('messages.security'),
-                'route' => 'backend.security.index',
+                'url'   => url('/app/security'),
                 'active' => ['app/security', 'app/security/*', 'app/permission-role'],
                 'order' => 10,
             ]);
