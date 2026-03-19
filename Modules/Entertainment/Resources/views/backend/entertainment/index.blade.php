@@ -143,25 +143,10 @@
               data: 'updated_at',
               name: 'updated_at',
               title: "{{ __('service.lbl_update_at') }}",
-              orderable: true,            {
-                data: 'partner_name',
-                name: 'partner_name',
-                title: "{{ __('partner::partner.lbl_partner') }}",
-                orderable: false,
-                searchable: false,
-            },
-            {
-                data: 'approval_col',
-                name: 'approval_col',
-                title: "{{ __('partner::partner.validation_title') }}",
-                orderable: false,
-                searchable: false,
-            },
-        
+              orderable: true,
              visible: false,
            },
 
-        ,
             {
                 data: 'partner_name',
                 name: 'partner_name',
@@ -175,12 +160,9 @@
                 title: "{{ __('partner::partner.validation_title') }}",
                 orderable: false,
                 searchable: false,
-            }
-        ]
-}",
-                orderable: false,
-                searchable: false,
             },
+        ]
+
         const actionColumn = [{
             data: 'action',
             name: 'action',
