@@ -96,6 +96,7 @@ return[
     'details'=>'Entertainment Details',
     'continuewatch_notfound' => 'Continuewatch not found',
     'continuewatch_delete' => 'Continue Watching Deleted Successfully !',
+    'movies'  => 'Movies',
     'tvshows'=>'TV Shows',
     'seasons'=>'Season',
     'episode'=>'Episode',

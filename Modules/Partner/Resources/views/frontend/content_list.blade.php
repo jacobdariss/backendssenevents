@@ -25,7 +25,11 @@
                     <tr>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                @php $thumb = $item->thumbnail_url ?? $item->poster_url ?? $item->thumb_url ?? null; @endphp
+                                @php
+                                $rawThumb = $item->thumbnail_url ?? $item->poster_url ?? $item->thumb_url ?? null;
+                                $contentType = $content_type === 'movie' ? 'movie' : ($content_type === 'tvshow' ? 'tvshow' : ($content_type === 'livetv' ? 'livetvchannel' : 'video'));
+                                $thumb = $rawThumb ? setBaseUrlWithFileName($rawThumb, 'image', $contentType) : null;
+                            @endphp
                                 @if($thumb)
                                     <img src="{{ $thumb }}" style="width:40px;height:30px;object-fit:cover;border-radius:4px;">
                                 @endif
