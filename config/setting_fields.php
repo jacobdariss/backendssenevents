@@ -334,6 +334,16 @@ return [
                 'value' => '0',
                 'help' => 'Enable demo login functionality.',
             ],
+            [
+                'type' => 'checkbox',
+                'data' => 'module_settings',
+                'name' => 'admin_2fa_enabled',
+                'label' => 'Admin 2FA',
+                'rules' => 'boolean',
+                'class' => '',
+                'value' => '1',
+                'help' => 'Enable two-factor authentication for admin login.',
+            ],
 
 
         ],

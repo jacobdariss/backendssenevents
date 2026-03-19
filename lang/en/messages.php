@@ -2162,6 +2162,15 @@ return [
     'are_you_sure'        => 'Are you sure?',
     'error_occurred'      => 'An error occurred. Please try again.',
     'not_editable'         => 'Not Editable',
+
+    'security' => 'Security',
+    '2fa_admin_label' => 'Admin Two-Factor Authentication (2FA)',
+    '2fa_admin_desc' => 'Manage authentication security settings',
+    '2fa_admin_help' => 'When enabled, administrators must verify their identity with a 6-digit code sent by email at each login.',
+    '2fa_enabled_success' => '2FA has been enabled successfully.',
+    '2fa_disabled_success' => '2FA has been disabled successfully.',
+    'manage_permissions' => 'Manage Permissions',
+    'permission_role_desc' => 'Configure roles and permissions for each module.',
     'cannot_delete_yourself' => 'You cannot delete your own account.',
 
 ];

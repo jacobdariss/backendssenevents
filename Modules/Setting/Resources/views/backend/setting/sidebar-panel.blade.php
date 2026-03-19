@@ -72,7 +72,15 @@
                         </a>
                     </div>
 
-
+                    @if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin']))
+                    <hr class="my-2">
+                    <p class="text-muted small px-2 mb-1">{{ __('messages.security') }}</p>
+                    <div class="mb-3 active-menu">
+                        <a id="link-security" href="{{ route('backend.security.index') }}" class="btn btn-border {{ request()->routeIs('backend.security.*') ? 'active' : '' }}">
+                            <i class="fas fa-shield-alt"></i>{{ __('messages.security') }}
+                        </a>
+                    </div>
+                    @endif
 
                 </div>
             </div>

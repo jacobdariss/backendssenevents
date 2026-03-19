@@ -419,10 +419,10 @@ class GenerateMenus
             if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])){
 
             $this->mainRoute($menu, [
-                'icon' => 'ph ph-faders',
-                'title' => __('sidebar.access_control'),
-                'route' => 'backend.permission-role.list',
-                'active' => ['app/permission-role'],
+                'icon' => 'ph ph-shield-check',
+                'title' => __('messages.security'),
+                'route' => 'backend.security.index',
+                'active' => ['app/security', 'app/security/*', 'app/permission-role'],
                 'order' => 10,
             ]);
         }

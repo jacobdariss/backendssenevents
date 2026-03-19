@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\AdminManagementController;
+use App\Http\Controllers\Backend\SecurityController;
 use App\Http\Controllers\Backend\BackendController;
 use App\Http\Controllers\Backend\BackupController;
 use App\Http\Controllers\Backend\SettingController;
@@ -120,6 +121,12 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
             Route::post('roles', [AdminManagementController::class, 'storeRole'])->name('roles.store');
             Route::delete('roles/{id}', [AdminManagementController::class, 'destroyRole'])->name('roles.destroy');
         });
+        // Security (2FA + Permissions) — Super Admin only
+        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
+            Route::get('/', [SecurityController::class, 'index'])->name('index');
+            Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
+        });
+
         Route::get('google-auth', [BackendController::class, 'googleAuth'])->name('google-auth');
         Route::get('/get_revnue_chart_data/{type}', [BackendController::class, 'getRevenuechartData']);
         Route::get('/get_subscriber_chart_data/{type}', [BackendController::class, 'getSubscriberChartData']);

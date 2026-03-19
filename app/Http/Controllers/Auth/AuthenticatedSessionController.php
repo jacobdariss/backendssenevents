@@ -55,8 +55,14 @@ class AuthenticatedSessionController extends Controller
 
             } else {
 
-                // 2FA : store user in session, send OTP, logout temporarily
                 $user = Auth::user();
+
+                // Si le 2FA admin est désactivé → connexion directe
+                if (!setting('admin_2fa_enabled', true)) {
+                    return redirect()->intended(RouteServiceProvider::HOME);
+                }
+
+                // 2FA : store user in session, send OTP, logout temporarily
                 $otp  = (string) random_int(100000, 999999);
 
                 $request->session()->put('2fa_pending_user_id', $user->id);
