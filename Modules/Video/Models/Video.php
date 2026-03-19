@@ -47,6 +47,7 @@ class Video extends BaseModel
         'enable_download_quality',
         'poster_tv_url',
         'price',
+        'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',
@@ -268,7 +269,8 @@ class Video extends BaseModel
             'download_url', 'description', 'download_type', 'enable_quality',
             'download_status', 'enable_download_quality',
             'status', 'enable_subtitle', 'subtitle_language', 'is_default_subtitle',
-            'price', 'purchase_type', 'access_duration', 'discount', 'available_for',
+            'price',
+        'partner_proposed_price', 'purchase_type', 'access_duration', 'discount', 'available_for',
             'plan_id','bunny_video_url', 'enable_clips'
         ])
         ->with([

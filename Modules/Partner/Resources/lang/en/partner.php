@@ -78,4 +78,11 @@ return [
     'video_submitted'        => 'Video submitted for validation.',
     'video_updated'          => 'Video updated and resubmitted for validation.',
 
+    // Financial / PPV
+    'lbl_commission_rate'   => 'Platform Commission',
+    'lbl_commission_help'   => 'Percentage retained by the platform. Leave blank to define later.',
+    'ppv_price_info'        => 'Your proposed price will be reviewed by the admin before publication.',
+    'proposed_by_partner'   => 'Proposed by partner',
+    'price_set_by_admin'    => 'Set by admin',
+
 ];

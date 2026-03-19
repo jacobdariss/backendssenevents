@@ -76,23 +76,55 @@
                 <div class="col-md-6">
                     {{ html()->label(__('movie.lbl_movie_access'), 'access')->class('form-label') }}
                     <div class="d-flex flex-wrap align-items-center gap-3">
-                        @foreach(['free' => __('movie.lbl_free'), 'paid' => __('movie.lbl_paid'), 'pay-per-view' => __('messages.lbl_pay_per_view')] as $val => $label)
                         <label class="form-check form-check-inline form-control cursor-pointer w-auto m-0">
                             <div>
-                                <input class="form-check-input" type="radio" name="access" value="{{ $val }}"
-                                    onchange="showPlanSelection(this.value === 'paid')"
-                                    {{ old('access', $video->access) == $val ? 'checked' : '' }}>
-                                <span class="form-check-label">{{ $label }}</span>
+                                <input class="form-check-input" type="radio" name="access" value="free"
+                                    onchange="togglePpvFields(this.value)"
+                                    {{ old('access', $video->access) == 'free' ? 'checked' : '' }}>
+                                <span class="form-check-label">{{ __('movie.lbl_free') }}</span>
                             </div>
                         </label>
-                        @endforeach
+                        <label class="form-check form-check-inline form-control cursor-pointer w-auto m-0">
+                            <div>
+                                <input class="form-check-input" type="radio" name="access" value="pay-per-view"
+                                    onchange="togglePpvFields(this.value)"
+                                    {{ old('access', $video->access) == 'pay-per-view' ? 'checked' : '' }}>
+                                <span class="form-check-label">{{ __('messages.lbl_pay_per_view') }}</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
-                {{-- Plan --}}
-                <div class="col-md-6 {{ old('access', $video->access) == 'free' ? 'd-none' : '' }}" id="planSelection">
-                    {{ html()->label(__('movie.lbl_select_plan'), 'plan_id')->class('form-label') }}
-                    {{ html()->select('plan_id', $plan->pluck('name', 'id')->prepend(__('placeholder.lbl_select_plan'), ''), old('plan_id', $video->plan_id))->class('form-control select2')->id('plan_id') }}
+                {{-- PPV Fields (affichés si pay-per-view) --}}
+                <div class="col-12 {{ old('access', $video->access) == 'pay-per-view' ? '' : 'd-none' }}" id="ppv_fields">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            {{ html()->label(__('messages.lbl_price') . ' <span class="text-danger">*</span>', 'price')->class('form-label') }}
+                            <div class="input-group">
+                                <span class="input-group-text">FCFA</span>
+                                {{ html()->number('price', old('price', $video->price))->class('form-control')->attribute('step', '0.01')->attribute('min', 0)->id('price') }}
+                            </div>
+                            @error('price')<span class="text-danger small">{{ $message }}</span>@enderror
+                        </div>
+                        <div class="col-md-3">
+                            {{ html()->label(__('messages.purchase_type') . ' <span class="text-danger">*</span>', 'purchase_type')->class('form-label') }}
+                            {{ html()->select('purchase_type', ['rental' => __('messages.lbl_rental'), 'onetime' => __('messages.lbl_one_time_purchase')], old('purchase_type', $video->purchase_type ?? 'rental'))->class('form-control select2')->id('purchase_type')->attribute('onchange', 'toggleAccessDurationPartner(this.value)') }}
+                        </div>
+                        <div class="col-md-3" id="access_duration_wrapper_partner">
+                            {{ html()->label(__('messages.lbl_access_duration') . ' (jours) <span class="text-danger">*</span>', 'access_duration')->class('form-label') }}
+                            {{ html()->number('access_duration', old('access_duration', $video->access_duration))->class('form-control')->attribute('min', 1)->attribute('placeholder', '7') }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ html()->label(__('messages.lbl_available_for') . ' (jours) <span class="text-danger">*</span>', 'available_for')->class('form-label') }}
+                            {{ html()->number('available_for', old('available_for', $video->available_for))->class('form-control')->attribute('min', 1)->attribute('placeholder', '30') }}
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-info py-2 mb-0 small">
+                                <i class="ph ph-info me-1"></i>
+                                {{ __('partner::partner.ppv_price_info') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Duration --}}
@@ -202,6 +234,21 @@
 
 @push('after-scripts')
 <script>
+function togglePpvFields(val) {
+    const ppvDiv = document.getElementById('ppv_fields');
+    if (ppvDiv) ppvDiv.classList.toggle('d-none', val !== 'pay-per-view');
+    // Prix obligatoire seulement si PPV
+    const priceInput = document.getElementById('price');
+    if (priceInput) {
+        val === 'pay-per-view' ? priceInput.setAttribute('required', 'required') : priceInput.removeAttribute('required');
+    }
+}
+
+function toggleAccessDurationPartner(val) {
+    const wrapper = document.getElementById('access_duration_wrapper_partner');
+    if (wrapper) wrapper.classList.toggle('d-none', val !== 'rental');
+}
+
 function showPlanSelection(show) {
     const planDiv = document.getElementById('planSelection');
     if (planDiv) planDiv.classList.toggle('d-none', !show);

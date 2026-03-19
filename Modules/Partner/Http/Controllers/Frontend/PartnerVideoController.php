@@ -49,8 +49,12 @@ class PartnerVideoController extends Controller
             'description'       => 'required|string',
             'duration'          => 'required',
             'release_date'      => 'required',
-            'access'            => 'required',
+            'access'            => 'required|in:free,pay-per-view',
             'video_upload_type' => 'required',
+            'price'             => 'required_if:access,pay-per-view|numeric|min:0',
+            'purchase_type'     => 'required_if:access,pay-per-view',
+            'access_duration'   => 'required_if:purchase_type,rental|nullable|integer|min:1',
+            'available_for'     => 'required_if:access,pay-per-view|nullable|integer|min:1',
         ]);
 
         $data = $request->except(['_token']);
@@ -58,6 +62,16 @@ class PartnerVideoController extends Controller
         $data['approval_status'] = 'pending';
         $data['slug']            = Str::slug($request->name) . '-' . time();
         $data['status']          = 0; // inactif jusqu'à validation
+
+        // Si PPV : conserver le prix proposé par le partenaire
+        if ($request->access === 'pay-per-view' && $request->price) {
+            $data['partner_proposed_price'] = $request->price;
+        } else {
+            // Forcer free si pas PPV
+            $data['access'] = $request->access === 'free' ? 'free' : 'free';
+            $data['price']  = null;
+            $data['partner_proposed_price'] = null;
+        }
 
         // Extraire le nom de fichier des URLs
         foreach (['thumbnail_url', 'poster_url', 'poster_tv_url'] as $field) {
@@ -112,13 +126,28 @@ class PartnerVideoController extends Controller
             'description'       => 'required|string',
             'duration'          => 'required',
             'release_date'      => 'required',
-            'access'            => 'required',
+            'access'            => 'required|in:free,pay-per-view',
             'video_upload_type' => 'required',
+            'price'             => 'required_if:access,pay-per-view|numeric|min:0',
+            'purchase_type'     => 'required_if:access,pay-per-view',
+            'access_duration'   => 'required_if:purchase_type,rental|nullable|integer|min:1',
+            'available_for'     => 'required_if:access,pay-per-view|nullable|integer|min:1',
         ]);
 
         $data = $request->except(['_token', '_method']);
-        $data['approval_status'] = 'pending'; // Re-soumettre à validation
+        $data['approval_status'] = 'pending';
         $data['status']          = 0;
+
+        if ($request->access === 'pay-per-view' && $request->price) {
+            $data['partner_proposed_price'] = $request->price;
+        } else {
+            $data['access']                 = 'free';
+            $data['price']                  = null;
+            $data['partner_proposed_price'] = null;
+            $data['purchase_type']          = null;
+            $data['access_duration']        = null;
+            $data['available_for']          = null;
+        }
 
         foreach (['thumbnail_url', 'poster_url', 'poster_tv_url'] as $field) {
             if (!empty($data[$field])) {

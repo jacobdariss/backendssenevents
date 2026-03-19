@@ -61,6 +61,17 @@
                             @enderror
                         </div>
                         <div class="col-md-6">
+
+                        {{-- Commission plateforme --}}
+                        <div class="col-md-4">
+                            {{ html()->label(__('partner::partner.lbl_commission_rate') . ' (%)', 'commission_rate')->class('form-label') }}
+                            <div class="input-group">
+                                {{ html()->number('commission_rate', old('commission_rate', $partner->commission_rate))->class('form-control')->attribute('step', '0.01')->attribute('min', 0)->attribute('max', 100)->attribute('placeholder', '30') }}
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">{{ __('partner::partner.lbl_commission_help') }}</small>
+                        </div>
+
                             {{ html()->label(__('messages.lbl_status'), 'status')->class('form-label') }}
                             <div class="d-flex justify-content-between align-items-center form-control">
                                 {{ html()->label(__('messages.active'), 'status')->class('form-label mb-0') }}

@@ -67,6 +67,7 @@
                         <th>{{ __('messages.name') }}</th>
                         <th>{{ __('partner::partner.lbl_partner') }}</th>
                         <th>{{ __('messages.type') }}</th>
+                        <th>{{ __('messages.lbl_price') }}</th>
                         <th>{{ __('messages.lbl_status') }}</th>
                         <th>{{ __('messages.created_at') }}</th>
                         <th class="text-end">{{ __('messages.action') }}</th>
@@ -92,6 +93,20 @@
                             @endif
                         </td>
                         <td><span class="badge bg-secondary">{{ $row['label'] }}</span></td>
+                        <td>
+                            @if($item->access === 'pay-per-view')
+                                @if($item->partner_proposed_price)
+                                    <span class="badge bg-warning text-dark fw-bold">{{ number_format($item->partner_proposed_price, 0) }} FCFA</span>
+                                    <small class="d-block text-muted mt-1">{{ __('partner::partner.proposed_by_partner') }}</small>
+                                @endif
+                                @if($item->price && $item->price != $item->partner_proposed_price)
+                                    <span class="badge bg-success fw-bold">{{ number_format($item->price, 0) }} FCFA</span>
+                                    <small class="d-block text-muted mt-1">{{ __('partner::partner.price_set_by_admin') }}</small>
+                                @endif
+                            @else
+                                <span class="text-muted small">{{ __('movie.lbl_free') }}</span>
+                            @endif
+                        </td>
                         <td>
                             @if($item->approval_status === 'pending')
                                 <span class="badge bg-warning text-dark">{{ __('partner::partner.status_pending') }}</span>
