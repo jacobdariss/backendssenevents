@@ -502,7 +502,13 @@ private function getFileType($extension)
         $mediaUrl = '';
         if (!$isDir && ($isVideo || $isImage)) {
             $type = $isVideo ? 'video' : 'image';
-            $mediaUrl = setBaseUrlWithFileName($name, $type, $pageType);
+            // Pour les dossiers partenaires, utiliser le chemin complet du dossier parent
+            if (!empty($folder) && str_starts_with($folder, 'partners/')) {
+                // Construire l'URL directement depuis le chemin relatif
+                $mediaUrl = asset('storage/' . $folder . '/' . $name);
+            } else {
+                $mediaUrl = setBaseUrlWithFileName($name, $type, $pageType);
+            }
         }
 
         // When local, compute size/mtime using absolute path; expose relative path to the client
