@@ -19,7 +19,7 @@ class PartnerValidationController extends Controller
     public function __construct()
     {
         $this->traitInitializeModuleTrait(
-            'partner.validation_title',
+            'partner::partner.validation_title',
             'partner-validation',
             'ph ph-seal-check'
         );
