@@ -27,6 +27,10 @@ return [
         //     'is_custom_permission' => 0,
         // ],
         [
+            'module_name' => 'partners',
+            'is_custom_permission' => 0,
+        ],
+        [
             'module_name' => 'genres',
             'is_custom_permission' => 0,
         ],

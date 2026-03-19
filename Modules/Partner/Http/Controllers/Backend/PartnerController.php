@@ -99,7 +99,12 @@ class PartnerController extends Controller
 
     public function show(int $id)
     {
-        return redirect()->route('backend.partners.edit', $id);
+        $partner     = $this->partnerService->getPartnerById($id);
+        $stats       = $this->partnerService->getVideoStats($id);
+        $module_title = __('partner::partner.lbl_partner');
+        $module_action = 'Show';
+
+        return view('partner::backend.partner.show', compact('partner', 'stats', 'module_title', 'module_action'));
     }
 
     public function edit(int $id)

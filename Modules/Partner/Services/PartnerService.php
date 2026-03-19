@@ -6,6 +6,7 @@ use Modules\Partner\Repositories\PartnerRepositoryInterface;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class PartnerService
 {
@@ -52,9 +53,32 @@ class PartnerService
         return $this->partnerRepository->forceDelete($id);
     }
 
+    /**
+     * Statistiques vidéos pour un partenaire donné
+     */
+    public function getVideoStats(int $partnerId): array
+    {
+        $stats = ['videos_active' => 0, 'videos_inactive' => 0, 'movies_active' => 0, 'movies_inactive' => 0, 'total' => 0];
+
+        try {
+            if (class_exists(\Modules\Video\Models\Video::class)) {
+                $stats['videos_active']   = \Modules\Video\Models\Video::where('partner_id', $partnerId)->where('status', 1)->count();
+                $stats['videos_inactive'] = \Modules\Video\Models\Video::where('partner_id', $partnerId)->where('status', 0)->count();
+            }
+            if (class_exists(\Modules\Entertainment\Models\Entertainment::class)) {
+                $stats['movies_active']   = \Modules\Entertainment\Models\Entertainment::where('partner_id', $partnerId)->where('status', 1)->count();
+                $stats['movies_inactive'] = \Modules\Entertainment\Models\Entertainment::where('partner_id', $partnerId)->where('status', 0)->count();
+            }
+            $stats['total'] = $stats['videos_active'] + $stats['videos_inactive'] + $stats['movies_active'] + $stats['movies_inactive'];
+        } catch (\Exception $e) {}
+
+        return $stats;
+    }
+
     public function getDataTable(Datatables $datatable, array $filter)
     {
         $query = $this->getFilteredData($filter);
+
         return $datatable->eloquent($query)
             ->addColumn('check', function ($row) {
                 return '<input type="checkbox" class="form-check-input select-table-row" id="datatable-row-' . $row->id . '" name="datatable_ids[]" value="' . $row->id . '" data-type="partners" onclick="dataTableRowCheck(' . $row->id . ',this)">';
@@ -63,11 +87,20 @@ class PartnerService
                 $imageUrl = $data->logo_url ? setBaseUrlWithFileName($data->logo_url, 'image', 'partners') : asset('images/default.png');
                 return view('components.image-name', ['image' => $imageUrl, 'name' => $data->name])->render();
             })
+            ->addColumn('videos_count', function ($data) {
+                $stats = $this->getVideoStats($data->id);
+                return '
+                    <div class="d-flex gap-1 flex-wrap">
+                        <span class="badge bg-success">' . $stats['videos_active'] . ' ' . __('messages.active') . '</span>
+                        <span class="badge bg-secondary">' . $stats['videos_inactive'] . ' ' . __('messages.inactive') . '</span>
+                    </div>
+                ';
+            })
             ->addColumn('action', function ($data) {
                 return view('partner::backend.partner.action', compact('data'));
             })
             ->editColumn('status', function ($row) {
-                $checked = $row->status ? 'checked="checked"' : '';
+                $checked  = $row->status ? 'checked="checked"' : '';
                 $disabled = $row->trashed() ? 'disabled' : '';
                 return '
                     <div class="form-check form-switch">
@@ -82,7 +115,7 @@ class PartnerService
                 return $diff < 25 ? $data->updated_at->diffForHumans() : $data->updated_at->isoFormat('llll');
             })
             ->orderColumns(['id'], '-:column $1')
-            ->rawColumns(['action', 'status', 'check', 'logo'])
+            ->rawColumns(['action', 'status', 'check', 'logo', 'videos_count'])
             ->toJson();
     }
 

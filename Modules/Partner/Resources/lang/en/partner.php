@@ -53,4 +53,16 @@ return [
     'content_approved'         => 'Content approved successfully.',
     'content_rejected'         => 'Content rejected.',
     'no_content_to_validate'   => 'No content to display for the selected filters.',
+    // Fiche & stats
+    'lbl_videos_count'    => 'Videos',
+    'lbl_videos_active'   => 'Active videos',
+    'lbl_videos_inactive' => 'Inactive videos',
+    'lbl_movies_active'   => 'Active films',
+    'lbl_videos_total'    => 'Total content',
+
+    // Rejection
+    'rejection_reason'         => 'Rejection reason',
+    'placeholder_rejection'    => 'Explain why this content was rejected...',
+    'content_rejected_reason'  => 'Content rejected with reason.',
+
 ];

@@ -120,9 +120,20 @@ class PartnerValidationController extends Controller
             return response()->json(['status' => false, 'message' => __('messages.not_found')], 404);
         }
 
-        $model->update(['approval_status' => 'rejected', 'status' => 0]);
+        $updateData = ['approval_status' => 'rejected', 'status' => 0];
 
-        return response()->json(['status' => true, 'message' => __('partner::partner.content_rejected')]);
+        // Motif de rejet si fourni
+        if ($request->filled('rejection_reason')) {
+            $updateData['rejection_reason'] = $request->input('rejection_reason');
+        }
+
+        $model->update($updateData);
+
+        $message = $request->filled('rejection_reason')
+            ? __('partner::partner.content_rejected_reason')
+            : __('partner::partner.content_rejected');
+
+        return response()->json(['status' => true, 'message' => $message]);
     }
 
     private function resolveModel(string $contentType, int $id)

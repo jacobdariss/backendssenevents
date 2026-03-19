@@ -408,6 +408,14 @@ class GenerateMenus
 
 
             $this->mainRoute($menu, [
+                'icon' => 'ph ph-handshake',
+                'title' => __('partner::partner.title'),
+                'url'   => url('/app/partners'),
+                'active' => ['app/partners', 'app/partners/*', 'app/partner-validation', 'app/partner-validation/*'],
+                'order' => 5,
+            ]);
+
+            $this->mainRoute($menu, [
                 'icon' => 'ph ph-gear-six',
                 'title' => __('sidebar.settings'),
                 'route' => 'backend.settings.general',

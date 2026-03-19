@@ -53,4 +53,16 @@ return [
     'content_approved'         => 'Contenu approuvé avec succès.',
     'content_rejected'         => 'Contenu rejeté.',
     'no_content_to_validate'   => 'Aucun contenu à afficher pour les filtres sélectionnés.',
+    // Fiche & stats
+    'lbl_videos_count'    => 'Vidéos',
+    'lbl_videos_active'   => 'Vidéos actives',
+    'lbl_videos_inactive' => 'Vidéos inactives',
+    'lbl_movies_active'   => 'Films actifs',
+    'lbl_videos_total'    => 'Contenu total',
+
+    // Rejection
+    'rejection_reason'         => 'Motif de rejet',
+    'placeholder_rejection'    => 'Expliquez pourquoi ce contenu a été rejeté...',
+    'content_rejected_reason'  => 'Contenu rejeté avec motif.',
+
 ];

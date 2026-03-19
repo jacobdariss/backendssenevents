@@ -99,6 +99,9 @@
                                 <span class="badge bg-success">{{ __('partner::partner.status_approved') }}</span>
                             @else
                                 <span class="badge bg-danger">{{ __('partner::partner.status_rejected') }}</span>
+                                @if(!empty($item->rejection_reason))
+                                    <p class="small text-muted mt-1 mb-0"><i class="ph ph-warning me-1"></i>{{ $item->rejection_reason }}</p>
+                                @endif
                             @endif
                         </td>
                         <td class="small text-muted">{{ $item->created_at->format('d/m/Y H:i') }}</td>
@@ -181,9 +184,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('.btn-reject').forEach(btn => {
         btn.addEventListener('click', function () {
-            const type = this.dataset.type;
-            const id   = this.dataset.id;
-            handleAction('{{ url("app/partner-validation/reject") }}/' + type + '/' + id, 'row-' + type + '-' + id);
+            const type   = this.dataset.type;
+            const id     = this.dataset.id;
+            const rowId  = 'row-' + type + '-' + id;
+            const reason = prompt('{{ __("partner::partner.rejection_reason") }} ({{ __("messages.optional") }})');
+            if (reason === null) return; // annulé
+
+            fetch('{{ url("app/partner-validation/reject") }}/' + type + '/' + id, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rejection_reason: reason })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status) {
+                    const row = document.getElementById(rowId);
+                    if (row) { row.style.transition='opacity .3s'; row.style.opacity='0'; setTimeout(()=>row.remove(),300); }
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message, 'danger');
+                }
+            })
+            .catch(() => showToast('{{ __("messages.something_went_wrong") }}', 'danger'));
         });
     });
 });
