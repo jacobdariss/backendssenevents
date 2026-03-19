@@ -55,6 +55,10 @@ class PartnerVideoController extends Controller
         $data['approval_status'] = 'pending';
         $data['slug']            = Str::slug($request->name) . '-' . time();
         $data['status']          = 0; // inactif jusqu'à validation
+        // S'assurer que release_date est définie (sinon le scope released() l'exclurait)
+        if (empty($data['release_date'])) {
+            $data['release_date'] = now()->toDateString();
+        }
 
         // Si PPV : conserver le prix proposé par le partenaire
         if ($request->access === 'pay-per-view' && $request->price) {
@@ -135,6 +139,9 @@ class PartnerVideoController extends Controller
         $data = $request->except(['_token', '_method']);
         $data['approval_status'] = 'pending';
         $data['status']          = 0;
+        if (empty($data['release_date'])) {
+            $data['release_date'] = now()->toDateString();
+        }
 
         if ($request->access === 'pay-per-view' && $request->price) {
             $data['partner_proposed_price'] = $request->price;

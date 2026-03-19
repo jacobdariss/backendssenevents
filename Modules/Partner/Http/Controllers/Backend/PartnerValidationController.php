@@ -149,6 +149,10 @@ class PartnerValidationController extends Controller
 
         $model->update($updateData);
 
+        // Vider le cache pour que le contenu approuvé apparaisse immédiatement
+        clearRelatedCache(['setting', 'home_banners', 'genres', 'genres_v2'], null);
+        clearDashboardCache();
+
         $this->notifyPartner($model, 'approved');
 
         return response()->json(['status' => true, 'message' => __('partner::partner.content_approved')]);
@@ -170,6 +174,9 @@ class PartnerValidationController extends Controller
         }
 
         $model->update($updateData);
+
+        clearRelatedCache(['setting', 'home_banners', 'genres', 'genres_v2'], null);
+        clearDashboardCache();
 
         $this->notifyPartner($model, 'rejected', $request->input('rejection_reason'));
 
