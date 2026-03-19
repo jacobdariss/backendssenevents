@@ -50,6 +50,7 @@ $navbarClass = $navbarHide ? 'd-none' : (!empty(getCustomizationSetting('navbar_
         </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto align-items-center navbar-list gap-3">
+                @if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin']))
                 <li class="nav-item dropdown iq-dropdown">
                     <a class="nav-link" data-bs-toggle="dropdown" href="#">
                         <div class="d-flex align-items-center gap-3 btn btn-warning px-2 py-2">
@@ -108,6 +109,7 @@ $navbarClass = $navbarHide ? 'd-none' : (!empty(getCustomizationSetting('navbar_
                         </div>
                     </ul>
                 </li>
+                @endif
                 <li class="nav-item dropdown">
                     <div class="d-flex align-items-center mr-2 iq-font-style" role="group"
                         aria-label="First group">
