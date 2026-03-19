@@ -75,7 +75,7 @@
                     <hr class="my-2">
                     <p class="text-muted small px-2 mb-1">{{ __('messages.security') }}</p>
                     <div class="mb-3 active-menu">
-                        <a id="link-security" href="{{ url('app/security') }}" class="btn btn-border {{ request()->is('app/security*') ? 'active' : '' }}">
+                        <a id="link-security" href="{{ url('/app/setting/security') }}" class="btn btn-border {{ request()->is('app/setting/security*') ? 'active' : '' }}">
                             <i class="fas fa-shield-alt"></i>{{ __('messages.security') }}
                         </a>
                     </div>

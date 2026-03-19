@@ -122,7 +122,7 @@ Route::group(['prefix' => 'app', ['middleware' => ['auth','admin']]], function (
             Route::delete('roles/{id}', [AdminManagementController::class, 'destroyRole'])->name('roles.destroy');
         });
         // Security (2FA + Permissions) — Super Admin only
-        Route::group(['prefix' => 'security', 'as' => 'security.'], function () {
+        Route::group(['prefix' => 'setting/security', 'as' => 'security.'], function () {
             Route::get('/', [SecurityController::class, 'index'])->name('index');
             Route::post('2fa/toggle', [SecurityController::class, 'toggle2FA'])->name('2fa.toggle');
         });
