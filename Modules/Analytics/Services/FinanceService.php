@@ -166,33 +166,42 @@ class FinanceService
     }
 
     // ─── Transactions récentes ────────────────────────────────────────────────
-    public function recentTransactions(Carbon $from, Carbon $to, int $limit = 15): \Illuminate\Support\Collection
+    public function recentTransactions(Carbon $from, Carbon $to, int $limit = 15): array
     {
-        $ppv = PayperviewTransaction::with(['payPerView'])
-            ->whereBetween('created_at', [$from, $to])
+        $result = [];
+
+        $ppvList = PayperviewTransaction::whereBetween('created_at', [$from, $to])
             ->where('payment_status', 'success')
-            ->latest()->limit($limit)->get()
-            ->map(fn($t) => [
-                'date'         => $t->created_at,
-                'type'         => 'PPV',
-                'amount'       => $t->amount,
-                'gateway'      => $t->payment_type ?? '—',
-                'status'       => $t->payment_status,
+            ->latest()->limit($limit)->get();
+
+        foreach ($ppvList as $t) {
+            $result[] = [
+                'date'           => $t->created_at->format('Y-m-d H:i:s'),
+                'type'           => 'PPV',
+                'amount'         => $t->amount,
+                'gateway'        => $t->payment_type ?? '—',
+                'status'         => $t->payment_status,
                 'transaction_id' => $t->transaction_id ?? '—',
-            ]);
+            ];
+        }
 
-        $subs = Subscription::whereBetween('created_at', [$from, $to])
-            ->latest()->limit($limit)->get()
-            ->map(fn($s) => [
-                'date'         => $s->created_at,
-                'type'         => 'Abonnement',
-                'amount'       => $s->total_amount,
-                'gateway'      => $s->subscription_transaction?->payment_type ?? '—',
-                'status'       => $s->status,
+        $subsList = Subscription::whereBetween('created_at', [$from, $to])
+            ->latest()->limit($limit)->get();
+
+        foreach ($subsList as $s) {
+            $result[] = [
+                'date'           => $s->created_at->format('Y-m-d H:i:s'),
+                'type'           => 'Abonnement',
+                'amount'         => $s->total_amount,
+                'gateway'        => '—',
+                'status'         => $s->status,
                 'transaction_id' => $s->identifier ?? '—',
-            ]);
+            ];
+        }
 
-        return $ppv->merge($subs)->sortByDesc(fn($t) => $t['date'])->take($limit);
+        usort($result, fn($a, $b) => strcmp($b['date'], $a['date']));
+
+        return array_slice($result, 0, $limit);
     }
 
     // ─── Abonnements détaillés ────────────────────────────────────────────────
