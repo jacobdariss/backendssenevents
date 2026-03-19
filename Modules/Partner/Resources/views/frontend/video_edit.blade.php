@@ -109,7 +109,8 @@
                     @error('release_date')<span class="text-danger small">{{ $message }}</span>@enderror
                 </div>
 
-                {{-- Upload type --}}
+                {{-- Upload type + URL/File/Embed sur une ligne --}}
+                <div class="col-12"><div class="row g-3">
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_video_upload_type') . ' <span class="text-danger">*</span>', 'video_upload_type')->class('form-label') }}
                     {{ html()->select('video_upload_type', $upload_url_type->pluck('name', 'name')->prepend(__('placeholder.lbl_select_video_type'), '')->merge(['Embedded' => 'Embedded']), old('video_upload_type', $video->video_upload_type))->class('form-control select2')->id('video_upload_type')->attribute('required') }}
@@ -142,10 +143,11 @@
                     {{ html()->hidden('video_url_input')->id('file_url_video')->value(old('video_url_input', $video->video_url_input)) }}
                 </div>
 
-                </div>{{-- end video wrapper --}}
+                </div>{{-- end video url/file/embed --}}
+                </div></div>{{-- end upload type row --}}
 
-                <div class="col-12"></div>{{-- line break --}}
-
+                {{-- Trailer URL type + URL/File/Embed sur une ligne --}}
+                <div class="col-12"><div class="row g-3">
                 {{-- Trailer URL type --}}
                 <div class="col-md-4">
                     {{ html()->label(__('movie.lbl_trailer_url_type') . ' <span class="text-danger">*</span>', 'trailer_url_type')->class('form-label') }}
@@ -173,6 +175,8 @@
                         {{ html()->textarea('trailer_embedded', old('trailer_embedded'))->class('form-control')->id('trailer_embedded')->placeholder('<iframe ...></iframe>') }}
                     </div>
                 </div>
+                </div></div>{{-- end trailer row --}}
+
                 {{-- Description --}}
                 <div class="col-md-12">
                     {{ html()->label(__('movie.lbl_description') . ' <span class="text-danger">*</span>', 'description')->class('form-label') }}
