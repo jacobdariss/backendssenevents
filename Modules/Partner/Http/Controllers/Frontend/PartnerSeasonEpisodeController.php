@@ -179,7 +179,7 @@ class PartnerSeasonEpisodeController extends Controller
             ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
         $season = Season::where('id', $seasonId)->where('partner_id', $partner->id)->firstOrFail();
 
-        $page_type     = 'episode';
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder = 'partners/' . $partner->id;
 
         return view('partner::frontend.episode_create',
@@ -241,7 +241,7 @@ class PartnerSeasonEpisodeController extends Controller
         $episode->poster_url    = $episode->poster_url    ? setBaseUrlWithFileName($episode->poster_url,    'image', 'episode') : null;
         $episode->poster_tv_url = $episode->poster_tv_url ? setBaseUrlWithFileName($episode->poster_tv_url, 'image', 'episode') : null;
 
-        $page_type     = 'episode';
+        $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder = 'partners/' . $partner->id;
 
         return view('partner::frontend.episode_edit',
