@@ -59,7 +59,7 @@ class AuthenticatedSessionController extends Controller
 
                 // Si le 2FA admin est désactivé → connexion directe
                 if (!setting('admin_2fa_enabled', true)) {
-                    return redirect()->intended(RouteServiceProvider::HOME);
+                    return redirect()->intended('/app/dashboard');
                 }
 
                 // 2FA : store user in session, send OTP, logout temporarily
