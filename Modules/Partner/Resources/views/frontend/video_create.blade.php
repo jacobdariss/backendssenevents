@@ -67,7 +67,7 @@
                 <div class="col-md-6">
                     {{ html()->label(__('movie.lbl_movie_access'), 'access')->class('form-label') }}
                     <div class="d-flex flex-wrap align-items-center gap-3">
-                        @foreach(['free' => __('movie.lbl_free'), 'paid' => __('movie.lbl_paid'), 'pay-per-view' => __('movie.lbl_pay_per_view')] as $val => $label)
+                        @foreach(['free' => __('movie.lbl_free'), 'paid' => __('movie.lbl_paid'), 'pay-per-view' => __('messages.lbl_pay_per_view')] as $val => $label)
                         <label class="form-check form-check-inline form-control cursor-pointer w-auto m-0">
                             <div>
                                 <input class="form-check-input" type="radio" name="access" value="{{ $val }}"
@@ -191,5 +191,14 @@ document.addEventListener('DOMContentLoaded', function () {
         $('.select2').select2({ language: { noResults: function() { return "{{ __('messages.no_results_found') }}"; } } });
     }
 });
+
+    // TinyMCE description
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: '#description',
+            plugins: 'link image code',
+            toolbar: 'undo redo | styleselect | bold italic | link | alignleft aligncenter alignright | removeformat | code',
+        });
+    }
 </script>
 @endpush
