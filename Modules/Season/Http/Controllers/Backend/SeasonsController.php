@@ -151,12 +151,12 @@ class SeasonsController extends Controller
 {
     $data = $request->all();
         // Attribution partenaire
-        if ($request->filled('partner_id')) {
+        if (\Schema::hasColumn('seasons', 'partner_id') && $request->filled('partner_id')) {
             $data['partner_id']      = $request->partner_id;
-            $data['approval_status'] = 'pending';
+            if (\Schema::hasColumn('seasons', 'approval_status')) $data['approval_status'] = 'pending';
         } else {
             $data['partner_id']      = null;
-            $data['approval_status'] = null;
+            if (\Schema::hasColumn('seasons', 'approval_status')) $data['approval_status'] = null;
         }
 
 
