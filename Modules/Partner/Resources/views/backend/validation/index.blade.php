@@ -86,7 +86,7 @@
                         </td>
                         <td>
                             @if($item->partner)
-                                <span class="badge bg-light text-dark border">{{ $item->partner->name }}</span>
+                                <span class="badge bg-info text-white">{{ $item->partner->name }}</span>
                             @else
                                 <span class="text-muted">—</span>
                             @endif

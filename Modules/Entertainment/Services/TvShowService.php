@@ -323,7 +323,7 @@ class TvShowService
             
         ->addColumn('partner_name', function ($data) {
             if (!empty($data->partner_id) && $data->partner) {
-                return '<span class="badge bg-primary-subtle text-primary">' . e($data->partner->name) . '</span>';
+                return '<span class="badge bg-info text-white">' . e($data->partner->name) . '</span>';
             }
             return '<span class="text-muted">—</span>';
         })
