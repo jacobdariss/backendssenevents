@@ -2164,6 +2164,11 @@ return [
     'not_editable'         => 'Not Editable',
 
     'contact_admin'  => 'Please contact your administrator to link your account.',
+    'verify'  => 'Verify',
+    'back_to_login'  => 'Back to login',
+    '2fa_partner_label'  => 'Partner Two-Factor Authentication (2FA)',
+    '2fa_partner_desc'  => 'Control partner login security',
+    '2fa_partner_help'  => 'When enabled, partners must verify their identity with a 6-digit code sent by email.',
     'optional'  => 'Optional',
     'security' => 'Security',
     '2fa_admin_label' => 'Admin Two-Factor Authentication (2FA)',

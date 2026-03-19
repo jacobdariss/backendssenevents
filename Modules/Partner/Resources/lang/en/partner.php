@@ -65,4 +65,10 @@ return [
     'placeholder_rejection'    => 'Explain why this content was rejected...',
     'content_rejected_reason'  => 'Content rejected with reason.',
 
+    // Login
+    'login_title'      => 'Partner Login',
+    'login_subtitle'   => 'Sign in to manage your content.',
+    'no_account'       => 'No account?',
+    'not_a_partner'    => 'This account is not registered as a partner.',
+
 ];

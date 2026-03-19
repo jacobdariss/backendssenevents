@@ -65,4 +65,10 @@ return [
     'placeholder_rejection'    => 'Expliquez pourquoi ce contenu a été rejeté...',
     'content_rejected_reason'  => 'Contenu rejeté avec motif.',
 
+    // Login
+    'login_title'      => 'Connexion Partenaire',
+    'login_subtitle'   => 'Connectez-vous pour gérer votre contenu.',
+    'no_account'       => 'Pas de compte ?',
+    'not_a_partner'    => 'Ce compte n\'est pas enregistré en tant que partenaire.',
+
 ];

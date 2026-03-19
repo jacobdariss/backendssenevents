@@ -14,6 +14,14 @@ use Modules\Partner\Http\Controllers\Frontend\PartnerDashboardController;
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('register', [PartnerAuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [PartnerAuthController::class, 'register'])->name('register.store');
+
+    Route::get('login',  [PartnerAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [PartnerAuthController::class, 'login'])->name('login.store');
+    Route::post('logout',[PartnerAuthController::class, 'logout'])->name('logout');
+
+    Route::get('2fa',           [PartnerAuthController::class, 'show2FA'])->name('2fa');
+    Route::post('2fa/verify',   [PartnerAuthController::class, 'verify2FA'])->name('2fa.verify');
+    Route::post('2fa/resend',   [PartnerAuthController::class, 'resend2FA'])->name('2fa.resend');
 });
 
 /*

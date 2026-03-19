@@ -18,9 +18,12 @@ class SecurityController extends Controller
 
     public function toggle2FA(Request $request)
     {
+        $key     = in_array($request->input('setting_key'), ['admin_2fa_enabled', 'partner_2fa_enabled'])
+            ? $request->input('setting_key')
+            : 'admin_2fa_enabled';
         $enabled = $request->has('admin_2fa_enabled') ? 1 : 0;
 
-        Setting::add('admin_2fa_enabled', $enabled, 'string', null);
+        Setting::add($key, $enabled, 'string', null);
 
         $message = $enabled
             ? __('messages.2fa_enabled_success')
