@@ -2163,23 +2163,9 @@ class EntertainmentsController extends Controller
         if ($request->video_id)   $data['video_id']   = $request->video_id;
         // ──────────────────────────────────────────────────────────────────
 
-        $viewData = EntertainmentView::where('entertainment_id', $request->entertainment_id)
-            ->where('user_id', $user->id)->first();
-
-        if (!$viewData) {
-            $views = EntertainmentView::create($data);
-            $message = __('movie.view_add');
-        } else {
-            // Mettre à jour les métadonnées si déjà vu
-            $viewData->update(array_filter([
-                'device_type'  => $data['device_type'],
-                'platform'     => $data['platform'],
-                'ip_address'   => $data['ip_address'],
-                'country_code' => $data['country_code'],
-                'partner_id'   => $data['partner_id'] ?? null,
-            ]));
-            $message = __('movie.already_added');
-        }
+        // Toujours créer une nouvelle vue pour les analytics (comptage réel)
+        EntertainmentView::create($data);
+        $message = __('movie.view_add');
 
         return ApiResponse::success(null, $message, 200);
     }
