@@ -119,4 +119,5 @@ return [
     'images_required_hint' => 'Poster and TV poster are required for proper display on web and mobile.',
     'image_required'        => 'This image is required.',
 
+    'preview_video' => 'Preview Video',
 ];

@@ -119,4 +119,5 @@ return [
     'images_required_hint' => 'L\'affiche et l\'affiche TV sont obligatoires pour un bon affichage sur web et mobile.',
     'image_required'        => 'Cette image est obligatoire.',
 
+    'preview_video' => 'Voir la vidéo',
 ];

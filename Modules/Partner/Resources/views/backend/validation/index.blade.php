@@ -125,7 +125,25 @@
                         </td>
                         <td class="small text-muted">{{ $item->created_at->format('d/m/Y H:i') }}</td>
                         <td class="text-end">
-                            <div class="d-flex gap-2 justify-content-end" id="actions-{{ $row['content_type'] }}-{{ $item->id }}">
+                            <div class="d-flex gap-2 justify-content-end flex-wrap" id="actions-{{ $row['content_type'] }}-{{ $item->id }}">
+                                {{-- Bouton Voir la vidéo --}}
+                                @php
+                                    $previewUrl = null;
+                                    $videoUrl = $item->video_url_input ?? null;
+                                    if ($videoUrl) {
+                                        // YouTube
+                                        if (preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $videoUrl, $m)) {
+                                            $previewUrl = 'https://www.youtube.com/watch?v=' . $m[1];
+                                        } else {
+                                            $previewUrl = $videoUrl;
+                                        }
+                                    }
+                                @endphp
+                                @if($previewUrl)
+                                <a href="{{ $previewUrl }}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="ph ph-play-circle me-1"></i>{{ __('partner::partner.preview_video') }}
+                                </a>
+                                @endif
                                 @if($item->approval_status !== 'approved')
                                 <button class="btn btn-sm btn-success btn-approve"
                                     data-type="{{ $row['content_type'] }}"
