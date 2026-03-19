@@ -158,7 +158,7 @@
                     @foreach ($folders as $folder)
                         @if ($folder['name'] != 'avatars' && $folder['name'] != 'subtitles' && $folder['name'] != 'logo')
                             <div class="col-lg-3 col-md-2 col-sm-1">
-                                <div class="card h-100 folder-card folder-card-clickable" data-folder-name="{{ $folder['name'] }}"
+                                <div class="card h-100 folder-card folder-card-clickable" data-folder-name="{{ $folder['path'] ?? $folder['name'] }}"
                                     style="cursor: pointer;">
                                     <div class="card-body text-center">
                                         <i class="ph ph-folder text-primary" style="font-size: 3rem;"></i>
