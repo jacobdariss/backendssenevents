@@ -106,16 +106,17 @@ class PartnerValidationController extends Controller
             }
         }
 
+        // Count all pending items across all types (regardless of current filter)
         $pendingCount = Entertainment::where('approval_status', 'pending')->whereNotNull('partner_id')->count()
             + Video::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
 
         if (Schema::hasColumn('live_tv_channel', 'approval_status')) {
             $pendingCount += LiveTvChannel::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
         }
-        if (Schema::hasColumn('seasons', 'approval_status')) {
+        if (Schema::hasColumn('seasons', 'approval_status') && Schema::hasColumn('seasons', 'partner_id')) {
             $pendingCount += Season::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
         }
-        if (Schema::hasColumn('episodes', 'approval_status')) {
+        if (Schema::hasColumn('episodes', 'approval_status') && Schema::hasColumn('episodes', 'partner_id')) {
             $pendingCount += Episode::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
         }
 

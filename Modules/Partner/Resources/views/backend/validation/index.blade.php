@@ -45,7 +45,9 @@
         ->merge($movies->map(fn($m)  => ['item' => $m, 'content_type' => 'movie',  'label' => __('movie.title')]))
         ->merge($tvshows->map(fn($t) => ['item' => $t, 'content_type' => 'tvshow', 'label' => __('movie.tvshows')]))
         ->merge($videos->map(fn($v)  => ['item' => $v, 'content_type' => 'video',  'label' => __('video.title')]))
-        ->merge($livetvs->map(fn($l) => ['item' => $l, 'content_type' => 'livetv', 'label' => __('frontend.livetv')]));
+        ->merge($livetvs->map(fn($l)   => ['item' => $l, 'content_type' => 'livetv',  'label' => __('frontend.livetv')]))
+        ->merge(($seasons  ?? collect())->map(fn($s) => ['item' => $s, 'content_type' => 'season',  'label' => __('episode.lbl_season')]))
+        ->merge(($episodes ?? collect())->map(fn($e) => ['item' => $e, 'content_type' => 'episode', 'label' => __('episode.title')]));
 @endphp
 
 @if(!empty($migrationNeeded))
