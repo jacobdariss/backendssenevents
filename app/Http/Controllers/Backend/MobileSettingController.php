@@ -403,14 +403,19 @@ class MobileSettingController extends Controller
                         $selected_values = Entertainment::whereIn('id', $selectedIds)->released()->where('status',1)->whereNull('deleted_at')->get();
                     }
                 } elseif ($type == 'video') {
-                    $value = Video::whereDate('release_date', '<=', now())
-                        ->where('status', 1)
+                    $value = Video::where('status', 1)
                         ->whereNull('deleted_at')
-                        ->orderBy('release_date', 'desc')
+                        ->where(function($q) {
+                            $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+                        })
+                        ->orderByDesc('created_at')
                         ->get();
 
                     if (!empty($selectedIds)) {
-                        $selected_values = Video::whereIn('id', $selectedIds)->whereDate('release_date', '<=', now())->where('status',1)->whereNull('deleted_at')->get();
+                        $selected_values = Video::whereIn('id', $selectedIds)
+                            ->where('status', 1)
+                            ->whereNull('deleted_at')
+                            ->get();
                     }
                 } elseif ($type == 'channel') {
                     $value = LiveTvChannel::where('status', 1)
@@ -559,10 +564,12 @@ class MobileSettingController extends Controller
                         ->orderBy('release_date', 'desc')
                         ->get();
                 } elseif ($type === 'video') {
-                    $value = Video::whereDate('release_date', '<=', now())
-                        ->where('status', 1)
+                    $value = Video::where('status', 1)
                         ->whereNull('deleted_at')
-                        ->orderBy('release_date', 'desc')
+                        ->where(function($q) {
+                            $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+                        })
+                        ->orderByDesc('created_at')
                         ->get();
                 } elseif ($type === 'channel') {
                     $value = LiveTvChannel::where('status', 1)
