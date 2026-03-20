@@ -33,5 +33,6 @@ return [
     'lbl_database_reset' => 'Database Reset',
     'load_sample_data' => 'Load Sample Data',
     'reset_database' => 'Reset Database',
-    'lbl_seo' => 'Ρυθμίσεις SEO',
+    'lbl_seo' => 'SEO Settings',
+    'lbl_video_player' => 'Video Player',
 ];

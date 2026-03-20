@@ -427,6 +427,67 @@ class SettingsController extends Controller
         $settings = $this->fieldsData($fields);
         return view('setting::backend.setting.section-pages.misc-settings', compact('settings', 'languages', 'timezones','dateFormat','timeFormatList'));
     }
+    // ── Lecteur Vidéo ────────────────────────────────────────────────────────
+
+    public function videoPlayerSetting()
+    {
+        $fields = [
+            'player_autoplay',
+            'player_muted_on_load',
+            'player_continue_watching',
+            'player_skip_intro',
+            'player_skip_intro_delay',
+            'player_default_quality',
+            'player_speed_control',
+            'player_download_enabled',
+            'player_subtitles_default',
+            'player_watermark_position',
+            'player_forward_seconds',
+        ];
+        $data = $this->fieldsData($fields);
+        return view('setting::backend.setting.section-pages.video-player', compact('data'));
+    }
+
+    public function saveVideoPlayerSetting(Request $request)
+    {
+        $fields = [
+            'player_autoplay'           => 'boolean',
+            'player_muted_on_load'      => 'boolean',
+            'player_continue_watching'  => 'boolean',
+            'player_skip_intro'         => 'boolean',
+            'player_skip_intro_delay'   => 'nullable|integer|min:0|max:300',
+            'player_default_quality'    => 'nullable|string|in:auto,360p,480p,720p,1080p',
+            'player_speed_control'      => 'boolean',
+            'player_download_enabled'   => 'boolean',
+            'player_subtitles_default'  => 'boolean',
+            'player_watermark_position' => 'nullable|string|in:top-left,top-right,bottom-left,bottom-right',
+            'player_forward_seconds'    => 'nullable|integer|min:5|max:120',
+        ];
+
+        // Checkboxes non cochées = absentes du POST → forcer à 0
+        $checkboxes = [
+            'player_autoplay', 'player_muted_on_load', 'player_continue_watching',
+            'player_skip_intro', 'player_speed_control', 'player_download_enabled',
+            'player_subtitles_default',
+        ];
+        foreach ($checkboxes as $cb) {
+            if (!$request->has($cb)) {
+                $request->merge([$cb => 0]);
+            }
+        }
+
+        $request->validate($fields);
+
+        foreach (array_keys($fields) as $key) {
+            \App\Models\Setting::add($key, $request->input($key, 0), 'string', null);
+        }
+
+        // Vider le cache
+        \Illuminate\Support\Facades\Cache::forget('setting');
+
+        return redirect()->back()->with('success', __('messages.save_setting'));
+    }
+
     /**
      * Store a newly created resource in storage.
      *

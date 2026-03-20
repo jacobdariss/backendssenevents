@@ -72,6 +72,12 @@
                         </a>
                     </div>
 
+
+                    <div class="mb-3 active-menu">
+                        <a id="link-video-player" href="{{ route('backend.settings.video-player') }}" class="btn btn-border {{ request()->routeIs('backend.settings.video-player') ? 'active' : '' }}">
+                            <i class="fas fa-play-circle"></i>{{ __('setting_sidebar.lbl_video_player') }}
+                        </a>
+                    </div>
                     <hr class="my-2">
                     <p class="text-muted small px-2 mb-1">{{ __('messages.security') }}</p>
                     <div class="mb-3 active-menu">

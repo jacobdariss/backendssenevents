@@ -34,4 +34,5 @@ return [
     'load_sample_data' => 'Load Sample Data',
     'reset_database' => 'Reset Database',
     'lbl_seo' => 'Paramètres SEO',
+    'lbl_video_player' => 'Lecteur Vidéo',
 ];
