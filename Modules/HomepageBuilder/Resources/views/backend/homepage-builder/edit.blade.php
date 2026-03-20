@@ -228,6 +228,13 @@
 
 @push('after-scripts')
 <script>
+// URLs injectées depuis PHP — évite les route() inline sujets au cache de routes
+const HB_URLS = {
+    contentOptions : '{{ $ajaxUrls["contentOptions"] }}',
+    tvshowSeasons  : '{{ $ajaxUrls["tvshowSeasons"] }}',
+    seasonEpisodes : '{{ $ajaxUrls["seasonEpisodes"] }}',
+};
+
 document.addEventListener('DOMContentLoaded', function() {
 
     const typeSelect    = document.getElementById('type');
@@ -276,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         pickerWrap.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
 
-        fetch('{{ route("backend.homepage-builder.content-options") }}?type=' + type + '&content_type=' + contentType)
+        fetch(HB_URLS.contentOptions + '?type=' + type + '&content_type=' + contentType)
         .then(r => r.json())
         .then(items => {
             if (!items.length) {
@@ -340,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             epLoading && (epLoading.style.display = '');
             seasonsWrap.style.display = '';
-            fetch('{{ route("backend.homepage-builder.tvshow-seasons") }}?tvshow_id=' + tvshowId)
+            fetch(HB_URLS.tvshowSeasons + '?tvshow_id=' + tvshowId)
             .then(r => r.json())
             .then(seasons => {
                 epLoading && (epLoading.style.display = 'none');
@@ -369,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             epLoading && (epLoading.style.display = '');
             const qs = seasonIds.map(id => 'season_ids[]=' + id).join('&');
-            fetch('{{ route("backend.homepage-builder.season-episodes") }}?' + qs)
+            fetch(HB_URLS.seasonEpisodes + '?' + qs)
             .then(r => r.json())
             .then(episodes => {
                 epLoading && (epLoading.style.display = 'none');

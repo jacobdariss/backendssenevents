@@ -51,8 +51,14 @@ class HomepageBuilderController extends Controller
         // Pour la section tvshow : pré-charger les données de la sélection saisons/épisodes
         $episodePickerData = $this->buildEpisodePickerData($section);
 
+        $ajaxUrls = [
+            'contentOptions' => route('backend.homepage-builder.content-options'),
+            'tvshowSeasons'  => route('backend.homepage-builder.tvshow-seasons'),
+            'seasonEpisodes' => route('backend.homepage-builder.season-episodes'),
+        ];
+
         return view('homepage-builder::backend.homepage-builder.edit', compact(
-            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData'
+            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData', 'ajaxUrls'
         ));
     }
 
@@ -89,8 +95,13 @@ class HomepageBuilderController extends Controller
         $section        = null;
         $contentOptions = [];
         $episodePickerData = null;
+        $ajaxUrls = [
+            'contentOptions' => route('backend.homepage-builder.content-options'),
+            'tvshowSeasons'  => route('backend.homepage-builder.tvshow-seasons'),
+            'seasonEpisodes' => route('backend.homepage-builder.season-episodes'),
+        ];
         return view('homepage-builder::backend.homepage-builder.edit', compact(
-            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData'
+            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData', 'ajaxUrls'
         ));
     }
 
