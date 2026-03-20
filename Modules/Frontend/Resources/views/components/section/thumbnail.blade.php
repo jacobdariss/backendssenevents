@@ -23,13 +23,29 @@
                 </svg>
                 Son désactivé — cliquez pour activer
             </div>
+            @php
+                $vp_autoplay         = setting('player_autoplay', 0);
+                $vp_muted            = setting('player_muted_on_load', 0) || $vp_autoplay;
+                $vp_continue         = setting('player_continue_watching', 1);
+                $vp_skip_intro       = setting('player_skip_intro', 1);
+                $vp_skip_intro_delay = (int) setting('player_skip_intro_delay', 5);
+                $vp_quality          = setting('player_default_quality', 'auto');
+                $vp_speed            = setting('player_speed_control', 1);
+                $vp_download         = setting('player_download_enabled', 0);
+                $vp_subtitles        = setting('player_subtitles_default', 0);
+                $vp_watermark        = setting('player_watermark_position', 'top-right');
+                $vp_forward          = (int) setting('player_forward_seconds', 10);
+                $vp_continue_watch   = $vp_continue && isset($continue_watch) && $continue_watch;
+            @endphp
             <video id="videoPlayer" class="video-js vjs-default-skin vjs-ima"
-                   controls width="560" height="315" muted
+                   controls width="560" height="315"
+                   {{ $vp_muted ? 'muted' : '' }}
+                   {{ $vp_autoplay ? 'autoplay' : '' }}
                    poster="{{ $thumbnail_image }}"
-                   data-setup='{"muted": true}'
+                   data-setup='{"muted": {{ $vp_muted ? "true" : "false" }}, "autoplay": {{ $vp_autoplay ? "true" : "false" }}}'
                    data-type="{{ $type }}"
                    content-video-type="{{ $content_video_type }}"
-                   data-continue-watch="{{ isset($continue_watch) && $continue_watch ? 'true' : 'false' }}"
+                   data-continue-watch="{{ $vp_continue_watch ? 'true' : 'false' }}"
                    data-movie-access="{{ $dataAccess ?? '' }}"
                    data-plan-id="{{ $plan_id ?? '' }}"
                    data-watch-time="{{ $watched_time ?? 0 }}"
@@ -38,8 +54,15 @@
                        data-contentType="{{ $content_type }}"
                        data-contentId="{{ $content_id }}"
                    @endif
-                   data-forward-seconds="{{ setting('forward_seconds', 30) }}"
-                   data-backward-seconds="{{ setting('backward_seconds', 30) }}"
+                   data-forward-seconds="{{ $vp_forward }}"
+                   data-backward-seconds="{{ $vp_forward }}"
+                   data-skip-intro="{{ $vp_skip_intro ? 'true' : 'false' }}"
+                   data-skip-intro-delay="{{ $vp_skip_intro_delay }}"
+                   data-default-quality="{{ $vp_quality }}"
+                   data-speed-control="{{ $vp_speed ? 'true' : 'false' }}"
+                   data-download-enabled="{{ $vp_download ? 'true' : 'false' }}"
+                   data-subtitles-default="{{ $vp_subtitles ? 'true' : 'false' }}"
+                   data-watermark-position="{{ $vp_watermark }}"
                    playsinline webkit-playsinline
                    x-webkit-airplay="allow"
                    preload="metadata">
@@ -77,6 +100,21 @@
     var defaultText          = "{{ __('messages.default') }}";
     var errorLoadingAdText   = "{{ __('messages.error_loading_ad') }}";
     var nextText             = "{{ __('messages.next') }}";
+
+    // ── Paramètres du lecteur (depuis Paramètres > Lecteur Vidéo) ────────────
+    window.playerSettings = {
+        autoplay:          {{ $vp_autoplay ? 'true' : 'false' }},
+        mutedOnLoad:       {{ $vp_muted ? 'true' : 'false' }},
+        continueWatching:  {{ $vp_continue ? 'true' : 'false' }},
+        skipIntro:         {{ $vp_skip_intro ? 'true' : 'false' }},
+        skipIntroDelay:    {{ $vp_skip_intro_delay }},
+        defaultQuality:    "{{ $vp_quality }}",
+        speedControl:      {{ $vp_speed ? 'true' : 'false' }},
+        downloadEnabled:   {{ $vp_download ? 'true' : 'false' }},
+        subtitlesDefault:  {{ $vp_subtitles ? 'true' : 'false' }},
+        watermarkPosition: "{{ $vp_watermark }}",
+        forwardSeconds:    {{ $vp_forward }},
+    };
 </script>
 
 <style>
@@ -226,9 +264,11 @@
         setTimeout(function () { badge.style.display = 'none'; badge.style.opacity = '1'; }, 420);
     }
 
-    // Déclencher quand Video.js démarre la lecture
-    vid.addEventListener('play', function () {
-        if (vid.muted) showBadge();
-    }, { once: true });
+    // Afficher le badge muet seulement si muted_on_load est activé
+    if (window.playerSettings && window.playerSettings.mutedOnLoad) {
+        vid.addEventListener('play', function () {
+            if (vid.muted) showBadge();
+        }, { once: true });
+    }
 })();
 </script>
