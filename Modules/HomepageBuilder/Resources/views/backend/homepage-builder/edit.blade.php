@@ -70,6 +70,33 @@
                         </div>
                     </div>
 
+                    {{-- Orientation des vignettes --}}
+                    <div class="mt-4" id="orientation-wrap">
+                        <label class="form-label fw-semibold">Orientation des vignettes</label>
+                        <div class="d-flex gap-3">
+                            <div class="orientation-card {{ old('card_orientation', $section?->card_orientation ?? 'vertical') === 'vertical' ? 'active' : '' }}"
+                                 data-value="vertical" onclick="setOrientation('vertical')">
+                                <div class="orientation-preview orientation-vertical">
+                                    <div class="orientation-thumb"></div>
+                                    <div class="orientation-thumb"></div>
+                                    <div class="orientation-thumb"></div>
+                                </div>
+                                <span>Verticale</span>
+                            </div>
+                            <div class="orientation-card {{ old('card_orientation', $section?->card_orientation ?? 'vertical') === 'horizontal' ? 'active' : '' }}"
+                                 data-value="horizontal" onclick="setOrientation('horizontal')">
+                                <div class="orientation-preview orientation-horizontal">
+                                    <div class="orientation-thumb"></div>
+                                    <div class="orientation-thumb"></div>
+                                    <div class="orientation-thumb"></div>
+                                </div>
+                                <span>Horizontale</span>
+                            </div>
+                        </div>
+                        <input type="hidden" name="card_orientation" id="card_orientation"
+                               value="{{ old('card_orientation', $section?->card_orientation ?? 'vertical') }}">
+                    </div>
+
                     <div class="mt-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
@@ -172,6 +199,42 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.$ && $.fn.select2) {
         $('#content_ids').select2({ placeholder: 'Chercher et sélectionner...', allowClear: true, width: '100%' });
     }
+
+    // Masquer orientation pour les types sans vignettes
+    const noCardTypes = ['banner', 'genre', 'language', 'personality', 'continue_watching'];
+    function toggleOrientationWrap() {
+        const wrap = document.getElementById('orientation-wrap');
+        if (wrap) wrap.style.display = noCardTypes.includes(typeSelect.value) ? 'none' : '';
+    }
+    toggleOrientationWrap();
+    typeSelect.addEventListener('change', toggleOrientationWrap);
 });
+
+function setOrientation(value) {
+    document.getElementById('card_orientation').value = value;
+    document.querySelectorAll('.orientation-card').forEach(el => {
+        el.classList.toggle('active', el.dataset.value === value);
+    });
+}
 </script>
+
+<style>
+.orientation-card {
+    cursor: pointer;
+    border: 2px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    padding: 12px 20px;
+    text-align: center;
+    transition: all .2s ease;
+    min-width: 110px;
+    font-size: .875rem;
+    color: var(--bs-body-color);
+}
+.orientation-card:hover { border-color: var(--bs-primary); }
+.orientation-card.active { border-color: var(--bs-primary); background: rgba(var(--bs-primary-rgb),.08); color: var(--bs-primary); }
+.orientation-preview { display: flex; gap: 4px; justify-content: center; margin-bottom: 8px; }
+.orientation-vertical .orientation-thumb { width: 20px; height: 30px; background: var(--bs-border-color); border-radius: 3px; }
+.orientation-horizontal .orientation-thumb { width: 36px; height: 20px; background: var(--bs-border-color); border-radius: 3px; }
+.orientation-card.active .orientation-thumb { background: var(--bs-primary); opacity: .6; }
+</style>
 @endpush

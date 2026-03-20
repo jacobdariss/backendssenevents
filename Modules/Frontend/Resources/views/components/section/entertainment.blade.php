@@ -41,10 +41,11 @@
     ];
 
     $class = 'slick-general ' . ($slickClasses[$slug] ?? '');
+    $orientationClass = (!empty($orientation) && $orientation === 'horizontal') ? 'cards-horizontal' : '';
 
 @endphp
 
-<div class="streamit-block">
+<div class="streamit-block {{ $orientationClass }}">
     <div class="d-flex align-items-center justify-content-between my-2 me-2">
         <h5 class="main-title text-capitalize mb-0">{{ $title }}</h5>
 

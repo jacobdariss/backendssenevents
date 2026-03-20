@@ -58,12 +58,14 @@ class HomepageBuilderController extends Controller
             'type'          => 'required|string',
             'content_type'  => 'nullable|string',
             'platform'      => 'required|in:web,mobile,both',
-            'content_limit' => 'required|integer|min:1|max:100',
-            'sort_by'       => 'required|string',
-            'content_ids'   => 'nullable|array',
+            'content_limit'    => 'required|integer|min:1|max:100',
+            'sort_by'          => 'required|string',
+            'card_orientation' => 'nullable|in:vertical,horizontal',
+            'content_ids'      => 'nullable|array',
         ]);
-        $data['content_ids'] = !empty($data['content_ids']) ? $data['content_ids'] : null;
-        $data['is_active']   = $request->boolean('is_active', $section->is_active);
+        $data['content_ids']      = !empty($data['content_ids']) ? $data['content_ids'] : null;
+        $data['card_orientation'] = $request->input('card_orientation', 'vertical');
+        $data['is_active']        = $request->boolean('is_active', $section->is_active);
         $section->update($data);
         HomepageSection::clearCache();
         return redirect()->route('backend.homepage-builder.index')
@@ -90,14 +92,16 @@ class HomepageBuilderController extends Controller
             'type'          => 'required|string',
             'content_type'  => 'nullable|string',
             'platform'      => 'required|in:web,mobile,both',
-            'content_limit' => 'required|integer|min:1|max:100',
-            'sort_by'       => 'required|string',
-            'content_ids'   => 'nullable|array',
+            'content_limit'    => 'required|integer|min:1|max:100',
+            'sort_by'          => 'required|string',
+            'card_orientation' => 'nullable|in:vertical,horizontal',
+            'content_ids'      => 'nullable|array',
         ]);
-        $data['slug']        = Str::slug($data['name']) . '-' . uniqid();
-        $data['position']    = HomepageSection::max('position') + 1;
-        $data['is_active']   = $request->boolean('is_active', true);
-        $data['content_ids'] = !empty($data['content_ids']) ? $data['content_ids'] : null;
+        $data['slug']             = Str::slug($data['name']) . '-' . uniqid();
+        $data['position']         = HomepageSection::max('position') + 1;
+        $data['is_active']        = $request->boolean('is_active', true);
+        $data['card_orientation'] = $request->input('card_orientation', 'vertical');
+        $data['content_ids']      = !empty($data['content_ids']) ? $data['content_ids'] : null;
         HomepageSection::create($data);
         HomepageSection::clearCache();
         return redirect()->route('backend.homepage-builder.index')->with('success', 'Section créée');

@@ -3,10 +3,11 @@
     Variables : $section (HomepageSection), $cachedResult (array), $user_id
 --}}
 @php
-    $slug = $section->slug;
-    $name = $section->name;
-    $type = $section->type;
-    $ct   = $section->content_type;
+    $slug        = $section->slug;
+    $name        = $section->name;
+    $type        = $section->type;
+    $ct          = $section->content_type;
+    $orientation = $section->card_orientation ?? 'vertical';
 
     // Mapper le slug vers la clé cachedResult existante
     $slugToKey = [
@@ -57,10 +58,11 @@
     @if(($ct === 'movie' && isenablemodule('movie') == 1) || ($ct === 'tvshow' && isenablemodule('tvshow') == 1) || empty($ct))
     <div id="{{ $slug }}-section" class="section-wraper scroll-section section-hidden">
         @include('frontend::components.section.entertainment', [
-            'data'  => $sectionData,
-            'title' => $sectionName,
-            'type'  => $ct ?: 'movie',
-            'slug'  => str_replace('-', '_', $slug),
+            'data'        => $sectionData,
+            'title'       => $sectionName,
+            'type'        => $ct ?: 'movie',
+            'slug'        => str_replace('-', '_', $slug),
+            'orientation' => $orientation,
         ])
     </div>
     @endif
@@ -69,10 +71,11 @@
     @if(isenablemodule('video') == 1)
     <div id="{{ $slug }}-section" class="section-wraper scroll-section section-hidden">
         @include('frontend::components.section.video', [
-            'data'  => $sectionData,
-            'title' => $sectionName,
-            'type'  => 'video',
-            'slug'  => str_replace('-', '_', $slug),
+            'data'        => $sectionData,
+            'title'       => $sectionName,
+            'type'        => 'video',
+            'slug'        => str_replace('-', '_', $slug),
+            'orientation' => $orientation,
         ])
     </div>
     @endif

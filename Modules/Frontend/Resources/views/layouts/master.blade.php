@@ -127,12 +127,10 @@
 
     <style>
         /* ========== Centrage des sections homepage ========== */
-        /* .section-wraper = wrapper commun de TOUTES les sections */
         .section-wraper {
             padding-left: 6.25em;
             padding-right: 6.25em;
         }
-        /* Bannière : pleine largeur */
         .banner-section {
             padding-left: 0 !important;
             padding-right: 0 !important;
@@ -142,6 +140,16 @@
         }
         @media (max-width: 767.98px) {
             .section-wraper { padding-left: 1rem; padding-right: 1rem; }
+        }
+
+        /* ========== Vignettes horizontales (HomepageBuilder) ========== */
+        .cards-horizontal .iq-card .block-images .image-box img {
+            aspect-ratio: 16/9 !important;
+            object-fit: cover;
+        }
+        /* Légendes moins hautes en horizontal */
+        .cards-horizontal .iq-card .block-images .card-description {
+            padding: .75rem 0;
         }
     </style>
 
