@@ -385,7 +385,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '0',
-                'help'     => 'Démarrer la lecture en mode muet (requis pour l'autoplay sur certains navigateurs).',
+                'help'     => "Démarrer la lecture en mode muet (requis pour l'autoplay sur certains navigateurs).",
             ],
             [
                 'type'     => 'checkbox',
@@ -395,7 +395,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '1',
-                'help'     => 'Reprendre automatiquement la lecture là où l'utilisateur s'est arrêté.',
+                'help'     => "Reprendre automatiquement la lecture là où l'utilisateur s'est arrêté.",
             ],
             [
                 'type'     => 'checkbox',
@@ -405,7 +405,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '1',
-                'help'     => 'Afficher le bouton "Passer l'intro" sur les épisodes de séries.',
+                'help'     => "Afficher le bouton 'Passer l\'intro' sur les épisodes de séries.",
             ],
             [
                 'type'     => 'number',
@@ -435,7 +435,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '1',
-                'help'     => 'Permettre à l'utilisateur de modifier la vitesse de lecture (0.5x à 2x).',
+                'help'     => "Permettre à l'utilisateur de modifier la vitesse de lecture (0.5x à 2x).",
             ],
             [
                 'type'     => 'checkbox',
@@ -445,7 +445,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '0',
-                'help'     => 'Autoriser le téléchargement des contenus pour les utilisateurs abonnés.',
+                'help'     => "Autoriser le téléchargement des contenus pour les utilisateurs abonnés.",
             ],
             [
                 'type'     => 'checkbox',
@@ -455,7 +455,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '0',
-                'help'     => 'Activer automatiquement les sous-titres s'ils sont disponibles.',
+                'help'     => "Activer automatiquement les sous-titres s'ils sont disponibles.",
             ],
             [
                 'type'     => 'select',
@@ -475,7 +475,7 @@ return [
                 'rules'    => 'nullable|integer|min:5|max:120',
                 'class'    => '',
                 'value'    => '10',
-                'help'     => 'Nombre de secondes pour l'avance/retour rapide lors d'un double tap.',
+                'help'     => "Nombre de secondes pour l'avance/retour rapide lors d'un double tap.",
             ],
         ],
     ],
