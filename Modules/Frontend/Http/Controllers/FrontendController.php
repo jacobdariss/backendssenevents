@@ -538,7 +538,7 @@ class FrontendController extends Controller
 
 
         // Sections homepage ordonnées depuis HomepageBuilder
-        $homepageSections = HomepageSection::getForWeb();
+        $homepageSections = HomepageSection::getActive('web');
 
         return view('frontend::index', compact('user_id', 'cachedResult', 'homepageSections'));
     }
