@@ -126,24 +126,22 @@
     </style>
 
     <style>
-        /* ========== Padding des sections homepage ========== */
-        /* streamit-block = wrapper de chaque section (title + slider) */
-        .streamit-block {
+        /* ========== Centrage des sections homepage ========== */
+        /* .section-wraper = wrapper commun de TOUTES les sections */
+        .section-wraper {
             padding-left: 6.25em;
             padding-right: 6.25em;
         }
-        /* La bannière reste pleine largeur — pas de padding */
-        .main-banner .streamit-block,
-        .banner-section .streamit-block,
-        #banner-section .streamit-block {
-            padding-left: 0;
-            padding-right: 0;
+        /* Bannière : pleine largeur */
+        .banner-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
         @media (max-width: 1399.98px) {
-            .streamit-block { padding-left: 2rem; padding-right: 2rem; }
+            .section-wraper { padding-left: 2rem; padding-right: 2rem; }
         }
         @media (max-width: 767.98px) {
-            .streamit-block { padding-left: 1rem; padding-right: 1rem; }
+            .section-wraper { padding-left: 1rem; padding-right: 1rem; }
         }
     </style>
 
