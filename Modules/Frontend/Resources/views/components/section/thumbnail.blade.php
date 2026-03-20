@@ -11,18 +11,21 @@
 
         <div class="video-player">
 
-            {{-- Badge son muté — visible 4s au chargement, masqué au unmute --}}
-            <div id="vp-muted-badge"
-                 style="display:none;position:absolute;top:14px;right:14px;z-index:10;
-                        background:rgba(0,0,0,.7);color:#fff;font-size:.72rem;font-weight:600;
-                        padding:4px 10px 4px 8px;border-radius:20px;backdrop-filter:blur(4px);
-                        align-items:center;gap:5px;pointer-events:none;
-                        animation:vp-badge-in .3s ease;">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="13" height="13" style="flex-shrink:0">
+
+            {{-- Bouton Unmute — permanent, visible quand son est muté --}}
+            <button id="vp-unmute-btn"
+                    title="Activer le son"
+                    style="display:none;position:absolute;bottom:70px;right:16px;z-index:100;
+                           background:rgba(0,0,0,.78);backdrop-filter:blur(6px);
+                           color:#fff;border:2px solid rgba(255,255,255,.55);border-radius:50px;
+                           padding:10px 20px 10px 14px;font-size:.9rem;font-weight:700;
+                           cursor:pointer;align-items:center;gap:8px;
+                           transition:background .2s,transform .15s;animation:vp-badge-in .3s ease;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22" style="flex-shrink:0">
                     <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97V9.5l2.45 2.45c.03-.3.05-.61.05-.95zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/>
                 </svg>
-                Son désactivé — cliquez pour activer
-            </div>
+                <span>Son désactivé — Cliquez ici</span>
+            </button>
             @php
                 $vp_autoplay         = setting('player_autoplay', 0);
                 $vp_muted            = setting('player_muted_on_load', 0) || $vp_autoplay;
@@ -234,41 +237,63 @@
 
 <script>
 (function () {
-    var badge = document.getElementById('vp-muted-badge');
-    var vid   = document.getElementById('videoPlayer');
-    if (!badge || !vid) return;
+    var btn = document.getElementById('vp-unmute-btn');
+    var vid = document.getElementById('videoPlayer');
+    if (!btn || !vid) return;
 
-    function showBadge() {
-        badge.style.display = 'flex';
-        // Masquer après 4 secondes
-        var hideTimer = setTimeout(function () {
-            fadeBadge();
-        }, 4000);
-        // Masquer immédiatement si l'utilisateur active le son
-        vid.addEventListener('volumechange', function () {
-            if (!vid.muted && vid.volume > 0) {
-                clearTimeout(hideTimer);
-                fadeBadge();
+    function syncBtn() {
+        var isMuted = vid.muted || vid.volume === 0;
+        btn.style.display = isMuted ? 'flex' : 'none';
+    }
+
+    // Clic sur le bouton → unmute + hide
+    btn.addEventListener('click', function () {
+        vid.muted  = false;
+        vid.volume = vid.volume > 0 ? vid.volume : 1;
+        // Essayer via l'instance Video.js si disponible
+        if (window.videojs && videojs.getPlayer && videojs.getPlayer('videoPlayer')) {
+            var p = videojs.getPlayer('videoPlayer');
+            p.muted(false);
+            if (p.volume() === 0) p.volume(1);
+        }
+        syncBtn();
+    });
+
+    btn.addEventListener('mouseenter', function () {
+        btn.style.background = 'rgba(229,9,20,.9)';
+        btn.style.borderColor = '#fff';
+        btn.style.transform = 'scale(1.04)';
+    });
+    btn.addEventListener('mouseleave', function () {
+        btn.style.background = 'rgba(0,0,0,.78)';
+        btn.style.borderColor = 'rgba(255,255,255,.55)';
+        btn.style.transform = 'scale(1)';
+    });
+
+    // Surveiller les changements de volume/mute
+    vid.addEventListener('volumechange', syncBtn);
+
+    // Afficher dès que la vidéo commence à jouer si elle est mutée
+    vid.addEventListener('play', syncBtn);
+    vid.addEventListener('playing', syncBtn);
+
+    // Synchronisation initiale après chargement Video.js
+    var attempts = 0;
+    var checkInterval = setInterval(function () {
+        attempts++;
+        syncBtn();
+        // Aussi vérifier via l'instance Video.js
+        if (window.videojs && typeof videojs.getPlayer === 'function') {
+            var p = videojs.getPlayer('videoPlayer');
+            if (p) {
+                p.on('volumechange', syncBtn);
+                p.on('play', syncBtn);
+                p.on('playing', syncBtn);
+                clearInterval(checkInterval);
+                syncBtn();
             }
-        });
-        // Masquer aussi au clic sur le player
-        vid.addEventListener('click', function () {
-            clearTimeout(hideTimer);
-            fadeBadge();
-        }, { once: true });
-    }
-
-    function fadeBadge() {
-        badge.style.transition = 'opacity .4s ease';
-        badge.style.opacity = '0';
-        setTimeout(function () { badge.style.display = 'none'; badge.style.opacity = '1'; }, 420);
-    }
-
-    // Afficher le badge muet seulement si muted_on_load est activé
-    if (window.playerSettings && window.playerSettings.mutedOnLoad) {
-        vid.addEventListener('play', function () {
-            if (vid.muted) showBadge();
-        }, { once: true });
-    }
+        }
+        if (attempts > 20) clearInterval(checkInterval);
+    }, 300);
 })();
 </script>
