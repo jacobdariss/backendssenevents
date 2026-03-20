@@ -120,9 +120,11 @@ class EpisodesController extends Controller
         $export_url = route('backend.episodes.export');
 
 
-        $tvshows = Entertainment::where('type','tvshow')->get();
+        $tvshows = Entertainment::where('type','tvshow')
+            ->where(function($q) { $q->where('status', 1)->orWhereNotNull('partner_id'); })
+            ->with('partner')->orderBy('name')->get();
 
-        $seasons=Season::where('status', 1)->get();
+        $seasons = Season::orderBy('id', 'desc')->get();
 
         $plan=Plan::where('status',1)->get();
 
@@ -165,8 +167,15 @@ class EpisodesController extends Controller
             return [$number => $number];
         });
         $video_quality = Constant::where('type', 'video_quality')->where('status', 1)->get();
-        $tvshows = Entertainment::Where('type', 'tvshow')->where('status', 1)->orderBy('id', 'desc')->get();
-        $seasons = Season::where('status', 1)->orderBy('id', 'desc')->get();
+        // Inclure les séries partenaires (status=0 pending) pour que l'admin puisse les assigner
+        $tvshows = Entertainment::where('type', 'tvshow')
+            ->where(function($q) {
+                $q->where('status', 1)
+                  ->orWhereNotNull('partner_id'); // séries partenaires même non encore approuvées
+            })
+            ->with('partner')
+            ->orderBy('name')->get();
+        $seasons = Season::orderBy('id', 'desc')->get(); // toutes les saisons visibles admin
         $movie_language = Constant::where('type', 'language')->where('status', 1)->get();
         $subtitle_language = Constant::where('type', 'subtitle_language')->where('status', 1)->get();
 
@@ -463,8 +472,15 @@ class EpisodesController extends Controller
     $assets = ['textarea'];
     $video_quality = Constant::where('type', 'video_quality')->where('status', 1)->get();
     $subtitle_language = Constant::where('type', 'subtitle_language')->where('status', 1)->get();  // Avoid duplicate call
-    $tvshows = Entertainment::Where('type', 'tvshow')->where('status', 1)->orderBy('id', 'desc')->get();
-    $seasons = Season::where('status', 1)->orderBy('id', 'desc')->get();
+    // Inclure les séries partenaires (status=0 pending) pour que l'admin puisse les modifier
+    $tvshows = Entertainment::where('type', 'tvshow')
+        ->where(function($q) {
+            $q->where('status', 1)
+              ->orWhereNotNull('partner_id');
+        })
+        ->with('partner')
+        ->orderBy('name')->get();
+    $seasons = Season::orderBy('id', 'desc')->get(); // toutes les saisons visibles admin
     $movie_language = Constant::where('type', 'language')->where('status', 1)->get();
     $module_title = __('episode.edit_title');
     $mediaUrls = getMediaUrls();

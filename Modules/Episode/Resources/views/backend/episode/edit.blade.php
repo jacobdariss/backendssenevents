@@ -121,7 +121,14 @@
                                     {{ html()->label(__('season.lbl_tv_shows') . ' <span class="text-danger">*</span>', 'type')->class('form-label') }}
                                     {{ html()->select(
                                             'entertainment_id',
-                                            $tvshows->pluck('name', 'id')->prepend(__('placeholder.lbl_select_tvshow'), ''),
+                                            $tvshows->mapWithKeys(function($t) {
+                                        $label = $t->name;
+                                        if ($t->partner_id) {
+                                            $partnerName = $t->partner->name ?? 'Partenaire';
+                                            $label .= ' [' . $partnerName . ']';
+                                        }
+                                        return [$t->id => $label];
+                                    })->prepend(__('placeholder.lbl_select_tvshow'), ''),
                                             $data->entertainment_id,
                                         )->class('form-control select2')->id('entertainment_id')->attribute('required', 'required') }}
                                     @error('entertainment_id')
