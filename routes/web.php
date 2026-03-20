@@ -34,6 +34,55 @@ use App\Http\Controllers\Auth\WebQrLoginController;
 require __DIR__ . '/auth.php';
 
 
+
+// ── PHPUnit Runner — TEMPORAIRE, supprimer après usage ───────────────────────
+Route::get('/dev-run-tests', function () {
+    if (request('token') !== 'sen2026tests') {
+        abort(403, 'Token invalide');
+    }
+
+    $suite  = request('suite', 'Feature');
+    $filter = request('filter', '');
+    $php     = '/opt/plesk/php/8.4/bin/php';
+    $phpunit = base_path('vendor/bin/phpunit');
+    $config  = base_path('phpunit.xml');
+
+    $cmd = escapeshellcmd($php) . ' '
+         . escapeshellarg($phpunit)
+         . ' --testsuite=' . escapeshellarg($suite)
+         . ' --colors=never'
+         . ' --configuration=' . escapeshellarg($config);
+
+    if ($filter) {
+        $cmd .= ' --filter=' . escapeshellarg($filter);
+    }
+
+    $start = microtime(true);
+    exec($cmd . ' 2>&1', $output, $exitCode);
+    $elapsed = round(microtime(true) - $start, 2);
+    $raw = implode("\n", $output);
+
+    preg_match('/(\d+) passed/', $raw, $p);
+    preg_match('/(\d+) failed/', $raw, $f);
+    preg_match('/(\d+) error/', $raw, $e);
+    preg_match('/Tests: (\d+)/', $raw, $t);
+
+    $passed = (int)($p[1] ?? 0);
+    $failed = (int)($f[1] ?? 0);
+    $errors = (int)($e[1] ?? 0);
+    $total  = (int)($t[1] ?? $passed + $failed + $errors);
+    $ok     = $exitCode === 0;
+
+    $suites = ['Feature', 'Unit'];
+    $token  = 'sen2026tests';
+
+    return response(view('phpunit_runner', compact(
+        'raw', 'passed', 'failed', 'errors', 'total',
+        'elapsed', 'exitCode', 'ok', 'suite', 'filter',
+        'suites', 'token'
+    )));
+})->withoutMiddleware([\App\Http\Middleware\CheckInstallation::class]);
+
 Route::group(['middleware' => ['checkInstallation']], function () {
 
 Route::get('/', [FrontendController::class, 'index'])->name('user.login');
@@ -227,50 +276,3 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'a
     Route::post('homepage-builder/{id}/toggle',    [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'toggleActive'])->name('homepage-builder.toggle');
 });
 
-// ── PHPUnit Runner — TEMPORAIRE, supprimer après usage ────────────────────────
-Route::get('/dev-run-tests', function () {
-    if (request('token') !== 'sen2026tests') {
-        abort(403, 'Token invalide');
-    }
-
-    $suite  = request('suite', 'Feature');
-    $filter = request('filter', '');
-    $php     = '/opt/plesk/php/8.4/bin/php';
-    $phpunit = base_path('vendor/bin/phpunit');
-    $config  = base_path('phpunit.xml');
-
-    $cmd = escapeshellcmd($php) . ' '
-         . escapeshellarg($phpunit)
-         . ' --testsuite=' . escapeshellarg($suite)
-         . ' --colors=never'
-         . ' --configuration=' . escapeshellarg($config);
-
-    if ($filter) {
-        $cmd .= ' --filter=' . escapeshellarg($filter);
-    }
-
-    $start = microtime(true);
-    exec($cmd . ' 2>&1', $output, $exitCode);
-    $elapsed = round(microtime(true) - $start, 2);
-    $raw = implode("\n", $output);
-
-    preg_match('/(\d+) passed/', $raw, $p);
-    preg_match('/(\d+) failed/', $raw, $f);
-    preg_match('/(\d+) error/', $raw, $e);
-    preg_match('/Tests: (\d+)/', $raw, $t);
-
-    $passed = (int)($p[1] ?? 0);
-    $failed = (int)($f[1] ?? 0);
-    $errors = (int)($e[1] ?? 0);
-    $total  = (int)($t[1] ?? $passed + $failed + $errors);
-    $ok     = $exitCode === 0;
-
-    $suites = ['Feature', 'Unit'];
-    $token  = 'sen2026tests';
-
-    return response(view('phpunit_runner', compact(
-        'raw', 'passed', 'failed', 'errors', 'total',
-        'elapsed', 'exitCode', 'ok', 'suite', 'filter',
-        'suites', 'token'
-    )));
-});
