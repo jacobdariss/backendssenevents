@@ -3,6 +3,7 @@
 namespace Modules\Frontend\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\HomepageBuilder\Models\HomepageSection;
 use Illuminate\Http\Request;
 use App\Models\MobileSetting;
 use Modules\Entertainment\Models\Entertainment;
@@ -536,7 +537,10 @@ class FrontendController extends Controller
 
 
 
-        return view('frontend::index', compact('user_id', 'cachedResult'));
+        // Sections homepage ordonnées depuis HomepageBuilder
+        $homepageSections = HomepageSection::getForWeb();
+
+        return view('frontend::index', compact('user_id', 'cachedResult', 'homepageSections'));
     }
 
 

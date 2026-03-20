@@ -209,6 +209,7 @@ return [
         App\Providers\CurrencyServiceProvider::class,
         Modules\Partner\Providers\PartnerServiceProvider::class,
         Modules\Analytics\Providers\AnalyticsServiceProvider::class,
+        Modules\HomepageBuilder\Providers\HomepageBuilderServiceProvider::class,
         Modules\Genres\Providers\RouteServiceProvider::class,
         Modules\CastCrew\Providers\RouteServiceProvider::class,
         Modules\Entertainment\Providers\RouteServiceProvider::class,
