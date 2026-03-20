@@ -26,5 +26,6 @@
     "SEO": true,
     "Onboarding": true,
     "Analytics": true,
-    "Partner": true
+    "Partner": true,
+    "HomepageBuilder": true
 }

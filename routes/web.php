@@ -211,3 +211,16 @@ require base_path('Modules/Partner/Routes/web.php');
 Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'admin', 'admin.timeout']], function () {
     Route::get('audit-log', [App\Http\Controllers\Backend\AuditLogController::class, 'index'])->name('audit-log.index');
 });
+
+// ── Homepage Builder ──────────────────────────────────────────────────────────
+Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'admin', 'admin.timeout']], function () {
+    Route::get('homepage-builder',                 [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'index'])->name('homepage-builder.index');
+    Route::get('homepage-builder/create',          [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'create'])->name('homepage-builder.create');
+    Route::get('homepage-builder/content-options', [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'getContentOptionsAjax'])->name('homepage-builder.content-options');
+    Route::post('homepage-builder/reorder',        [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'reorder'])->name('homepage-builder.reorder');
+    Route::post('homepage-builder',                [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'store'])->name('homepage-builder.store');
+    Route::get('homepage-builder/{id}/edit',       [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'edit'])->name('homepage-builder.edit');
+    Route::put('homepage-builder/{id}',            [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'update'])->name('homepage-builder.update');
+    Route::delete('homepage-builder/{id}',         [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'destroy'])->name('homepage-builder.destroy');
+    Route::post('homepage-builder/{id}/toggle',    [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'toggleActive'])->name('homepage-builder.toggle');
+});
