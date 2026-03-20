@@ -480,6 +480,14 @@ class GenerateMenus
                 'order' => 0,
             ]);
 
+            $this->childMain($mobile_setting, [
+                'icon'   => 'ph ph-layout',
+                'title'  => 'Homepage Builder',
+                'route'  => 'backend.homepage-builder.index',
+                'active' => 'app/homepage-builder*',
+                'order'  => 0,
+            ]);
+
             if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])){
 
             $this->childMain($mobile_setting, [
