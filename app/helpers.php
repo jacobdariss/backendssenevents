@@ -1125,20 +1125,21 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
-        // Check for embedded iframe-type URL (e.g. short.icu, embedded players)
-        if (preg_match('/<iframe.*?src=[\"\']([^\"\']+)[\"\'].*?>.*?<\/iframe>/i', $decryptedUrl, $embedMatch)) {
-            return [
-                'platform' => 'embedded',
-                'url' => $embedMatch[1]
-            ];
+        // Check for embedded iframe-type URL — supporte les iframes multi-lignes et Cloudflare Stream
+        if (str_contains($decryptedUrl, '<iframe')) {
+            // Regex avec flag s (DOTALL) pour iframes multi-lignes
+            if (preg_match('/<iframe[^>]*\bsrc=["\'](https?[^"\']+)["\'][^>]*>/is', $decryptedUrl, $embedMatch)) {
+                return ['platform' => 'embedded', 'url' => $embedMatch[1]];
+            }
+            // Fallback : src= n'importe où dans le code
+            if (preg_match('/\bsrc\s*=\s*["\'](https?[^"\']+)["\']/i', $decryptedUrl, $embedMatch)) {
+                return ['platform' => 'embedded', 'url' => $embedMatch[1]];
+            }
         }
 
-        // OR: If the decrypted URL is directly an embeddable iframe source (no iframe tag)
-        if (preg_match('/^(https?:\/\/)?(short\.icu|iframe\..+|embed\..+|player\..+)\//i', $decryptedUrl)) {
-            return [
-                'platform' => 'embedded',
-                'url' => $decryptedUrl
-            ];
+        // OR: URL directe embeddable (Cloudflare Stream, short.icu, embed.*, player.*, iframe.*)
+        if (preg_match('/^https?:\/\/.*(cloudflarestream\.com|short\.icu|iframe\.|embed\.|player\.)/i', $decryptedUrl)) {
+            return ['platform' => 'embedded', 'url' => $decryptedUrl];
         }
 
 
