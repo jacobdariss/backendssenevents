@@ -126,6 +126,28 @@
     </style>
 
     <style>
+        /* ========== Padding des sections homepage ========== */
+        /* streamit-block = wrapper de chaque section (title + slider) */
+        .streamit-block {
+            padding-left: 6.25em;
+            padding-right: 6.25em;
+        }
+        /* La bannière reste pleine largeur — pas de padding */
+        .main-banner .streamit-block,
+        .banner-section .streamit-block,
+        #banner-section .streamit-block {
+            padding-left: 0;
+            padding-right: 0;
+        }
+        @media (max-width: 1399.98px) {
+            .streamit-block { padding-left: 2rem; padding-right: 2rem; }
+        }
+        @media (max-width: 767.98px) {
+            .streamit-block { padding-left: 1rem; padding-right: 1rem; }
+        }
+    </style>
+
+    <style>
         /* ========== Centrage du contenu — marges horizontales ========== */
 
         /* Conteneur principal : max-width + auto margins pour centrer */
