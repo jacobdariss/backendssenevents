@@ -10,6 +10,19 @@
         <script src="{{ asset('js/videojs/videojs.ima.min.js') }}"></script>
 
         <div class="video-player">
+
+            {{-- Badge son muté — visible 4s au chargement, masqué au unmute --}}
+            <div id="vp-muted-badge"
+                 style="display:none;position:absolute;top:14px;right:14px;z-index:10;
+                        background:rgba(0,0,0,.7);color:#fff;font-size:.72rem;font-weight:600;
+                        padding:4px 10px 4px 8px;border-radius:20px;backdrop-filter:blur(4px);
+                        align-items:center;gap:5px;pointer-events:none;
+                        animation:vp-badge-in .3s ease;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="13" height="13" style="flex-shrink:0">
+                    <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97V9.5l2.45 2.45c.03-.3.05-.61.05-.95zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/>
+                </svg>
+                Son désactivé — cliquez pour activer
+            </div>
             <video id="videoPlayer" class="video-js vjs-default-skin vjs-ima"
                    controls width="560" height="315" muted
                    poster="{{ $thumbnail_image }}"
@@ -164,6 +177,10 @@
         padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2);
     }
     .video-player { position: relative; z-index: 0; }
+    @keyframes vp-badge-in {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
     @media (max-width: 768px) {
         .vjs-skip-ad-button { bottom: 70px; padding: 8px 16px; font-size: 14px; }
         .overlay-ad { bottom: 80px; left: 10px; right: 10px; text-align: center; }
@@ -176,3 +193,42 @@
         #customAdContent { width: 98%; max-height: 70vh; }
     }
 </style>
+
+<script>
+(function () {
+    var badge = document.getElementById('vp-muted-badge');
+    var vid   = document.getElementById('videoPlayer');
+    if (!badge || !vid) return;
+
+    function showBadge() {
+        badge.style.display = 'flex';
+        // Masquer après 4 secondes
+        var hideTimer = setTimeout(function () {
+            fadeBadge();
+        }, 4000);
+        // Masquer immédiatement si l'utilisateur active le son
+        vid.addEventListener('volumechange', function () {
+            if (!vid.muted && vid.volume > 0) {
+                clearTimeout(hideTimer);
+                fadeBadge();
+            }
+        });
+        // Masquer aussi au clic sur le player
+        vid.addEventListener('click', function () {
+            clearTimeout(hideTimer);
+            fadeBadge();
+        }, { once: true });
+    }
+
+    function fadeBadge() {
+        badge.style.transition = 'opacity .4s ease';
+        badge.style.opacity = '0';
+        setTimeout(function () { badge.style.display = 'none'; badge.style.opacity = '1'; }, 420);
+    }
+
+    // Déclencher quand Video.js démarre la lecture
+    vid.addEventListener('play', function () {
+        if (vid.muted) showBadge();
+    }, { once: true });
+})();
+</script>
