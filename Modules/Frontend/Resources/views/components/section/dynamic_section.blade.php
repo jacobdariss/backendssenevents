@@ -29,10 +29,18 @@
         'liked-movies'      => 'liked_movie',
     ];
 
-    $cacheKey = $slugToKey[$slug] ?? null;
-    $data     = $cacheKey && isset($cachedResult[$cacheKey])
-                ? $cachedResult[$cacheKey]
-                : ($cachedResult[$slug] ?? null);
+    // Priorité 1 : données chargées directement par HomepageSectionDataService (indépendant de MobileSetting)
+    // Priorité 2 : fallback sur cachedResult (pour banner, payperview, continue_watching, top_10, etc.)
+    $directData = $section->_direct_data ?? null;
+
+    if ($directData !== null) {
+        $data = $directData;
+    } else {
+        $cacheKey = $slugToKey[$slug] ?? null;
+        $data     = $cacheKey && isset($cachedResult[$cacheKey])
+                    ? $cachedResult[$cacheKey]
+                    : ($cachedResult[$slug] ?? null);
+    }
 
     $sectionData = isset($data['data']) ? $data['data'] : (is_array($data) && !isset($data[0]) ? [] : ($data ?? []));
     $sectionName = isset($data['name']) ? $data['name'] : $name;

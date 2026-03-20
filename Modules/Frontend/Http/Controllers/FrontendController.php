@@ -46,6 +46,7 @@ use Modules\Entertainment\Transformers\Backend\SeasonResourceV3;
 use Modules\Season\Models\Season;
 use Carbon\Carbon;
 use Modules\Entertainment\Models\EntertainmentView as EntertainmentViewModel;
+use Modules\HomepageBuilder\Services\HomepageSectionDataService;
 
 class FrontendController extends Controller
 {
@@ -538,7 +539,15 @@ class FrontendController extends Controller
 
 
         // Sections homepage ordonnées depuis HomepageBuilder
+        // On injecte les données directement dans chaque section (indépendant de MobileSetting)
         $homepageSections = HomepageSection::getActive('web');
+        $sectionService   = app(HomepageSectionDataService::class);
+        foreach ($homepageSections as $section) {
+            $loaded = $sectionService->loadForSection($section, $request);
+            if ($loaded !== null) {
+                $section->setAttribute('_direct_data', $loaded);
+            }
+        }
 
         return view('frontend::index', compact('user_id', 'cachedResult', 'homepageSections'));
     }
