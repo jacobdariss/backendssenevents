@@ -151,18 +151,23 @@ class HomepageBuilderController extends Controller
      */
     public function getTvshowSeasons(Request $request)
     {
-        $tvshowId = $request->integer('tvshow_id');
+        $tvshowId = (int) $request->input('tvshow_id');
         if (!$tvshowId) {
             return response()->json([]);
         }
 
         $seasons = Season::where('entertainment_id', $tvshowId)
+            ->whereNull('deleted_at')
             ->orderBy('season_number')
+            ->orderBy('id')
             ->get(['id', 'name', 'season_number'])
-            ->map(fn($s) => [
-                'id'   => $s->id,
-                'name' => $s->name ?: 'Saison ' . $s->season_number,
-            ]);
+            ->map(function ($s) {
+                // Nom robuste : name > "Saison X" > "Saison #id"
+                $name = !empty(trim((string)$s->name))
+                    ? $s->name
+                    : ($s->season_number ? 'Saison ' . $s->season_number : 'Saison #' . $s->id);
+                return ['id' => $s->id, 'name' => $name];
+            });
 
         return response()->json($seasons);
     }
@@ -177,22 +182,33 @@ class HomepageBuilderController extends Controller
             return response()->json([]);
         }
 
+        // Charger TOUS les épisodes des saisons (actifs et inactifs)
+        // pour que l'admin puisse faire son choix
         $episodes = Episode::whereIn('season_id', $seasonIds)
-            ->where('status', 1)
+            ->whereNull('deleted_at')
             ->orderBy('season_id')
             ->orderBy('episode_number')
-            ->get(['id', 'name', 'episode_number', 'season_id'])
-            ->map(function ($ep) {
-                $season = Season::find($ep->season_id);
-                $seasonLabel = $season ? ($season->name ?: 'Saison ' . $season->season_number) : '';
-                return [
-                    'id'   => $ep->id,
-                    'name' => ($ep->episode_number ? 'Ep.' . $ep->episode_number . ' — ' : '') . $ep->name
-                             . ($seasonLabel ? ' (' . $seasonLabel . ')' : ''),
-                ];
-            });
+            ->orderBy('id')
+            ->get(['id', 'name', 'episode_number', 'season_id']);
 
-        return response()->json($episodes);
+        // Charger les noms de saisons en une seule requête
+        $seasons = Season::whereIn('id', $episodes->pluck('season_id')->unique())
+            ->get(['id', 'name', 'season_number'])
+            ->keyBy('id');
+
+        $data = $episodes->map(function ($ep) use ($seasons) {
+            $season      = $seasons->get($ep->season_id);
+            $seasonLabel = $season
+                ? (!empty(trim((string)$season->name)) ? $season->name : 'Saison ' . $season->season_number)
+                : '';
+            $epNum = $ep->episode_number ? 'Ep.' . $ep->episode_number . ' — ' : '';
+            return [
+                'id'   => $ep->id,
+                'name' => $epNum . $ep->name . ($seasonLabel ? ' (' . $seasonLabel . ')' : ''),
+            ];
+        });
+
+        return response()->json($data);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

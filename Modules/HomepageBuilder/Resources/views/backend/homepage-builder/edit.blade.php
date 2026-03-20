@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Tvshow change → charger les saisons
     if (tvshowSelect) {
         $(tvshowSelect).on('change', function() {
-            const tvshowId = this.value;
+            const tvshowId = $(this).val();
             if (!tvshowId) {
                 seasonsWrap.style.display  = 'none';
                 episodesWrap.style.display = 'none';
