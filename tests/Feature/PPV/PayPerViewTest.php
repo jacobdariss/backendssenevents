@@ -4,7 +4,7 @@ namespace Tests\Feature\PPV;
 
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Entertainment\Models\Entertainment;
 use Modules\Frontend\Models\PayPerView;
 use Modules\Partner\Models\Partner;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class PayPerViewTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $user;
     private Entertainment $movie;

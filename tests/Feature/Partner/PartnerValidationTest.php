@@ -3,7 +3,7 @@
 namespace Tests\Feature\Partner;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Modules\Entertainment\Models\Entertainment;
 use Modules\Partner\Models\Partner;
@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class PartnerValidationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $admin;
     private User $partnerUser;

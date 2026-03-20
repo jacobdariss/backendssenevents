@@ -4,7 +4,7 @@ namespace Tests\Feature\Analytics;
 
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Analytics\Services\AnalyticsService;
 use Modules\Entertainment\Models\Entertainment;
 use Modules\Entertainment\Models\EntertainmentView;
@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class AnalyticsServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private AnalyticsService $analytics;
     private Partner $partner;

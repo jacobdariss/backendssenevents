@@ -3,14 +3,14 @@
 namespace Tests\Feature\HomepageBuilder;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\HomepageBuilder\Models\HomepageSection;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class HomepageBuilderTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $admin;
 

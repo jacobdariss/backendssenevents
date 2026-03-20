@@ -4,7 +4,7 @@ namespace Tests\Feature\Subscriptions;
 
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Subscriptions\Models\Plan;
 use Modules\Subscriptions\Models\Subscription;
 use Spatie\Permission\Models\Role;
@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class SubscriptionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $user;
     private Plan $plan;

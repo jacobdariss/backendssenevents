@@ -3,7 +3,7 @@
 namespace Tests\Feature\Finance;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Analytics\Services\FinanceService;
 use Modules\Partner\Models\Partner;
 use Tests\TestCase;
@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class FinanceServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private FinanceService $financeService;
     private Partner $partner;
