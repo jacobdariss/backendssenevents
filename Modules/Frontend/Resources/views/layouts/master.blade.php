@@ -126,6 +126,48 @@
     </style>
 
     <style>
+        /* ========== Centrage du contenu — marges horizontales ========== */
+
+        /* Conteneur principal : max-width + auto margins pour centrer */
+        .container-fluid,
+        .container-xl,
+        .container-xxl,
+        .container-lg {
+            max-width: 1920px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Bannière : reste pleine largeur, on centre uniquement son contenu interne */
+        #banner-section .container-fluid,
+        #banner-section .container-xl,
+        .main-banner .container-fluid,
+        .livetv-banner-wrapper .container-fluid {
+            max-width: 100%;
+        }
+
+        /* Sur très grands écrans (>1920px) : padding latéral plus généreux */
+        @media (min-width: 1921px) {
+            .container-fluid,
+            .container-xl,
+            .container-xxl {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+
+        /* Équilibrage du padding sur écrans intermédiaires */
+        @media (min-width: 1400px) and (max-width: 1920px) {
+            .container-fluid,
+            .container-xl,
+            .container-xxl {
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+        }
+    </style>
+
+    <style>
         /* ========== Full Page Loader Styles ========== */
         #page-loader {
             position: fixed;
