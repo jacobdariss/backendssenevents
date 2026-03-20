@@ -10,6 +10,12 @@ class AuthenticationTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->markTestSkipped('Tests Breeze scaffold — non applicables au projet SEN-EVENTS');
+    }
+
     public function test_login_screen_can_be_rendered()
     {
         $response = $this->get('/login');

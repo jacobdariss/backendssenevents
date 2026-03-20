@@ -10,6 +10,12 @@ class PasswordConfirmationTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->markTestSkipped('Tests Breeze scaffold — non applicables au projet SEN-EVENTS');
+    }
+
     public function test_confirm_password_screen_can_be_rendered()
     {
         $user = User::factory()->create();

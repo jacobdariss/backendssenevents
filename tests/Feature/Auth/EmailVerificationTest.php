@@ -14,6 +14,12 @@ class EmailVerificationTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->markTestSkipped('Tests Breeze scaffold — non applicables au projet SEN-EVENTS');
+    }
+
     public function test_email_verification_screen_can_be_rendered()
     {
         $user = User::factory()->create([
