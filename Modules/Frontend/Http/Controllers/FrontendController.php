@@ -94,6 +94,7 @@ class FrontendController extends Controller
                 'popular-movies' => MobileSetting::getNameAndValueBySlug('popular-movies'),
                 'popular-tvshows' => MobileSetting::getNameAndValueBySlug('popular-tvshows'),
                 'most-watched-videos' => MobileSetting::getNameAndValueBySlug('popular-videos'),
+                'latest-videos'       => MobileSetting::getNameAndValueBySlug('latest-videos'),
                 'top-channels' => MobileSetting::getNameAndValueBySlug('top-channels'),
                 'genre' => MobileSetting::getNameAndValueBySlug('genre'),
                 '500-free-movies' => MobileSetting::getNameAndValueBySlug('500-free-movies'),
@@ -437,6 +438,32 @@ class FrontendController extends Controller
                     'name' => $this->translateTabName($settings['most-watched-videos']['name'] ?? ''),
                     'data' => $popular_video,
                 ];
+            }
+
+            // ── Dernières Vidéos (latest-videos) ──────────────────────────────────
+            if (!empty($settings['latest-videos']) && !empty($settings['latest-videos']['value'])) {
+                $latestCount = max(1, min(50, (int) $settings['latest-videos']['value']));
+                $latest_videos = Video::where('status', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function($q) {
+                        $q->whereNull('release_date')
+                          ->orWhereDate('release_date', '<=', now());
+                    })
+                    ->orderByDesc('created_at')
+                    ->limit($latestCount)
+                    ->get();
+
+                // Filtrer profil enfant si nécessaire
+                if (!empty(getCurrentProfileSession('is_child_profile')) && getCurrentProfileSession('is_child_profile') != 0) {
+                    $latest_videos = $latest_videos->where('is_restricted', 0);
+                }
+
+                if ($latest_videos->isNotEmpty()) {
+                    $responseData['latest_videos'] = [
+                        'name' => $this->translateTabName($settings['latest-videos']['name'] ?? 'Dernières Vidéos'),
+                        'data' => VideoResourceV3::collection($latest_videos)->toArray($request),
+                    ];
+                }
             }
 
             $mobile_settings = MobileSetting::where('type', '!=', null)->get();

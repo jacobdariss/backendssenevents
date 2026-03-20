@@ -24,5 +24,7 @@ return [
         'banner' => 'Aktive Startseitenbanner abrufen.',
         'continue_watching' => 'Filme/Shows abrufen, die der Benutzer kürzlich angesehen hat.',
         'advertisement' => 'Werbebanner anzeigen.',
+        'latest_videos' => 'Die neuesten genehmigten Videos der Plattform automatisch abrufen.',
+        'latest_videos_count' => 'Number of videos to display.',
         'rate_our_app' => 'App-Bewertungsaufforderung anzeigen.'
 ];

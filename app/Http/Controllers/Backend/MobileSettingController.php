@@ -124,18 +124,23 @@ class MobileSettingController extends Controller
     {
         $data = $request->all();
 
-        if($request->has('dashboard_select')){
+        if ($request->has('dashboard_select')) {
+            $setting = MobileSetting::find($request->id);
 
-            $data['value']=$data['dashboard_select'];
-
+            if ($setting && $setting->slug === 'latest-videos') {
+                // Pour latest-videos, value = nombre (pas un tableau d'IDs)
+                $data['value'] = (int) $request->dashboard_select > 0
+                    ? (string)(int) $request->dashboard_select
+                    : '10';
+            } else {
+                $data['value'] = $data['dashboard_select'];
+            }
         }
 
         if (!empty($data) && isset($data['value']) && !empty($data['value'])) {
-
             $data['value'] = is_array($data['value']) ? json_encode($data['value']) : $data['value'];
-        }else{
-
-            $data['value'] =null;
+        } else {
+            $data['value'] = null;
         }
 
         $result = MobileSetting::updateOrCreate(['id' => $request->id], $data);

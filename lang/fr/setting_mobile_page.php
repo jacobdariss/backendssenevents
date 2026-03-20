@@ -23,6 +23,8 @@ return [
         'banner' => 'Récupérer les bannières d\'accueil actives.',
         'continue_watching' => 'Récupérer les films/émissions récemment regardés par l\'utilisateur.',
         'advertisement' => 'Afficher les bannières publicitaires.',
+        'latest_videos' => 'Récupère automatiquement les dernières vidéos approuvées sur la plateforme, triées par date d'ajout.',
+        'latest_videos_count' => 'Number of videos to display.',
         'rate_our_app' => 'Afficher l\'invite d\'évaluation de l\'application.'
     
 
