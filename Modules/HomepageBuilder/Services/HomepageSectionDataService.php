@@ -58,7 +58,7 @@ class HomepageSectionDataService
 
     // ──────────────────────────────────────────────────────────────────────────
 
-    private function loadEntertainment(string $ct, int $limit, string $sort, array $ids, Request $request): array
+    private function loadEntertainment(?string $ct, int $limit, string $sort, array $ids, Request $request): array
     {
         $query = Entertainment::where('status', 1)->whereNull('deleted_at');
 
