@@ -9,15 +9,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('homepage_sections', function (Blueprint $table) {
-            // Épisodes sélectionnés manuellement pour une section tvshow
-            $table->json('episode_ids')->nullable()->after('content_ids');
+            if (!Schema::hasColumn('homepage_sections', 'episode_ids')) {
+                // Épisodes sélectionnés manuellement pour une section tvshow
+                $table->json('episode_ids')->nullable()->after('content_ids');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('homepage_sections', function (Blueprint $table) {
-            $table->dropColumn('episode_ids');
+            if (Schema::hasColumn('homepage_sections', 'episode_ids')) {
+                $table->dropColumn('episode_ids');
+            }
         });
     }
 };
