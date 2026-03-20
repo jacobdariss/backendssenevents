@@ -52,9 +52,9 @@ class HomepageBuilderController extends Controller
         $episodePickerData = $this->buildEpisodePickerData($section);
 
         $ajaxUrls = [
-            'contentOptions' => route('backend.homepage-builder.content-options'),
-            'tvshowSeasons'  => route('backend.homepage-builder.tvshow-seasons'),
-            'seasonEpisodes' => route('backend.homepage-builder.season-episodes'),
+            'contentOptions' => url('/app/homepage-builder/content-options'),
+            'tvshowSeasons'  => url('/app/homepage-builder/tvshow-seasons'),
+            'seasonEpisodes' => url('/app/homepage-builder/season-episodes'),
         ];
 
         return view('homepage-builder::backend.homepage-builder.edit', compact(
@@ -96,9 +96,9 @@ class HomepageBuilderController extends Controller
         $contentOptions = [];
         $episodePickerData = null;
         $ajaxUrls = [
-            'contentOptions' => route('backend.homepage-builder.content-options'),
-            'tvshowSeasons'  => route('backend.homepage-builder.tvshow-seasons'),
-            'seasonEpisodes' => route('backend.homepage-builder.season-episodes'),
+            'contentOptions' => url('/app/homepage-builder/content-options'),
+            'tvshowSeasons'  => url('/app/homepage-builder/tvshow-seasons'),
+            'seasonEpisodes' => url('/app/homepage-builder/season-episodes'),
         ];
         return view('homepage-builder::backend.homepage-builder.edit', compact(
             'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData', 'ajaxUrls'
