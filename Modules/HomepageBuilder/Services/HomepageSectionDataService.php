@@ -78,7 +78,7 @@ class HomepageSectionDataService
             default        => $query->orderByDesc('created_at'),
         };
 
-        $items = $query->with(['genresdata:id,name', 'casts:id,name'])
+        $items = $query->with(['genresdata:id,name'])
                        ->limit($limit)
                        ->get();
 
