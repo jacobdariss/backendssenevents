@@ -453,44 +453,111 @@ function setOrientation(value) {
 #episode-picker-card { border-left: 3px solid var(--bs-primary); }
 #episode-picker-card .card-title { font-size: .95rem; }
 
-/* ── Select2 tags : compact & soft ─────────────────────────────────────── */
+/* ── Select2 : container ────────────────────────────────────────────────── */
 .select2-container--default .select2-selection--multiple {
-    background-color: var(--bs-body-bg, #1a1a2e);
-    border-color: var(--bs-border-color);
-    border-radius: 6px;
-    min-height: 38px;
-    padding: 2px 4px;
+    background-color: transparent;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    min-height: 42px;
+    padding: 4px 6px;
+    transition: border-color .2s;
 }
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), .12);
+}
+
+/* ── Tags : taille dynamique selon le texte ─────────────────────────────── */
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: rgba(var(--bs-primary-rgb), 0.15) !important;
-    border: 1px solid rgba(var(--bs-primary-rgb), 0.35) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    /* taille dynamique — pas de max-width fixe */
+    max-width: min(260px, 90%) !important;
+    width: fit-content !important;
+    /* couleurs douces par défaut */
+    background: rgba(100, 116, 139, .15) !important;
+    border: 1px solid rgba(100, 116, 139, .3) !important;
     color: var(--bs-body-color) !important;
-    border-radius: 4px !important;
-    font-size: 0.75rem !important;
-    padding: 1px 22px 1px 8px !important;
-    margin: 3px 3px !important;
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    border-radius: 20px !important;
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    letter-spacing: .01em;
+    padding: 2px 8px 2px 10px !important;
+    margin: 3px 4px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    position: relative;
+    transition: background .18s, border-color .18s;
 }
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-    color: var(--bs-body-color) !important;
-    opacity: 0.5;
-    font-size: 0.85rem;
-    border-right: none !important;
-    padding: 0 4px 0 0 !important;
-    right: 4px;
-    left: auto;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+
+/* Couleur différente selon le select (contenu, saisons, épisodes) */
+#content_ids + .select2-container .select2-selection__choice,
+.select2-container:has(+ input[name="content_ids[]"]) .select2-selection__choice {
+    background: rgba(99, 102, 241, .18) !important;
+    border-color: rgba(99, 102, 241, .4) !important;
 }
+.select2-container:has(#select2-ep_seasons_select-container) .select2-selection__choice {
+    background: rgba(16, 185, 129, .15) !important;
+    border-color: rgba(16, 185, 129, .35) !important;
+}
+.select2-container:has(#select2-ep_episodes_select-container) .select2-selection__choice {
+    background: rgba(245, 158, 11, .15) !important;
+    border-color: rgba(245, 158, 11, .35) !important;
+}
+
 .select2-container--default .select2-selection--multiple .select2-selection__choice:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.25) !important;
+    background: rgba(var(--bs-primary-rgb), .22) !important;
+    border-color: rgba(var(--bs-primary-rgb), .5) !important;
+}
+
+/* ── Bouton × ────────────────────────────────────────────────────────────── */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: rgba(var(--bs-body-color-rgb, 255,255,255), .15) !important;
+    color: var(--bs-body-color) !important;
+    opacity: .7;
+    padding: 0 !important;
+    margin-left: 2px !important;
+    flex-shrink: 0;
+    order: 2;
+    position: static !important;
+    transform: none !important;
+    transition: background .15s, opacity .15s;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    background: rgba(239, 68, 68, .5) !important;
+    opacity: 1;
 }
 .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
-    padding-right: 4px;
+    order: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 220px;
+}
+
+/* ── Dropdown ────────────────────────────────────────────────────────────── */
+.select2-dropdown {
+    border-color: var(--bs-border-color);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+.select2-container--default .select2-results__option--highlighted {
+    background-color: rgba(var(--bs-primary-rgb), .2) !important;
+    color: var(--bs-body-color) !important;
+}
+.select2-container--default .select2-results__option--selected {
+    background-color: rgba(var(--bs-primary-rgb), .1) !important;
 }
 
 </style>
