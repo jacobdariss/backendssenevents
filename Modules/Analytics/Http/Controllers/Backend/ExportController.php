@@ -24,8 +24,15 @@ class ExportController extends Controller
             if (!auth()->check()) {
                 abort(403, 'Non authentifié.');
             }
-            $user = auth()->user()->fresh();
-            if (!$user->hasRole(['admin', 'super-admin'])) {
+            // Vérification directe en DB — bypass du cache Spatie
+            $userId = auth()->id();
+            $isAdmin = \DB::table('model_has_roles')
+                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                ->where('model_has_roles.model_id', $userId)
+                ->where('model_has_roles.model_type', get_class(auth()->user()))
+                ->whereIn('roles.name', ['admin', 'super-admin'])
+                ->exists();
+            if (!$isAdmin) {
                 abort(403, 'Accès réservé aux administrateurs.');
             }
             return $next($request);
