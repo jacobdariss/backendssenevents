@@ -97,6 +97,13 @@
                 title: "{{ __('messages.lbl_status') }}",
             },
             {
+                data: 'videos_count',
+                name: 'videos_count',
+                title: "{{ __('partner::partner.lbl_videos_count') }}",
+                orderable: false,
+                searchable: false,
+            },
+            {
                 data: 'updated_at',
                 name: 'updated_at',
                 title: "{{ __('messages.updated_at') }}",

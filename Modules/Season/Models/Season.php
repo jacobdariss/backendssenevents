@@ -32,6 +32,7 @@ class Season extends BaseModel
         'status',
         'poster_tv_url',
         'price',
+        'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',
@@ -42,7 +43,10 @@ class Season extends BaseModel
         'seo_image',
         'google_site_verification',
         'canonical_url',
-        'short_description'
+        'short_description',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
     ];
 
 
@@ -121,4 +125,9 @@ class Season extends BaseModel
 
 
 
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
+    }
 }

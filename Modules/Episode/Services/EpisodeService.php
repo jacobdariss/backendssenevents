@@ -248,13 +248,30 @@ class EpisodeService
         ->orderColumn('watch_count', 'entertainment_view_count $1')
           ->editColumn('updated_at', fn($data) =>formatUpdatedAt($data->updated_at))
             ->orderColumns(['id'], '-:column $1')
-            ->rawColumns(['action', 'status', 'check','poster_url','entertainment_id','season_id','plan_id','is_restricted'])
+            
+        ->addColumn('partner_name', function ($data) {
+            if (!empty($data->partner_id) && $data->partner) {
+                return '<span class="badge bg-info text-white">' . e($data->partner->name) . '</span>';
+            }
+            return '<span class="text-muted">—</span>';
+        })
+        ->addColumn('approval_col', function ($data) {
+            if (empty($data->partner_id)) return '—';
+            $status = $data->approval_status ?? 'pending';
+            $map = [
+                'pending'  => '<span class="badge bg-warning text-dark">Pending</span>',
+                'approved' => '<span class="badge bg-success">Approved</span>',
+                'rejected' => '<span class="badge bg-danger">Rejected</span>',
+            ];
+            return $map[$status] ?? '—';
+        })
+            ->rawColumns(['action', 'status', 'check','poster_url','entertainment_id','season_id','plan_id','is_restricted','partner_name','approval_col'])
             ->toJson();
     }
 
     public function getFilteredData($filter)
     {
-        $query = $this->episodeRepository->query();
+        $query = $this->episodeRepository->query()->with('partner');
 
         if (isset($filter['name'])) {
             $query->where('name', $filter['name']);

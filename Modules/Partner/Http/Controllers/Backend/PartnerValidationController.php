@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\ModuleTrait;
 use Modules\Entertainment\Models\Entertainment;
+use Modules\Episode\Models\Episode;
+use Modules\Season\Models\Season;
 use Modules\Video\Models\Video;
 use Modules\LiveTV\Models\LiveTvChannel;
 use Illuminate\Support\Facades\Schema;
+use Modules\Partner\Notifications\ContentStatusNotification;
+use App\Models\AuditLog;
+use App\Models\User;
 
 class PartnerValidationController extends Controller
 {
@@ -19,7 +24,7 @@ class PartnerValidationController extends Controller
     public function __construct()
     {
         $this->traitInitializeModuleTrait(
-            'partner.validation_title',
+            'partner::partner.validation_title',
             'partner-validation',
             'ph ph-seal-check'
         );
@@ -34,6 +39,8 @@ class PartnerValidationController extends Controller
         $tvshows   = collect();
         $videos    = collect();
         $livetvs   = collect();
+        $seasons   = collect();
+        $episodes  = collect();
         $pendingCount = 0;
         $migrationNeeded = false;
 
@@ -43,7 +50,7 @@ class PartnerValidationController extends Controller
             $migrationNeeded = true;
             $module_action = 'List';
             return view('partner::backend.validation.index', compact(
-                'movies', 'tvshows', 'videos', 'livetvs',
+                'movies', 'tvshows', 'videos', 'livetvs', 'seasons', 'episodes',
                 'type', 'status', 'pendingCount', 'module_action', 'migrationNeeded'
             ));
         }
@@ -59,7 +66,7 @@ class PartnerValidationController extends Controller
 
         if (in_array($type, ['all', 'tvshow'])) {
             $tvshows = Entertainment::with('partner')
-                ->where('type', 'tv_show')
+                ->where('type', 'tvshow')
                 ->where('approval_status', $status)
                 ->whereNotNull('partner_id')
                 ->latest()
@@ -84,17 +91,42 @@ class PartnerValidationController extends Controller
             }
         }
 
+        if (in_array($type, ['all', 'season'])) {
+            if (Schema::hasColumn('seasons', 'approval_status')) {
+                $seasons = Season::with('partner')
+                    ->where('approval_status', $status)
+                    ->whereNotNull('partner_id')
+                    ->latest()->get();
+            }
+        }
+
+        if (in_array($type, ['all', 'episode'])) {
+            if (Schema::hasColumn('episodes', 'approval_status')) {
+                $episodes = Episode::with('partner')
+                    ->where('approval_status', $status)
+                    ->whereNotNull('partner_id')
+                    ->latest()->get();
+            }
+        }
+
+        // Count all pending items across all types (regardless of current filter)
         $pendingCount = Entertainment::where('approval_status', 'pending')->whereNotNull('partner_id')->count()
             + Video::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
 
         if (Schema::hasColumn('live_tv_channel', 'approval_status')) {
             $pendingCount += LiveTvChannel::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
         }
+        if (Schema::hasColumn('seasons', 'approval_status') && Schema::hasColumn('seasons', 'partner_id')) {
+            $pendingCount += Season::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
+        }
+        if (Schema::hasColumn('episodes', 'approval_status') && Schema::hasColumn('episodes', 'partner_id')) {
+            $pendingCount += Episode::where('approval_status', 'pending')->whereNotNull('partner_id')->count();
+        }
 
         $module_action = 'List';
 
         return view('partner::backend.validation.index', compact(
-            'movies', 'tvshows', 'videos', 'livetvs',
+            'movies', 'tvshows', 'videos', 'livetvs', 'seasons', 'episodes',
             'type', 'status', 'pendingCount', 'module_action', 'migrationNeeded'
         ));
     }
@@ -107,7 +139,45 @@ class PartnerValidationController extends Controller
             return response()->json(['status' => false, 'message' => __('messages.not_found')], 404);
         }
 
-        $model->update(['approval_status' => 'approved', 'status' => 1]);
+        $updateData = ['approval_status' => 'approved', 'status' => 1];
+
+        // Si admin fixe un prix final (PPV), on l'utilise. Sinon on valide le prix propose par le partenaire
+        if ($request->filled('final_price') && is_numeric($request->input('final_price'))) {
+            $updateData['price'] = (float) $request->input('final_price');
+        } elseif (!empty($model->partner_proposed_price) && empty($model->price)) {
+            $updateData['price'] = $model->partner_proposed_price;
+        }
+
+        $model->update($updateData);
+
+        // Si c'est un épisode → approuver automatiquement la saison et la série parente
+        if ($contentType === 'episode' && $model->entertainment_id) {
+            // Approuver la série parente
+            \Modules\Entertainment\Models\Entertainment::where('id', $model->entertainment_id)
+                ->where('status', 0)
+                ->update(['approval_status' => 'approved', 'status' => 1]);
+
+            // Approuver la saison parente si elle existe
+            if ($model->season_id) {
+                \Modules\Season\Models\Season::where('id', $model->season_id)
+                    ->where('status', 0)
+                    ->update(['approval_status' => 'approved', 'status' => 1]);
+            }
+        }
+
+        // Si c'est une saison → approuver la série parente
+        if ($contentType === 'season' && $model->entertainment_id) {
+            \Modules\Entertainment\Models\Entertainment::where('id', $model->entertainment_id)
+                ->where('status', 0)
+                ->update(['approval_status' => 'approved', 'status' => 1]);
+        }
+
+        // Vider le cache pour que le contenu approuvé apparaisse immédiatement
+        clearRelatedCache(['setting', 'home_banners', 'genres', 'genres_v2'], null);
+        clearDashboardCache();
+
+        $this->notifyPartner($model, 'approved');
+        AuditLog::log('content_approved', $model, json_encode(['content_type' => $contentType]));
 
         return response()->json(['status' => true, 'message' => __('partner::partner.content_approved')]);
     }
@@ -120,9 +190,48 @@ class PartnerValidationController extends Controller
             return response()->json(['status' => false, 'message' => __('messages.not_found')], 404);
         }
 
-        $model->update(['approval_status' => 'rejected', 'status' => 0]);
+        $updateData = ['approval_status' => 'rejected', 'status' => 0];
 
-        return response()->json(['status' => true, 'message' => __('partner::partner.content_rejected')]);
+        // Motif de rejet si fourni
+        if ($request->filled('rejection_reason')) {
+            $updateData['rejection_reason'] = $request->input('rejection_reason');
+        }
+
+        $model->update($updateData);
+
+        clearRelatedCache(['setting', 'home_banners', 'genres', 'genres_v2'], null);
+        clearDashboardCache();
+
+        $this->notifyPartner($model, 'rejected', $request->input('rejection_reason'));
+        AuditLog::log('content_rejected', $model, json_encode(['reason' => $request->input('rejection_reason'), 'content_type' => $contentType]));
+
+        $message = $request->filled('rejection_reason')
+            ? __('partner::partner.content_rejected_reason')
+            : __('partner::partner.content_rejected');
+
+        return response()->json(['status' => true, 'message' => $message]);
+    }
+
+
+    private function notifyPartner($model, string $status, ?string $reason = null): void
+    {
+        try {
+            $partnerId = $model->partner_id ?? null;
+            if (!$partnerId) return;
+
+            $partner = \Modules\Partner\Models\Partner::find($partnerId);
+            if (!$partner || !$partner->user_id) return;
+
+            $user = User::find($partner->user_id);
+            if (!$user || !$user->email) return;
+
+            $contentName = $model->name ?? 'Contenu #'.$model->id;
+            $contentType = class_basename($model);
+
+            $user->notify(new ContentStatusNotification($status, $contentName, $contentType, $reason));
+        } catch (\Exception $e) {
+            \Log::error('Partner notification failed: ' . $e->getMessage());
+        }
     }
 
     private function resolveModel(string $contentType, int $id)
@@ -131,6 +240,8 @@ class PartnerValidationController extends Controller
             'movie', 'tvshow' => Entertainment::find($id),
             'video'           => Video::find($id),
             'livetv'          => LiveTvChannel::find($id),
+            'season'          => Season::find($id),
+            'episode'         => Episode::find($id),
             default           => null,
         };
     }

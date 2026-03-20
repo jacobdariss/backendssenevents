@@ -23,6 +23,8 @@ return [
         'banner' => 'Ανάκτηση ενεργών banner αρχικής σελίδας.',
         'continue_watching' => 'Ανάκτηση ταινιών/εκπομπών που είδε πρόσφατα ο χρήστης.',
         'advertisement' => 'Εμφάνιση διαφημιστικών banner.',
+        'latest_videos' => 'Αυτόματη ανάκτηση των τελευταίων εγκεκριμένων βίντεο της πλατφόρμας.',
+        'latest_videos_count' => 'Number of videos to display.',
         'rate_our_app' => 'Εμφάνιση προτροπής αξιολόγησης εφαρμογής.'
 
 ];

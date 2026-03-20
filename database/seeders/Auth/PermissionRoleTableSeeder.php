@@ -27,6 +27,8 @@ class PermissionRoleTableSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'admin', 'title' => 'Admin', 'is_fixed' => true]);
         $demo_admin = Role::firstOrCreate(['name' => 'demo_admin', 'title' => 'Demo Admin', 'is_fixed' => true]);
         $user = Role::firstOrCreate(['name' => 'user', 'title' => 'user', 'is_fixed' => true]);
+        Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web'], ['title' => 'Super Admin', 'is_fixed' => true]);
+        Role::firstOrCreate(['name' => 'partner', 'guard_name' => 'web'], ['title' => 'Partner', 'is_fixed' => true]);
 
         Permission::firstOrCreate(['name' => 'edit_settings', 'is_fixed' => true]);
         Permission::firstOrCreate(['name' => 'view_logs', 'is_fixed' => true]);

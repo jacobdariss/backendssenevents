@@ -15,6 +15,7 @@ use Modules\Entertainment\Trait\ImportMovieTrait;
 use Modules\Entertainment\Services\TvShowService;
 use Modules\World\Models\Country;
 use App\Models\Clip;
+use Modules\Partner\Models\Partner;
 
 class TVshowController extends Controller
 {
@@ -161,7 +162,8 @@ class TVshowController extends Controller
         $mediaUrls =  getMediaUrls();
 
 
-        return view('entertainment::backend.tvshows.create', compact('upload_url_type','assets','plan','movie_language','genres','numberOptions','actors','directors','countries','video_quality','type','module_title','mediaUrls','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('entertainment::backend.tvshows.create', compact('upload_url_type','assets','plan','movie_language','genres','numberOptions','actors','directors','countries','video_quality','type','module_title','mediaUrls','page_type', 'partners'));
     }
 
 
@@ -241,7 +243,8 @@ class TVshowController extends Controller
         ->get();
         $page_type='tvshow';
 
-        return view('entertainment::backend.tvshows.edit', compact('data','tmdb_id','assets','upload_url_type','plan','movie_language','genres','countries','numberOptions','actors','directors','mediaUrls','module_title','seo','clips','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('entertainment::backend.tvshows.edit', compact('data','tmdb_id','assets','upload_url_type','plan','movie_language','genres','countries','numberOptions','actors','directors','mediaUrls','module_title','seo','clips','page_type', 'partners'));
 
     }
 

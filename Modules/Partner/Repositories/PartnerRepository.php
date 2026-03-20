@@ -4,6 +4,7 @@ namespace Modules\Partner\Repositories;
 
 use Modules\Partner\Models\Partner;
 use Auth;
+use Illuminate\Support\Facades\Schema;
 
 class PartnerRepository implements PartnerRepositoryInterface
 {
@@ -37,6 +38,15 @@ class PartnerRepository implements PartnerRepositoryInterface
     public function update(int $id, array $data)
     {
         $partner = Partner::findOrFail($id);
+
+        // Guard: remove columns that don't exist yet in DB (migrations pending)
+        $guardColumns = ['commission_rate', 'revenue_model', 'allowed_content_types', 'user_id', 'contract_url', 'contract_signed_at', 'contract_status', 'video_quota'];
+        foreach ($guardColumns as $col) {
+            if (isset($data[$col]) && !\Schema::hasColumn('partners', $col)) {
+                unset($data[$col]);
+            }
+        }
+
         $partner->update($data);
         return $partner;
     }

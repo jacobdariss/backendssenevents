@@ -15,6 +15,7 @@ use Modules\LiveTV\Models\LiveTvCategory;
 use Modules\LiveTV\Http\Requests\TvChannelRequest;
 use Modules\LiveTV\Models\TvChannelStreamContentMapping;
 use Modules\LiveTV\Services\LiveTvChannelService;
+use Modules\Partner\Models\Partner;
 
 
 class LiveTvChannelController extends Controller
@@ -170,7 +171,24 @@ class LiveTvChannelController extends Controller
                 ';
             })
             ->editColumn('updated_at', fn($data) => $this->formatUpdatedAt($data->updated_at))
-            ->rawColumns(['action', 'status', 'check', 'image', 'plan_id','category_name'])
+            
+        ->addColumn('partner_name', function ($data) {
+            if (!empty($data->partner_id) && $data->partner) {
+                return '<span class="badge bg-info text-white">' . e($data->partner->name) . '</span>';
+            }
+            return '<span class="text-muted">—</span>';
+        })
+        ->addColumn('approval_col', function ($data) {
+            if (empty($data->partner_id)) return '—';
+            $status = $data->approval_status ?? 'pending';
+            $map = [
+                'pending'  => '<span class="badge bg-warning text-dark">Pending</span>',
+                'approved' => '<span class="badge bg-success">Approved</span>',
+                'rejected' => '<span class="badge bg-danger">Rejected</span>',
+            ];
+            return $map[$status] ?? '—';
+        })
+        ->rawColumns(['action', 'status', 'check', 'image', 'plan_id','category_name','partner_name','approval_col'])
             ->orderColumns(['id'], '-:column $1')
             ->make(true);
     }
@@ -212,7 +230,8 @@ class LiveTvChannelController extends Controller
         $module_title = __('livetv.add_tvchannel');
         $page_type='livetv';
         $mediaUrls = getMediaUrls();
-        return view('livetv::backend.channel.create', compact('plan', 'assets','tvcategory', 'embedded', 'url', 'streamMapping', 'module_title', 'mediaUrls','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('livetv::backend.channel.create', compact('plan', 'assets','tvcategory', 'embedded', 'url', 'streamMapping', 'module_title', 'mediaUrls','page_type', 'partners'));
     }
 
     /**
@@ -222,6 +241,15 @@ class LiveTvChannelController extends Controller
     public function store(TvChannelRequest $request)
     {
         $data = $request->all();
+        // Attribution partenaire
+        if ($request->filled('partner_id')) {
+            $data['partner_id']      = $request->partner_id;
+            $data['approval_status'] = 'pending';
+        } else {
+            $data['partner_id']      = null;
+            $data['approval_status'] = null;
+        }
+
         $data['thumb_url'] = extractFileNameFromUrl($data['thumbnail_url'],'livetv');
         $data['poster_url'] = extractFileNameFromUrl($data['poster_url'],'livetv');
         $data['poster_tv_url'] = extractFileNameFromUrl($data['poster_tv_url'],'livetv');
@@ -265,7 +293,8 @@ class LiveTvChannelController extends Controller
         $module_title = __('livetv.edit_tvchannel');
         $page_type='livetv';
         $mediaUrls = getMediaUrls();
-        return view('livetv::backend.channel.edit', compact('data','assets', 'plan', 'tvcategory', 'embedded', 'url', 'module_title', 'mediaUrls','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('livetv::backend.channel.edit', compact('data','assets', 'plan', 'tvcategory', 'embedded', 'url', 'module_title', 'mediaUrls','page_type', 'partners'));
     }
 
     /**

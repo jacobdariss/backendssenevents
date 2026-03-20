@@ -15,6 +15,7 @@ use Modules\Subscriptions\Models\Plan;
 use App\Services\ChatGTPService;
 use Carbon\Carbon;
 use Modules\NotificationTemplate\Jobs\SendBulkNotification;
+use Modules\Partner\Models\Partner;
 
 
 class SeasonsController extends Controller
@@ -138,7 +139,8 @@ class SeasonsController extends Controller
         $mediaUrls =  getMediaUrls();
         $page_type='season';
 
-        return view('season::backend.season.create', compact('upload_url_type','assets','plan','tvshows','module_title','mediaUrls','imported_tvshow','seasons','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('season::backend.season.create', compact('upload_url_type','assets','plan','tvshows','module_title','mediaUrls','imported_tvshow','seasons','page_type', 'partners'));
 
     }
 
@@ -148,6 +150,19 @@ class SeasonsController extends Controller
     public function store(SeasonRequest $request)
 {
     $data = $request->all();
+        // Attribution partenaire
+        // Partner fields — only set if columns exist in DB
+        if (\Schema::hasColumn('seasons', 'partner_id')) {
+            $data['partner_id'] = $request->filled('partner_id') ? $request->partner_id : null;
+        } else {
+            unset($data['partner_id']);
+        }
+        if (\Schema::hasColumn('seasons', 'approval_status')) {
+            $data['approval_status'] = $request->filled('partner_id') ? 'pending' : null;
+        } else {
+            unset($data['approval_status']);
+        }
+
 
     $data['poster_url'] = !empty($data['tmdb_id']) ? $data['poster_url'] : extractFileNameFromUrl($data['poster_url'],'season');
     $data['poster_tv_url'] = !empty($data['tmdb_id']) ? $data['poster_tv_url'] : extractFileNameFromUrl($data['poster_tv_url'],'season');
@@ -276,7 +291,8 @@ class SeasonsController extends Controller
         'short_description' => $data->short_description
     ];
 
-    return view('season::backend.season.edit', compact(
+    $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('season::backend.season.edit', compact(
         'data',
         'tmdb_id',
         'upload_url_type',
@@ -286,8 +302,7 @@ class SeasonsController extends Controller
         'mediaUrls',
         'assets',
         'seo',
-        'page_type'
-    ));
+        'page_type', 'partners'));
 }
 
 
@@ -337,6 +352,14 @@ public function update(SeasonRequest $request, int $id)
     $requestData['google_site_verification'] = $request->input('google_site_verification');
     $requestData['canonical_url'] = $request->input('canonical_url');
     $requestData['short_description'] = $request->input('short_description');
+
+    // Guard partner fields — only include if columns exist in DB
+    if (!\Schema::hasColumn('seasons', 'partner_id')) {
+        unset($requestData['partner_id']);
+    }
+    if (!\Schema::hasColumn('seasons', 'approval_status')) {
+        unset($requestData['approval_status']);
+    }
 
     $this->seasonService->update($id, $requestData);
 

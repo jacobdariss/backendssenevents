@@ -1877,7 +1877,7 @@ class EntertainmentsController extends Controller
         $cacheKey = 'coming_soon_'. md5(json_encode($request->all())).($request->is_ajax ? '_html' : '_json');
 
 
-        $responseData = cache()->remember($cacheKey, 10, function () use ($request, $perPage, $todayDate,$device_type) {
+        $responseData = cache()->remember($cacheKey, 60, function () use ($request, $perPage, $todayDate,$device_type) {
 
             switch ($request->type) {
                 case 'all':
@@ -2123,16 +2123,49 @@ class EntertainmentsController extends Controller
         $user = auth()->user();
         $data = $request->all();
         $data['user_id'] = $user->id;
-        $viewData = EntertainmentView::where('entertainment_id', $request->entertainment_id)->where('user_id', $user->id)->first();
 
-        // Views are user-specific, no cache clearing needed
+        // ── Enrichir avec device, platform, pays, partenaire ──────────────
+        $data['device_type'] = getDeviceType($request);
 
-        if (!$viewData) {
-            $views = EntertainmentView::create($data);
-            $message = __('movie.view_add');
-        } else {
-            $message = __('movie.already_added');
+        // Platform depuis User-Agent
+        $ua = $request->header('User-Agent', '');
+        if (preg_match('/android/i', $ua))        $data['platform'] = 'Android';
+        elseif (preg_match('/iphone|ipad|ios/i', $ua)) $data['platform'] = 'iOS';
+        elseif (preg_match('/windows/i', $ua))    $data['platform'] = 'Windows';
+        elseif (preg_match('/macintosh|mac os/i', $ua)) $data['platform'] = 'macOS';
+        elseif (preg_match('/linux/i', $ua))      $data['platform'] = 'Linux';
+        else $data['platform'] = 'Web';
+
+        // IP & pays
+        $data['ip_address'] = $request->ip();
+        // Code pays depuis l'IP (si geoip disponible) ou depuis le header Cloudflare
+        $data['country_code'] = $request->header('CF-IPCountry')
+            ?? $request->header('X-Country-Code')
+            ?? null;
+
+        // content_type
+        $data['content_type'] = $request->content_type ?? null;
+
+        // partner_id depuis le contenu
+        if ($request->entertainment_id) {
+            $ent = \Modules\Entertainment\Models\Entertainment::select('partner_id')
+                ->find($request->entertainment_id);
+            if ($ent?->partner_id) $data['partner_id'] = $ent->partner_id;
         }
+        if (!isset($data['partner_id']) && $request->episode_id) {
+            $ep = \Modules\Episode\Models\Episode::select('partner_id')
+                ->find($request->episode_id);
+            if ($ep?->partner_id) $data['partner_id'] = $ep->partner_id;
+        }
+
+        // episode_id & video_id
+        if ($request->episode_id) $data['episode_id'] = $request->episode_id;
+        if ($request->video_id)   $data['video_id']   = $request->video_id;
+        // ──────────────────────────────────────────────────────────────────
+
+        // Toujours créer une nouvelle vue pour les analytics (comptage réel)
+        EntertainmentView::create($data);
+        $message = __('movie.view_add');
 
         return ApiResponse::success(null, $message, 200);
     }
@@ -2730,7 +2763,7 @@ class EntertainmentsController extends Controller
         $userId = $request->user_id ?? auth()->id() ;
         $cacheKey = 'common_content_detail_v3_'.$id . '_' . $request->profile_id . '_' . $request->type . '_' . ($userId ?? 0);
 
-         $responseData = cacheApiResponse($cacheKey, 10, function () use ($request, $id,$device_type, $userId) {
+         $responseData = cacheApiResponse($cacheKey, 60, function () use ($request, $id,$device_type, $userId) {
 
 
             $user_id = isset($request->user_id) ? $request->user_id : 0;

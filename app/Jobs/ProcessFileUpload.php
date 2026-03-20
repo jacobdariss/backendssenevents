@@ -75,10 +75,11 @@ class ProcessFileUpload implements ShouldQueue
                 if(!Storage::disk('local')->exists($directoryPath)) {
                     Log::info("Directory does not exist at path: {$directoryPath}");
                     $absoluteDirectoryPath = storage_path('app/' . $directoryPath);
-                    File::makeDirectory($absoluteDirectoryPath, 0775, true, true);
+                    File::makeDirectory($absoluteDirectoryPath, 0777, true, true);
                 }
 
                 Storage::disk('local')->put($folderPath, $file);
+                Log::info('File stored at: ' . $folderPath);
 
                 $fullPath = storage_path('app/' . $folderPath);
                 if (file_exists($fullPath)) {
@@ -86,7 +87,7 @@ class ProcessFileUpload implements ShouldQueue
 
                     $dirPath = dirname($fullPath);
                     if (is_dir($dirPath)) {
-                        chmod($dirPath, 0775);
+                        chmod($dirPath, 0777);
                     }
                 }
             } else {

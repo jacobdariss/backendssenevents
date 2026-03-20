@@ -3,6 +3,7 @@
 namespace Modules\Frontend\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\HomepageBuilder\Models\HomepageSection;
 use Illuminate\Http\Request;
 use App\Models\MobileSetting;
 use Modules\Entertainment\Models\Entertainment;
@@ -45,6 +46,7 @@ use Modules\Entertainment\Transformers\Backend\SeasonResourceV3;
 use Modules\Season\Models\Season;
 use Carbon\Carbon;
 use Modules\Entertainment\Models\EntertainmentView as EntertainmentViewModel;
+use Modules\HomepageBuilder\Services\HomepageSectionDataService;
 
 class FrontendController extends Controller
 {
@@ -94,6 +96,7 @@ class FrontendController extends Controller
                 'popular-movies' => MobileSetting::getNameAndValueBySlug('popular-movies'),
                 'popular-tvshows' => MobileSetting::getNameAndValueBySlug('popular-tvshows'),
                 'most-watched-videos' => MobileSetting::getNameAndValueBySlug('popular-videos'),
+                'latest-videos'       => MobileSetting::getNameAndValueBySlug('latest-videos'),
                 'top-channels' => MobileSetting::getNameAndValueBySlug('top-channels'),
                 'genre' => MobileSetting::getNameAndValueBySlug('genre'),
                 '500-free-movies' => MobileSetting::getNameAndValueBySlug('500-free-movies'),
@@ -439,6 +442,32 @@ class FrontendController extends Controller
                 ];
             }
 
+            // ── Dernières Vidéos (latest-videos) ──────────────────────────────────
+            if (!empty($settings['latest-videos']) && !empty($settings['latest-videos']['value'])) {
+                $latestCount = max(1, min(50, (int) $settings['latest-videos']['value']));
+                $latest_videos = Video::where('status', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function($q) {
+                        $q->whereNull('release_date')
+                          ->orWhereDate('release_date', '<=', now());
+                    })
+                    ->orderByDesc('created_at')
+                    ->limit($latestCount)
+                    ->get();
+
+                // Filtrer profil enfant si nécessaire
+                if (!empty(getCurrentProfileSession('is_child_profile')) && getCurrentProfileSession('is_child_profile') != 0) {
+                    $latest_videos = $latest_videos->where('is_restricted', 0);
+                }
+
+                if ($latest_videos->isNotEmpty()) {
+                    $responseData['latest_videos'] = [
+                        'name' => $this->translateTabName($settings['latest-videos']['name'] ?? 'Dernières Vidéos'),
+                        'data' => VideoResourceV3::collection($latest_videos)->toArray($request),
+                    ];
+                }
+            }
+
             $mobile_settings = MobileSetting::where('type', '!=', null)->get();
 
             $responseData['dynamic_data'] = [];
@@ -509,7 +538,18 @@ class FrontendController extends Controller
 
 
 
-        return view('frontend::index', compact('user_id', 'cachedResult'));
+        // Sections homepage ordonnées depuis HomepageBuilder
+        // On injecte les données directement dans chaque section (indépendant de MobileSetting)
+        $homepageSections = HomepageSection::getActive('web');
+        $sectionService   = app(HomepageSectionDataService::class);
+        foreach ($homepageSections as $section) {
+            $loaded = $sectionService->loadForSection($section, $request);
+            if ($loaded !== null) {
+                $section->setAttribute('_direct_data', $loaded);
+            }
+        }
+
+        return view('frontend::index', compact('user_id', 'cachedResult', 'homepageSections'));
     }
 
 

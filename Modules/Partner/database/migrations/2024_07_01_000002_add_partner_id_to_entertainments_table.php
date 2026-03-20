@@ -8,17 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('entertainments', function (Blueprint $table) {
-            $table->unsignedBigInteger('partner_id')->nullable()->after('id');
-            $table->foreign('partner_id')->references('id')->on('partners')->onDelete('set null');
-        });
+        if (Schema::hasTable('entertainments') && !Schema::hasColumn('entertainments', 'partner_id')) {
+            Schema::table('entertainments', function (Blueprint $table) {
+                $table->unsignedBigInteger('partner_id')->nullable()->after('id');
+                $table->foreign('partner_id')->references('id')->on('partners')->onDelete('set null');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('entertainments', function (Blueprint $table) {
-            $table->dropForeign(['partner_id']);
-            $table->dropColumn('partner_id');
-        });
+        if (Schema::hasTable('entertainments') && Schema::hasColumn('entertainments', 'partner_id')) {
+            Schema::table('entertainments', function (Blueprint $table) {
+                $table->dropForeign(['partner_id']);
+                $table->dropColumn('partner_id');
+            });
+        }
     }
 };

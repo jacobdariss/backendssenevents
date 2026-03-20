@@ -24,5 +24,7 @@ return [
         'banner' => 'Fetch active home banners.',
         'continue_watching' => 'Fetch movies/shows recently watched by the user.',
         'advertisement' => 'Displays advertisement banners.',
+        'latest_videos' => 'Automatically fetch the latest videos approved on the platform, sorted by creation date.',
+        'latest_videos_count' => 'Number of videos to display.',
         'rate_our_app' => 'Displays app rating prompt.'
 ];

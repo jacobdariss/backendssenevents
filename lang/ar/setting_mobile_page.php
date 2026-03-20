@@ -22,5 +22,7 @@ return [
         'banner' => 'جلب لافتات الصفحة الرئيسية النشطة.',
         'continue_watching' => 'جلب الأفلام/المسلسلات التي شاهدها المستخدم مؤخرًا.',
         'advertisement' => 'عرض لافتات الإعلانات.',
+        'latest_videos' => 'جلب أحدث مقاطع الفيديو المعتمدة على المنصة تلقائيًا.',
+        'latest_videos_count' => 'Number of videos to display.',
         'rate_our_app' => 'عرض نافذة تقييم التطبيق.'
 ];

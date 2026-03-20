@@ -140,26 +140,28 @@ class FilemanagersController extends Controller
 
     if (!empty($jobs)) {
 
-        Bus::batch($jobs)->dispatch();
-        Log::info('batch dispatched', ['count' => count($jobs)]);
-
-        // foreach ($jobs as $job) {
-        //      ProcessFileUpload::dispatchSync(
-        //         $job->filemanager,
-        //         $job->filePath,
-        //         $job->diskType,
-        //         $job->originalName,
-        //         $job->page_type,
-        //         $job->fileType
-        //     );
-        // }
-        // Log::info('jobs dispatched synchronously', ['count' => count($jobs)]);
+        // Exécution synchrone — pas de queue worker sur Plesk
+        foreach ($jobs as $job) {
+            ProcessFileUpload::dispatchSync(
+                $job->filemanager,
+                $job->filePath,
+                $job->diskType,
+                $job->originalName,
+                $job->page_type,
+                $job->fileType
+            );
+        }
+        Log::info('jobs dispatched synchronously', ['count' => count($jobs)]);
 
     } else {
         Log::warning('no jobs queued for upload');
     }
     $message = trans('filemanager.file_added');
 
+    // Si requête AJAX (depuis modal partenaire ou XMLHttpRequest), retourner JSON
+    if (request()->expectsJson() || request()->ajax() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+        return response()->json(['success' => true, 'message' => $message]);
+    }
     return redirect()->route('backend.media-library.index')->with('success', $message);
 }
 
@@ -413,6 +415,11 @@ private function getFileType($extension)
                 $storagePath = storage_path('app/public');
                 $fullPath = $folder ? $storagePath . '/' . $folder : $storagePath;
 
+                // Auto-create partner folder if it doesn't exist
+                if ($folder && str_starts_with($folder, 'partners/') && !is_dir($fullPath)) {
+                    mkdir($fullPath, 0777, true);
+                }
+
                 if (is_dir($fullPath)) {
                     $items = array_diff(scandir($fullPath), ['.', '..']);
                     foreach ($items as $item) {
@@ -495,7 +502,13 @@ private function getFileType($extension)
         $mediaUrl = '';
         if (!$isDir && ($isVideo || $isImage)) {
             $type = $isVideo ? 'video' : 'image';
-            $mediaUrl = setBaseUrlWithFileName($name, $type, $pageType);
+            // Pour les dossiers partenaires, utiliser le chemin complet du dossier parent
+            if (!empty($folder) && str_starts_with($folder, 'partners/')) {
+                // Construire l'URL directement depuis le chemin relatif
+                $mediaUrl = asset('storage/' . $folder . '/' . $name);
+            } else {
+                $mediaUrl = setBaseUrlWithFileName($name, $type, $pageType);
+            }
         }
 
         // When local, compute size/mtime using absolute path; expose relative path to the client

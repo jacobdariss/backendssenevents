@@ -17,16 +17,114 @@ class GenerateMenus
     public function handle()
     {
         return \Menu::make('menu', function ($menu) {
-            if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('demo_admin')) {
-                $this->staticMenu($menu, ['title' =>  __('sidebar.main'), 'order' => 0]);
+
+            // ── Menu spécifique PARTENAIRE ──────────────────────────────
+            if (auth()->user()->hasRole('partner')) {
+                $this->staticMenu($menu, ['title' => __('partner::partner.title'), 'order' => 0]);
+
                 $this->mainRoute($menu, [
-                    'icon' => 'ph ph-squares-four',
-                    'title' => __('sidebar.dashboard'),
-                    'route' => 'backend.home',
-                    'active' => ['app', 'app/dashboard'],
-                    'order' => 0,
+                    'icon'   => 'ph ph-squares-four',
+                    'title'  => __('sidebar.dashboard'),
+                    'url'    => url('/app/partner-dashboard'),
+                    'active' => ['app/partner-dashboard'],
+                    'order'  => 1,
                 ]);
+
+                // Menus dynamiques selon les types de contenu autorisés
+                $partner = \Modules\Partner\Models\Partner::where('user_id', auth()->id())->first();
+                $rawTypes = $partner ? ($partner->allowed_content_types ?? []) : [];
+                // Si aucun type configuré → tout est autorisé
+                $allTypes = ['video', 'movie', 'tvshow', 'livetv'];
+                $allowedTypes = empty($rawTypes) ? $allTypes : $rawTypes;
+
+                if (in_array('video', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-video',
+                        'title'  => __('video.title'),
+                        'url'    => url('/app/partner-videos'),
+                        'active' => ['app/partner-videos', 'app/partner-videos/*'],
+                        'order'  => 2,
+                    ]);
+                }
+
+                if (in_array('movie', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-film-strip',
+                        'title'  => __('movie.movies'),
+                        'url'    => url('/app/partner-movies'),
+                        'active' => ['app/partner-movies', 'app/partner-movies/*'],
+                        'order'  => 3,
+                    ]);
+                }
+
+                if (in_array('tvshow', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-monitor-play',
+                        'title'  => __('movie.tvshows'),
+                        'url'    => url('/app/partner-tvshows'),
+                        'active' => ['app/partner-tvshows', 'app/partner-tvshows/*'],
+                        'order'  => 4,
+                    ]);
+                }
+
+                // Notifications partenaire
+                $this->mainRoute($menu, [
+                    'title'  => __('partner::partner.notifications'),
+                    'url'    => url('/app/partner-notifications'),
+                    'icon'   => 'ph ph-bell',
+                    'active' => ['app/partner-notifications'],
+                    'order'  => 98,
+                ]);
+
+                // Analytics partenaire
+                $this->mainRoute($menu, [
+                    'title'  => __('analytics::analytics.title'),
+                    'url'    => url('/app/partner-analytics'),
+                    'icon'   => 'ph ph-chart-pie-slice',
+                    'active' => ['app/partner-analytics', 'app/partner-analytics/*'],
+                    'order'  => 99,
+                ]);
+
+                if (in_array('livetv', $allowedTypes)) {
+                    $this->mainRoute($menu, [
+                        'icon'   => 'ph ph-broadcast',
+                        'title'  => __('frontend.livetv'),
+                        'url'    => url('/app/partner-livetv'),
+                        'active' => ['app/partner-livetv', 'app/partner-livetv/*'],
+                        'order'  => 5,
+                    ]);
+                }
+
+                return;
             }
+
+            // Dashboard — visible pour tous les admins
+            $this->staticMenu($menu, ['title' =>  __('sidebar.main'), 'order' => 0]);
+            $this->mainRoute($menu, [
+                'icon' => 'ph ph-squares-four',
+                'title' => __('sidebar.dashboard'),
+                'route' => 'backend.home',
+                'active' => ['app', 'app/dashboard'],
+                'order' => 0,
+            ]);
+
+            // Analytics admin
+            $this->mainRoute($menu, [
+                'title'  => __('analytics::analytics.title'),
+                'url'    => url('/app/analytics'),
+                'icon'   => 'ph ph-chart-pie-slice',
+                'active' => ['app/analytics', 'app/analytics/*'],
+                'order'  => 0,
+            ]);
+
+            // Finance admin
+            $this->mainRoute($menu, [
+                'title'  => __('analytics::analytics.finance_title'),
+                'url'    => url('/app/finance'),
+                'icon'   => 'ph ph-currency-circle-dollar',
+                'active' => ['app/finance', 'app/finance/*'],
+                'order'  => 0,
+            ]);
 
 
             $this->mainRoute($menu, [
@@ -214,6 +312,31 @@ class GenerateMenus
             ]);
 
 
+            $partner_menu = $this->parentMenu($menu, [
+                'icon'     => 'ph ph-handshake',
+                'title'    => __('partner::partner.title'),
+                'nickname' => 'partners',
+                'order'    => 0,
+            ]);
+
+            $this->childMain($partner_menu, [
+                'icon'       => 'ph ph-list',
+                'title'      => __('partner::partner.title'),
+                'route'      => 'backend.partners.index',
+                'active'     => ['app/partners', 'app/partners/*'],
+                'shortTitle' => 'P',
+                'order'      => 1,
+            ]);
+
+            $this->childMain($partner_menu, [
+                'icon'       => 'ph ph-seal-check',
+                'title'      => __('partner::partner.validation_title'),
+                'route'      => 'backend.partner-validation.index',
+                'active'     => ['app/partner-validation', 'app/partner-validation/*'],
+                'shortTitle' => 'V',
+                'order'      => 2,
+            ]);
+
             $permissionsToCheck = ['view_subscription', 'view_plans', 'view_planlimitation'];
 
             if (collect($permissionsToCheck)->contains(fn ($permission) => auth()->user()->can($permission))) {
@@ -357,7 +480,15 @@ class GenerateMenus
                 'order' => 0,
             ]);
 
-            if(auth()->user()->hasRole('admin')){
+            $this->childMain($mobile_setting, [
+                'icon'   => 'ph ph-layout',
+                'title'  => 'Homepage Builder',
+                'route'  => 'backend.homepage-builder.index',
+                'active' => 'app/homepage-builder*',
+                'order'  => 0,
+            ]);
+
+            if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])){
 
             $this->childMain($mobile_setting, [
                 'icon' => 'ph ph-app-window',
@@ -405,8 +536,6 @@ class GenerateMenus
                     'order' => 0,
                 ]);
 
-
-
             $this->mainRoute($menu, [
                 'icon' => 'ph ph-gear-six',
                 'title' => __('sidebar.settings'),
@@ -416,13 +545,13 @@ class GenerateMenus
                 'order' => 0,
             ]);
 
-            if(auth()->user()->hasRole('admin')){
+            if(auth()->user()->hasAnyRole(['admin', 'super_admin', 'superadmin', 'demo_admin'])){
 
             $this->mainRoute($menu, [
-                'icon' => 'ph ph-faders',
-                'title' => __('sidebar.access_control'),
-                'route' => 'backend.permission-role.list',
-                'active' => ['app/permission-role'],
+                'icon' => 'ph ph-shield-check',
+                'title' => __('messages.security'),
+                'url'   => url('/app/setting/security'),
+                'active' => ['app/setting/security', 'app/setting/security/*', 'app/permission-role'],
                 'order' => 10,
             ]);
         }

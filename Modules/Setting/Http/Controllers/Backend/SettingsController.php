@@ -542,7 +542,6 @@ class SettingsController extends Controller
 
         try {
             $data = $this->validate($request, $rules, $messages);
-            \Log::info("data=".json_encode($data));
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error("Validation failed: ".json_encode($e->errors()));
             throw $e; // Re-throw to maintain normal validation behavior

@@ -23,6 +23,12 @@ class Partner extends BaseModel
         'website',
         'status',
         'allowed_content_types',
+        'commission_rate',
+        'revenue_model',
+        'video_quota',
+        'contract_url',
+        'contract_signed_at',
+        'contract_status',
     ];
 
     protected $casts = [

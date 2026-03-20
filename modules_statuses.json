@@ -24,5 +24,8 @@
     "Coupon": true,
     "Ad": true,
     "SEO": true,
-    "Onboarding": true
+    "Onboarding": true,
+    "Analytics": true,
+    "Partner": true,
+    "HomepageBuilder": true
 }

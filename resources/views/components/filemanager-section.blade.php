@@ -62,7 +62,7 @@
 
             <div>
                 <!-- Folder Navigation -->
-                <div class="mb-3" id="folder-navigation" style="display: none;">
+                <div class="mb-3" id="folder-navigation" style="display: none;"{{ isset($partnerFolder) && !empty($partnerFolder) ? ' data-partner-restricted="true"' : '' }}>
                     <div class="d-flex align-items-center justify-content-between">
                         <h3 class="mb-0" id="current-folder-name"></h3>
                         <div class="d-flex align-items-center gap-3">
@@ -115,7 +115,20 @@
                             ];
                         };
 
-                        if ($activeDisk === 'local') {
+                        // Si dossier partenaire restreint : créer le dossier si nécessaire et n'afficher que lui
+                        $isPartnerRestricted = isset($partnerFolder) && !empty($partnerFolder);
+
+                        if ($isPartnerRestricted) {
+                            // Créer le dossier image du partenaire directement
+                            $partnerImageDir = storage_path('app/public/' . $partnerFolder . '/image');
+                            if (!is_dir($partnerImageDir)) {
+                                mkdir($partnerImageDir, 0777, true);
+                            }
+                            // Montrer directement le contenu de partners/{id}/image
+                            $partnerFolder = $partnerFolder . '/image';
+                            // Ne pas ajouter de dossier affiché — on navigue directement via JS
+                            $folders[] = $formatFolder($partnerFolder);
+                        } elseif ($activeDisk === 'local') {
                             $root = storage_path('app/public');
                             if (is_dir($root)) {
                                 // Read only directories, skip dot entries, and excluded names
@@ -147,9 +160,9 @@
                     @endphp
 
                     @foreach ($folders as $folder)
-                        @if ($folder['name'] != 'avatars' && $folder['name'] != 'subtitles' && $folder['name'] != 'logo')
+                        @if ($folder['name'] != 'avatars' && $folder['name'] != 'subtitles' && $folder['name'] != 'logo' && !($isPartnerRestricted && $folder['name'] === 'image'))
                             <div class="col-lg-3 col-md-2 col-sm-1">
-                                <div class="card h-100 folder-card folder-card-clickable" data-folder-name="{{ $folder['name'] }}"
+                                <div class="card h-100 folder-card folder-card-clickable" data-folder-name="{{ $folder['path'] ?? $folder['name'] }}"
                                     style="cursor: pointer;">
                                     <div class="card-body text-center">
                                         <i class="ph ph-folder text-primary" style="font-size: 3rem;"></i>
@@ -209,6 +222,7 @@
     const FileManager = {
         // Configuration
         config: {
+            partnerFolder: '{{ isset($partnerFolder) ? $partnerFolder : "" }}',
             baseUrl: (function() {
                 const metaTag = BASE_URL;
                 if (metaTag) {
@@ -393,8 +407,24 @@
         // Navigation functions
         navigation: {
             openFolder: (folderName) => {
+                // Si dossier partenaire restreint, ne pas sortir du dossier autorisé
+                // Guard: ne pas naviguer en dehors du dossier partenaire
+                // partnerFolder peut être 'partners/1/image' maintenant
+                const partnerFolder = FileManager.config.partnerFolder;
+                if (partnerFolder) {
+                    const partnerBase = partnerFolder.replace('/image', '');
+                    if (!folderName.startsWith(partnerBase)) {
+                        console.warn('Partner restricted:', folderName);
+                        return;
+                    }
+                }
                 FileManager.cleanup();
                 FileManager.state.currentFolder = folderName;
+                // Afficher un nom simplifié dans le breadcrumb
+                const folderNameEl = document.getElementById('current-folder-name');
+                if (folderNameEl && FileManager.config.partnerFolder) {
+                    folderNameEl.textContent = '{{ __("messages.my_media") }}';
+                }
                 FileManager.state.nextOffset = 0;
                 FileManager.state.infiniteInitDone = false;
 
@@ -405,7 +435,7 @@
                 }
 
                 // Update UI
-                document.getElementById('folder-navigation').style.display = 'block';
+                if (!FileManager.config.partnerFolder) document.getElementById('folder-navigation').style.display = 'block';
                 (function() {
                     const el = document.getElementById('current-folder-name');
                     const transKey = 'folder_' + folderName.toLowerCase();
@@ -423,18 +453,24 @@
 
             goBackToFolders: () => {
                 FileManager.cleanup();
+                const partnerRootFolder = FileManager.config.partnerFolder;
                 const current = FileManager.state.currentFolder || '';
                 const hasParent = current && current.includes('/');
 
                 if (hasParent) {
                     // Navigate one level up (parent folder)
                     const parent = current.substring(0, current.lastIndexOf('/'));
-                    FileManager.state.currentFolder = parent;
+                    // Don't go above partner root
+                    if (partnerRootFolder && !parent.startsWith(partnerRootFolder) && parent !== partnerRootFolder) {
+                        FileManager.state.currentFolder = partnerRootFolder;
+                    } else {
+                        FileManager.state.currentFolder = parent;
+                    }
                     FileManager.state.nextOffset = 0;
                     FileManager.state.infiniteInitDone = false;
 
                     // Keep folder view visible, update header and reload contents
-                    document.getElementById('folder-navigation').style.display = 'block';
+                    if (!FileManager.config.partnerFolder) document.getElementById('folder-navigation').style.display = 'block';
                     (function() {
                         const base = parent.split('/').pop();
                         const el = document.getElementById('current-folder-name');
@@ -451,7 +487,7 @@
                     FileManager.loadFolderContents(parent);
                 } else {
                     // At root level → show root folders
-                    FileManager.state.currentFolder = '';
+                    FileManager.state.currentFolder = partnerRootFolder || '';
                     FileManager.state.nextOffset = 0;
                     FileManager.state.infiniteInitDone = false;
 
@@ -614,8 +650,7 @@
                 let hasMediaFiles = false;
 
                 if (contents.length === 0) {
-                    html =
-                        '<div class="text-center text-muted">{{ __('frontend.no_files_found_in_folder') }}</div>';
+                    html = '<div class="text-center text-muted py-4">{{ __('frontend.no_files_found_in_folder') }}</div>';
                 } else {
                     contents.forEach(item => {
                         html += FileManager.render.generateItemHTML(item);
@@ -982,6 +1017,23 @@
         }
     });
     window.getFolderFromUrl = FileManager.utils.getFolderFromUrl;
+
+    // Auto-ouvrir le dossier partenaire si restreint
+    if (FileManager.config.partnerFolder) {
+        const mediaModal = document.getElementById('exampleModal');
+        if (mediaModal) {
+            mediaModal.addEventListener('shown.bs.modal', function() {
+                if (FileManager.config.partnerFolder && !FileManager.state.currentFolder) {
+                    // Ouvrir directement le dossier image du partenaire
+                    FileManager.navigation.openFolder(FileManager.config.partnerFolder);
+                }
+            });
+            // Reset currentFolder à la fermeture pour permettre la réouverture
+            mediaModal.addEventListener('hidden.bs.modal', function() {
+                FileManager.state.currentFolder = '';
+            });
+        }
+    }
 
     // File upload handling
     document.getElementById('file_url_media')?.addEventListener('change', function() {

@@ -13,6 +13,7 @@ use Modules\Subscriptions\Models\Plan;
 use Modules\Video\Models\VideoStreamContentMapping;
 use App\Models\Clip;
 use Modules\Video\Services\VideoService;
+use Modules\Partner\Models\Partner;
 use App\Services\ChatGTPService;
 use Modules\Entertainment\Models\Subtitle;
 use Illuminate\Support\Facades\Storage;
@@ -141,7 +142,8 @@ class VideosController extends Controller
         $mediaUrls = getMediaUrls();
         $assets = ['textarea'];
         $page_type='video';
-        return view('video::backend.video.create', compact('subtitle_language','upload_url_type','assets', 'plan', 'video_quality', 'module_title', 'mediaUrls', 'movie_language','download_url_type','page_type'));
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('video::backend.video.create', compact('subtitle_language','upload_url_type','assets', 'plan', 'video_quality', 'module_title', 'mediaUrls', 'movie_language','download_url_type','page_type', 'partners'));
     }
 
     public function store(VideoRequest $request)
@@ -471,6 +473,7 @@ class VideosController extends Controller
 
         $page_type='video';
 
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
         return view('video::backend.video.edit', compact(
             'data',
             'upload_url_type',
@@ -483,8 +486,7 @@ class VideosController extends Controller
             'seo',
             'clips',
             'download_url_type',
-            'page_type'
-        ));
+            'page_type', 'partners'));
     }
 
     /**
@@ -909,6 +911,10 @@ class VideosController extends Controller
     public function storeDownloads(Request $request, int $id)    
     {
         $data = $request->all();
+        if ($request->filled('partner_id')) {
+            $data['partner_id'] = $request->partner_id;
+            $data['approval_status'] = 'pending';
+        }
         $this->videoService->storeDownloads($data, $id);
         $message = trans('messages.set_download_url_video');
 

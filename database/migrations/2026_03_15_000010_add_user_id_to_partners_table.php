@@ -8,10 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('partners') && !Schema::hasColumn('partners', 'user_id')) {
         Schema::table('partners', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->nullable()->unique()->after('id');
             $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
         });
+        }
     }
 
     public function down(): void

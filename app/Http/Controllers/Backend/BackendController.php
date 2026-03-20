@@ -193,7 +193,7 @@ class BackendController extends Controller
 
 
 
-        $diskType = env('ACTIVE_STORAGE', 'local');
+        $diskType = config('filesystems.active', 'local');
         if ($diskType == 'local') {
             // Use local storage disk
             $totalUsageInBytes = $this->getTotalStorageUsage($diskType);

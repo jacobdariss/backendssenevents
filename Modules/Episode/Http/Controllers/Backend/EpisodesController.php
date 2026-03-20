@@ -20,6 +20,7 @@ use Modules\Entertainment\Models\Subtitle;
 use Illuminate\Support\Facades\Storage;
 use Modules\NotificationTemplate\Jobs\SendBulkNotification;
 use Illuminate\Support\Facades\DB;
+use Modules\Partner\Models\Partner;
 
 class EpisodesController extends Controller
 {
@@ -119,9 +120,11 @@ class EpisodesController extends Controller
         $export_url = route('backend.episodes.export');
 
 
-        $tvshows = Entertainment::where('type','tvshow')->get();
+        $tvshows = Entertainment::where('type','tvshow')
+            ->where(function($q) { $q->where('status', 1)->orWhereNotNull('partner_id'); })
+            ->with('partner')->orderBy('name')->get();
 
-        $seasons=Season::where('status', 1)->get();
+        $seasons = Season::orderBy('id', 'desc')->get();
 
         $plan=Plan::where('status',1)->get();
 
@@ -164,8 +167,15 @@ class EpisodesController extends Controller
             return [$number => $number];
         });
         $video_quality = Constant::where('type', 'video_quality')->where('status', 1)->get();
-        $tvshows = Entertainment::Where('type', 'tvshow')->where('status', 1)->orderBy('id', 'desc')->get();
-        $seasons = Season::where('status', 1)->orderBy('id', 'desc')->get();
+        // Inclure les séries partenaires (status=0 pending) pour que l'admin puisse les assigner
+        $tvshows = Entertainment::where('type', 'tvshow')
+            ->where(function($q) {
+                $q->where('status', 1)
+                  ->orWhereNotNull('partner_id'); // séries partenaires même non encore approuvées
+            })
+            ->with('partner')
+            ->orderBy('name')->get();
+        $seasons = Season::orderBy('id', 'desc')->get(); // toutes les saisons visibles admin
         $movie_language = Constant::where('type', 'language')->where('status', 1)->get();
         $subtitle_language = Constant::where('type', 'subtitle_language')->where('status', 1)->get();
 
@@ -184,6 +194,7 @@ class EpisodesController extends Controller
         $mediaUrls = getMediaUrls();
         $page_type='episode';
 
+        $partners = Partner::where('status', 1)->orderBy('name')->get();
         return view('episode::backend.episode.create', compact(
             'upload_url_type',
             'assets',
@@ -198,14 +209,26 @@ class EpisodesController extends Controller
             'movie_language',
             'subtitle_language',
             'download_url_type',
-            'page_type'
-        ));
+            'page_type', 'partners'));
     }
 
    public function store(EpisodeRequest $request)
 {
     // Get all request data
     $data = $request->all();
+        // Attribution partenaire
+        // Partner fields — only set if columns exist in DB
+        if (\Schema::hasColumn('episodes', 'partner_id')) {
+            $data['partner_id'] = $request->filled('partner_id') ? $request->partner_id : null;
+        } else {
+            unset($data['partner_id']);
+        }
+        if (\Schema::hasColumn('episodes', 'approval_status')) {
+            $data['approval_status'] = $request->filled('partner_id') ? 'pending' : null;
+        } else {
+            unset($data['approval_status']);
+        }
+
 
 
     // Handle pay-per-view logic
@@ -449,8 +472,15 @@ class EpisodesController extends Controller
     $assets = ['textarea'];
     $video_quality = Constant::where('type', 'video_quality')->where('status', 1)->get();
     $subtitle_language = Constant::where('type', 'subtitle_language')->where('status', 1)->get();  // Avoid duplicate call
-    $tvshows = Entertainment::Where('type', 'tvshow')->where('status', 1)->orderBy('id', 'desc')->get();
-    $seasons = Season::where('status', 1)->orderBy('id', 'desc')->get();
+    // Inclure les séries partenaires (status=0 pending) pour que l'admin puisse les modifier
+    $tvshows = Entertainment::where('type', 'tvshow')
+        ->where(function($q) {
+            $q->where('status', 1)
+              ->orWhereNotNull('partner_id');
+        })
+        ->with('partner')
+        ->orderBy('name')->get();
+    $seasons = Season::orderBy('id', 'desc')->get(); // toutes les saisons visibles admin
     $movie_language = Constant::where('type', 'language')->where('status', 1)->get();
     $module_title = __('episode.edit_title');
     $mediaUrls = getMediaUrls();
@@ -470,7 +500,8 @@ class EpisodesController extends Controller
     ];
 
     // Return the edit view with necessary data
-    return view('episode::backend.episode.edit', compact(
+    $partners = Partner::where('status', 1)->orderBy('name')->get();
+        return view('episode::backend.episode.edit', compact(
         'data',
         'tmdb_id',  // Pass tmdb_id to the view
         'upload_url_type',
@@ -486,8 +517,7 @@ class EpisodesController extends Controller
         'mediaUrls',
         'seo',
         'download_url_type',
-        'page_type'
-    ));
+        'page_type', 'partners'));
 }
 
 
@@ -597,6 +627,14 @@ public function update(EpisodeRequest $request, int $id)
     // Clear plan_id if access is free
     if ($requestData['access'] === 'free') {
         $requestData['plan_id'] = null;
+    }
+
+    // Guard partner fields — only include if columns exist in DB
+    if (!\Schema::hasColumn('episodes', 'partner_id')) {
+        unset($requestData['partner_id']);
+    }
+    if (!\Schema::hasColumn('episodes', 'approval_status')) {
+        unset($requestData['approval_status']);
     }
 
     // Update the episode

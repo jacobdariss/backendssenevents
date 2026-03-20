@@ -5,6 +5,8 @@ namespace Modules\Partner\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use App\Models\AuditLog;
 use Modules\Partner\Http\Requests\PartnerRequest;
 use Modules\Partner\Services\PartnerService;
 use Modules\Partner\Models\Partner;
@@ -87,6 +89,7 @@ class PartnerController extends Controller
                 'password'   => Hash::make($request->account_password),
                 'user_type'  => 'partner',
             ]);
+            \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'partner', 'guard_name' => 'web'], ['title' => 'Partner', 'is_fixed' => true]);
             $user->assignRole('partner');
             $data['user_id'] = $user->id;
         }
@@ -99,7 +102,12 @@ class PartnerController extends Controller
 
     public function show(int $id)
     {
-        return redirect()->route('backend.partners.edit', $id);
+        $partner     = $this->partnerService->getPartnerById($id);
+        $stats       = $this->partnerService->getVideoStats($id);
+        $module_title = __('partner::partner.lbl_partner');
+        $module_action = 'Show';
+
+        return view('partner::backend.partner.show', compact('partner', 'stats', 'module_title', 'module_action'));
     }
 
     public function edit(int $id)
@@ -120,6 +128,30 @@ class PartnerController extends Controller
 
         $data['allowed_content_types'] = $request->input('content_types', []);
 
+        // Gestion upload contrat
+        if ($request->hasFile('contract_file') && $request->file('contract_file')->isValid()) {
+            $file = $request->file('contract_file');
+
+            // Validation MIME réelle (contenu binaire, pas juste l'extension)
+            $allowedMimes = ['application/pdf', 'application/msword',
+                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!in_array($file->getMimeType(), $allowedMimes)) {
+                return redirect()->back()->withErrors(['contract_file' => __('partner::partner.contract_invalid_type')]);
+            }
+            if ($file->getSize() > 10 * 1024 * 1024) { // 10 Mo max
+                return redirect()->back()->withErrors(['contract_file' => __('partner::partner.contract_too_large')]);
+            }
+
+            // Nom sécurisé sans utiliser le nom original client
+            $ext      = ['application/pdf' => 'pdf', 'application/msword' => 'doc',
+                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'][$file->getMimeType()] ?? 'bin';
+            $filename = 'contract_' . $id . '_' . time() . '.' . $ext;
+            $file->storeAs('public/partners/contracts', $filename);
+            $data['contract_url'] = 'partners/contracts/' . $filename;
+        } else {
+            unset($data['contract_file']);
+        }
+
         $partner = $this->partnerService->getPartnerById($id);
 
         // Create user account if partner doesn't have one and admin requests it
@@ -131,6 +163,7 @@ class PartnerController extends Controller
                 'password'   => Hash::make($request->account_password),
                 'user_type'  => 'partner',
             ]);
+            \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'partner', 'guard_name' => 'web'], ['title' => 'Partner', 'is_fixed' => true]);
             $user->assignRole('partner');
             $data['user_id'] = $user->id;
         }
@@ -141,9 +174,21 @@ class PartnerController extends Controller
         return redirect()->route('backend.partners.index')->with('success', $message);
     }
 
+    public function deleteContract(int $id)
+    {
+        $partner = $this->partnerService->getPartnerById($id);
+        if ($partner->contract_url) {
+            Storage::delete('public/' . $partner->contract_url);
+            $partner->update(['contract_url' => null, 'contract_status' => 'none', 'contract_signed_at' => null]);
+        }
+        return redirect()->back()->with('success', __('partner::partner.contract_deleted'));
+    }
+
     public function destroy(int $id)
     {
+        $partner = $this->partnerService->getPartnerById($id);
         $this->partnerService->deletePartner($id);
+        AuditLog::log('partner_deleted', $partner);
         $message = __('messages.delete_form', ['form' => __('partner.title')]);
         return response()->json(['message' => $message, 'status' => true], 200);
     }

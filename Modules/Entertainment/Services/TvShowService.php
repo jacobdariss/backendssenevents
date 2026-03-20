@@ -320,13 +320,30 @@ class TvShowService
 
         ->editColumn('updated_at', fn($data) =>formatUpdatedAt($data->updated_at))
             ->orderColumns(['id'], '-:column $1')
-            ->rawColumns(['action', 'status', 'check','thumbnail_url','is_restricted'])
+            
+        ->addColumn('partner_name', function ($data) {
+            if (!empty($data->partner_id) && $data->partner) {
+                return '<span class="badge bg-info text-white">' . e($data->partner->name) . '</span>';
+            }
+            return '<span class="text-muted">—</span>';
+        })
+        ->addColumn('approval_col', function ($data) {
+            if (empty($data->partner_id)) return '—';
+            $status = $data->approval_status ?? 'pending';
+            $map = [
+                'pending'  => '<span class="badge bg-warning text-dark">Pending</span>',
+                'approved' => '<span class="badge bg-success">Approved</span>',
+                'rejected' => '<span class="badge bg-danger">Rejected</span>',
+            ];
+            return $map[$status] ?? '—';
+        })
+        ->rawColumns(['action', 'status', 'check','thumbnail_url','is_restricted','partner_name','approval_col'])
             ->toJson();
     }
 
     public function getFilteredData(array $filter, string $type)
     {
-        $query = $this->entertainmentRepository->query();
+        $query = $this->entertainmentRepository->query()->with('partner');
 
         if($type!=null){
 
@@ -375,6 +392,15 @@ class TvShowService
 
         if (isset($filter['column_status'])) {
             $query->where('status', $filter['column_status']);
+        }
+
+        // Filtre par statut d'approbation partenaire
+        if (isset($filter['approval_status'])) {
+            if ($filter['approval_status'] === 'partner_only') {
+                $query->whereNotNull('partner_id');
+            } else {
+                $query->where('approval_status', $filter['approval_status']);
+            }
         }
 
         return $query;

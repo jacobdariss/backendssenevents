@@ -252,10 +252,11 @@ public function store(EntertainmentRequest $request)
 
         $page_type='movie';
 
+    $partners = \Modules\Partner\Models\Partner::where('status', 1)->orderBy('name')->get();
     return view('entertainment::backend.entertainment.edit', compact(
         'data', 'seo', 'tmdb_id', 'upload_url_type', 'plan', 'movie_language',
         'genres', 'numberOptions', 'actors', 'directors', 'countries',
-        'video_quality', 'mediaUrls', 'assets', 'module_title', 'subtitle_language', 'clips', 'download_url_type', 'page_type'
+        'video_quality', 'mediaUrls', 'assets', 'module_title', 'subtitle_language', 'clips', 'download_url_type', 'page_type', 'partners'
     ));
 }
 

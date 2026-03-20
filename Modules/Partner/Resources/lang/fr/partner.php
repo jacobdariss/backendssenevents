@@ -53,4 +53,109 @@ return [
     'content_approved'         => 'Contenu approuvé avec succès.',
     'content_rejected'         => 'Contenu rejeté.',
     'no_content_to_validate'   => 'Aucun contenu à afficher pour les filtres sélectionnés.',
+    // Fiche & stats
+    'lbl_videos_count'    => 'Vidéos',
+    'lbl_videos_active'   => 'Vidéos actives',
+    'lbl_videos_inactive' => 'Vidéos inactives',
+    'lbl_movies_active'   => 'Films actifs',
+    'lbl_videos_total'    => 'Contenu total',
+
+    // Rejection
+    'rejection_reason'         => 'Motif de rejet',
+    'placeholder_rejection'    => 'Expliquez pourquoi ce contenu a été rejeté...',
+    'content_rejected_reason'  => 'Contenu rejeté avec motif.',
+
+    // Login
+    'login_title'      => 'Connexion Partenaire',
+    'login_subtitle'   => 'Connectez-vous pour gérer votre contenu.',
+    'no_account'       => 'Pas de compte ?',
+    'not_a_partner'    => 'Ce compte n\'est pas enregistré en tant que partenaire.',
+
+    // Gestion vidéo
+    'add_video'              => 'Ajouter une vidéo',
+    'edit_video'             => 'Modifier la vidéo',
+    'submit_for_validation'  => 'Soumettre pour validation',
+    'video_submitted'        => 'Vidéo soumise pour validation.',
+    'video_updated'          => 'Vidéo mise à jour et soumise pour validation.',
+
+    // Financier / PPV
+    'lbl_commission_rate'   => 'Commission plateforme',
+    'lbl_commission_help'   => 'Pourcentage retenu par la plateforme. Laisser vide pour définir plus tard.',
+    'ppv_price_info'        => 'Votre prix proposé sera examiné par l\'administrateur avant publication.',
+    'proposed_by_partner'   => 'Proposé par le partenaire',
+    'price_set_by_admin'    => 'Fixé par l\'admin',
+
+    'admin_price_review_info'    => 'Vous pouvez garder le prix proposé par le partenaire ou en définir un autre.',
+    'leave_blank_keep_proposed'   => 'Laisser vide pour garder le prix du partenaire',
+
+    'add_movie'    => 'Ajouter un film',
+    'edit_movie'   => 'Modifier le film',
+    'add_tvshow'   => 'Ajouter une série TV',
+    'edit_tvshow'  => 'Modifier la série TV',
+    'add_livetv'   => 'Ajouter une chaîne TV en direct',
+    'edit_livetv'  => 'Modifier la chaîne TV en direct',
+
+    // Saisons & Épisodes
+    'seasons'            => 'Saisons',
+    'episodes'           => 'Épisodes',
+    'add_season'         => 'Ajouter une saison',
+    'edit_season'        => 'Modifier la saison',
+    'add_episode'        => 'Ajouter un épisode',
+    'edit_episode'       => 'Modifier l\'épisode',
+    'season_created'     => 'Saison soumise pour validation.',
+    'season_updated'     => 'Saison mise à jour et soumise pour validation.',
+    'episode_created'    => 'Épisode soumis pour validation.',
+    'episode_updated'    => 'Épisode mis à jour et soumis pour validation.',
+    'lbl_season_number'  => 'Numéro de saison',
+    'lbl_episode_number' => 'Numéro d\'épisode',
+
+    // Flow guidé
+    'no_tvshow_yet'     => 'Aucune série TV pour le moment',
+    'tvshow_flow_desc'  => 'Pour ajouter des épisodes, vous devez d\'abord créer une série TV, puis une saison.',
+    'no_season_yet'     => 'Aucune saison pour le moment',
+    'season_flow_desc'  => 'Pour ajouter des épisodes, commencez par créer une saison pour cette série.',
+
+    // Validation images
+    'images_required_hint' => 'L\'affiche et l\'affiche TV sont obligatoires pour un bon affichage sur web et mobile.',
+    'image_required'        => 'Cette image est obligatoire.',
+
+    'preview_video' => 'Voir la vidéo',
+    // Contract
+    'contract_title' => 'Contrat & Accord',
+    'contract_hint' => 'Téléversez le contrat signé avec le partenaire (PDF, Word).',
+    'contract_status' => 'Statut du contrat',
+    'contract_none' => 'Aucun contrat',
+    'contract_pending' => 'En attente de signature',
+    'contract_signed' => 'Signé',
+    'contract_signed_at' => 'Date de signature',
+    'contract_file' => 'Fichier contrat',
+    'contract_formats' => 'Formats acceptés : PDF, DOC, DOCX (max 10 Mo)',
+    'contract_current' => 'Contrat actuel',
+    'contract_delete_confirm' => 'Supprimer ce contrat définitivement ?',
+    'contract_deleted' => 'Contrat supprimé.',
+
+    // Notifications
+    'notif_approved_subject' => 'Votre contenu ":name" a été approuvé',
+    'notif_rejected_subject' => 'Votre contenu ":name" a été refusé',
+    'notif_hello' => 'Bonjour :name,',
+    'notif_approved_line' => 'Votre contenu ":name" (:type) a été approuvé et est maintenant visible sur la plateforme.',
+    'notif_rejected_line' => 'Votre contenu ":name" (:type) a malheureusement été refusé.',
+    'notif_rejection_reason' => 'Motif de refus',
+    'notif_view_dashboard' => 'Voir mon tableau de bord',
+    'notifications' => 'Notifications',
+    'mark_all_read' => 'Tout marquer comme lu',
+    'no_notifications' => 'Aucune notification',
+
+    // Quota
+    'video_quota' => 'Quota de contenus',
+    'quota_unlimited' => 'Illimité',
+    'quota_videos' => 'contenus',
+    'quota_help' => 'Laissez vide pour illimité. Compte vidéos + films + séries + TV en direct.',
+    'quota_usage' => 'Utilisation du quota',
+    'quota_exceeded' => 'Quota atteint (:current/:max contenus). Supprimez du contenu ou contactez l\'administrateur.',
+    'quota_exceeded_warning' => 'Quota atteint ! Vous ne pouvez plus ajouter de contenu.',
+
+    'contract_invalid_type' => 'Type de fichier invalide. Seuls PDF, DOC et DOCX sont acceptés.',
+    'contract_too_large' => 'Le fichier est trop volumineux (maximum 10 Mo).',
+
 ];

@@ -155,7 +155,14 @@
                                     {{ html()->label(__('season.lbl_tv_shows') . ' <span class="text-danger">*</span>', 'type')->class('form-label') }}
                                     {{ html()->select(
                                             'entertainment_id',
-                                            $tvshows->pluck('name', 'id')->prepend(__('placeholder.lbl_select_tvshow'), ''),
+                                            $tvshows->mapWithKeys(function($t) {
+                                                $label = $t->name;
+                                                if ($t->partner_id) {
+                                                    $partnerName = $t->partner->name ?? 'Partenaire';
+                                                    $label .= ' [' . $partnerName . ']';
+                                                }
+                                                return [$t->id => $label];
+                                            })->prepend(__('placeholder.lbl_select_tvshow'), ''),
                                             old('entertainment_id'),
                                         )->class('form-control select2')->id('entertainment_id')->attribute('required', 'required') }}
                                     @error('entertainment_id')
@@ -190,6 +197,15 @@
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                     <div class="invalid-feedback" id="name-error">{{ __('messages.name_field_required') }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    {{ html()->label(__('partner::partner.lbl_partner'), 'partner_id')->class('form-label') }}
+                                    <select name="partner_id" id="partner_id" class="form-control select2">
+                                        <option value="">— {{ __('partner::partner.lbl_no_partner') }} —</option>
+                                        @foreach($partners as $p)
+                                            <option value="{{ $p->id }}" {{ old('partner_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     {{ html()->label(__('plan.lbl_status'), 'status')->class('form-label') }}

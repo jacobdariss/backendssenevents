@@ -146,14 +146,30 @@ class VideoService
                 $query->orderBy('status', $order);
             })
         ->editColumn('updated_at', fn($data) =>formatUpdatedAt($data->updated_at))
-        ->rawColumns(['action', 'status', 'check','poster_url','plan_id','access','is_restricted','like_count','watch_count'])
+        ->addColumn('partner_name', function ($data) {
+            if ($data->partner_id && $data->partner) {
+                return '<span class="badge bg-info text-white">' . e($data->partner->name) . '</span>';
+            }
+            return '<span class="text-muted">—</span>';
+        })
+        ->addColumn('approval_col', function ($data) {
+            if (!$data->partner_id) return '—';
+            $status = $data->approval_status ?? 'pending';
+            $badges = [
+                'pending'  => '<span class="badge bg-warning text-dark">Pending</span>',
+                'approved' => '<span class="badge bg-success">Approved</span>',
+                'rejected' => '<span class="badge bg-danger">Rejected</span>',
+            ];
+            return $badges[$status] ?? '—';
+        })
+        ->rawColumns(['action', 'status', 'check','poster_url','plan_id','access','is_restricted','like_count','watch_count','partner_name','approval_col'])
         ->orderColumns(['id'], '-:column $1')
         ->toJson();
     }
 
     public function getFilteredData($filter)
     {
-        $query = $this->videoRepository->query();
+        $query = $this->videoRepository->query()->with('partner');
 
         if (isset($filter['column_status'])) {
             $query->where('status', $filter['column_status']);

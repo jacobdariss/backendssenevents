@@ -321,6 +321,15 @@
                             <div class="invalid-feedback" id="name-error">{{ __('messages.plan_field_required') }}</div>
                         </div>
                         <div class="col-md-6 col-lg-4">
+                            {{ html()->label(__('partner::partner.lbl_partner'), 'partner_id')->class('form-label') }}
+                            <select name="partner_id" id="partner_id" class="form-control select2">
+                                <option value="">— {{ __('partner::partner.lbl_no_partner') }} —</option>
+                                @foreach($partners as $p)
+                                    <option value="{{ $p->id }}" {{ (old('partner_id', $data->partner_id ?? '') == $p->id) ? 'selected' : '' }}>{{ $p->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
                             {{ html()->label(__('plan.lbl_status'), 'status')->class('form-label') }}
                             <div class="d-flex justify-content-between align-items-center form-control">
                                 {{ html()->label(__('messages.active'), 'status')->class('form-label mb-0 text-body') }}

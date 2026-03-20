@@ -33,7 +33,8 @@
         'banner' => __('setting_mobile_page.banner'),
         'continue-watching' => __('setting_mobile_page.continue_watching'),
         'advertisement' => __('setting_mobile_page.advertisement'),
-        'rate-our-app' => __('setting_mobile_page.rate_our_app')
+        'rate-our-app' => __('setting_mobile_page.rate_our_app'),
+        'latest-videos' => __('setting_mobile_page.latest_videos'),
     ];
 
     $getDefaultSource = function($slug, $type) use ($sourceDescriptions) {
@@ -145,10 +146,25 @@
                                 <i class="ph ph-info info-icon"></i>
                             </span>
                         </div>
+                        @if($mobile_setting->slug === 'latest-videos')
+                            {{-- Champ nombre pour latest-videos — stocke un count, pas des IDs --}}
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number"
+                                    name="dashboard_select"
+                                    id="dashboard_select_{{ $mobile_setting->id }}"
+                                    class="form-control"
+                                    style="max-width: 120px"
+                                    min="1" max="50"
+                                    value="{{ old('dashboard_select', $mobile_setting->value ?? 10) }}"
+                                    placeholder="10" />
+                                <span class="text-muted small">{{ __('setting_mobile_page.latest_videos_count') }}</span>
+                            </div>
+                        @else
                         {{ html()->select('dashboard_select[]', old('dashboard_select'))->class('form-control
                         select2')->id('dashboard_select_' .
                         $mobile_setting->id)->multiple()->attribute('data-placeholder',
                         __('placeholder.lbl_select_value')) }}
+                        @endif
                         @error('dashboard_select')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror

@@ -126,6 +126,76 @@
     </style>
 
     <style>
+        /* ========== Centrage des sections homepage ========== */
+        .section-wraper {
+            padding-left: 6.25em;
+            padding-right: 6.25em;
+        }
+        .banner-section {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        @media (max-width: 1399.98px) {
+            .section-wraper { padding-left: 2rem; padding-right: 2rem; }
+        }
+        @media (max-width: 767.98px) {
+            .section-wraper { padding-left: 1rem; padding-right: 1rem; }
+        }
+
+        /* ========== Vignettes horizontales (HomepageBuilder) ========== */
+        .cards-horizontal .iq-card .block-images .image-box img {
+            aspect-ratio: 16/9 !important;
+            object-fit: cover;
+        }
+        /* Légendes moins hautes en horizontal */
+        .cards-horizontal .iq-card .block-images .card-description {
+            padding: .75rem 0;
+        }
+    </style>
+
+    <style>
+        /* ========== Centrage du contenu — marges horizontales ========== */
+
+        /* Conteneur principal : max-width + auto margins pour centrer */
+        .container-fluid,
+        .container-xl,
+        .container-xxl,
+        .container-lg {
+            max-width: 1920px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Bannière : reste pleine largeur, on centre uniquement son contenu interne */
+        #banner-section .container-fluid,
+        #banner-section .container-xl,
+        .main-banner .container-fluid,
+        .livetv-banner-wrapper .container-fluid {
+            max-width: 100%;
+        }
+
+        /* Sur très grands écrans (>1920px) : padding latéral plus généreux */
+        @media (min-width: 1921px) {
+            .container-fluid,
+            .container-xl,
+            .container-xxl {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+
+        /* Équilibrage du padding sur écrans intermédiaires */
+        @media (min-width: 1400px) and (max-width: 1920px) {
+            .container-fluid,
+            .container-xl,
+            .container-xxl {
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+        }
+    </style>
+
+    <style>
         /* ========== Full Page Loader Styles ========== */
         #page-loader {
             position: fixed;

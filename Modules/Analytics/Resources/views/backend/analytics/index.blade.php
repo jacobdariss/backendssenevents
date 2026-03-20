@@ -1,253 +1,435 @@
 @extends('backend.layouts.app')
+@section('title') Analytics @endsection
 
-@section('title')
-    {{ __('analytics::analytics.title') }}
-@endsection
+@push('after-styles')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+@endpush
 
 @section('content')
-<div class="container-fluid">
 
-    {{-- Header --}}
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-        <div>
-            <h4 class="mb-1"><i class="ph ph-chart-line me-2"></i>{{ __('analytics::analytics.title') }}</h4>
-            <small class="text-muted">{{ __('analytics::analytics.subtitle') }}</small>
-        </div>
-
-        {{-- Period filter --}}
-        <div class="d-flex gap-2">
-            @foreach([7 => __('analytics::analytics.last_7_days'), 30 => __('analytics::analytics.last_30_days'), 90 => __('analytics::analytics.last_90_days')] as $value => $label)
-                <a href="{{ route('backend.analytics.index', ['days' => $value]) }}"
-                   class="btn btn-sm {{ $days == $value ? 'btn-primary' : 'btn-dark' }}">
-                    {{ $label }}
-                </a>
-            @endforeach
-        </div>
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="GET" action="{{ route('backend.analytics.index') }}" class="d-flex gap-2 align-items-end">
+            <div>
+                <label class="form-label mb-1 small">{{ __('analytics::analytics.period') }}</label>
+                <select name="period" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="7d"    {{ $period=='7d'    ?'selected':'' }}>{{ __('analytics::analytics.last_7_days') }}</option>
+                    <option value="30d"   {{ $period=='30d'   ?'selected':'' }}>{{ __('analytics::analytics.last_30_days') }}</option>
+                    <option value="month" {{ $period=='month' ?'selected':'' }}>{{ __('analytics::analytics.this_month') }}</option>
+                    <option value="all"   {{ $period=='all'   ?'selected':'' }}>{{ __('analytics::analytics.all_time') }}</option>
+                </select>
+            </div>
+        </form>
+                    <a href="{{ route('backend.analytics.export', ['period' => $period]) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="ph ph-download-simple me-1"></i>Export CSV
+            </a>
     </div>
+</div>
 
-    {{-- KPI Cards --}}
-    <div class="row g-3 mb-4">
-        <div class="col-xl col-md-4 col-sm-6">
-            <div class="card card-stats h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">{{ __('analytics::analytics.views_period') }}</p>
-                            <h2 class="fw-bold mb-0">{{ number_format($totalViews) }}</h2>
-                        </div>
-                        <div class="avatar-50 d-flex align-items-center justify-content-center rounded bg-primary bg-opacity-10">
-                            <i class="ph ph-eye fs-4 text-primary"></i>
-                        </div>
+{{-- KPIs --}}
+<div class="row g-3 mb-4">
+    @php $kpis = [
+        ['label'=>__('analytics::analytics.total_views'),    'value'=>number_format($stats['total_views']),          'sub'=>'',                           'icon'=>'ph-eye',                    'color'=>'primary'],
+        ['label'=>__('analytics::analytics.watch_time'),     'value'=>$stats['watch_time']['hours'].'h',             'sub'=>number_format($stats['watch_time']['minutes']).' min', 'icon'=>'ph-clock',  'color'=>'success'],
+        ['label'=>__('analytics::analytics.ppv_revenue'),    'value'=>number_format($stats['ppv_revenue']['total'],0,',',' ').' FCFA', 'sub'=>$stats['ppv_revenue']['count'].' transactions', 'icon'=>'ph-currency-circle-dollar', 'color'=>'warning'],
+        ['label'=>__('analytics::analytics.unique_viewers'), 'value'=>number_format($stats['unique_viewers']),       'sub'=>$stats['partner_count'].' partenaires actifs', 'icon'=>'ph-users', 'color'=>'info'],
+    ]; @endphp
+    @foreach($kpis as $kpi)
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $kpi['label'] }}</p>
+                        <h3 class="mb-0 fw-bold">{{ $kpi['value'] }}</h3>
+                        @if($kpi['sub'])<small class="text-muted">{{ $kpi['sub'] }}</small>@endif
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl col-md-4 col-sm-6">
-            <div class="card card-stats h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">{{ __('analytics::analytics.views_alltime') }}</p>
-                            <h2 class="fw-bold mb-0">{{ number_format($totalViewsAllTime) }}</h2>
-                        </div>
-                        <div class="avatar-50 d-flex align-items-center justify-content-center rounded bg-success bg-opacity-10">
-                            <i class="ph ph-chart-bar fs-4 text-success"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl col-md-4 col-sm-6">
-            <div class="card card-stats h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">{{ __('analytics::analytics.unique_viewers') }}</p>
-                            <h2 class="fw-bold mb-0">{{ number_format($uniqueViewers) }}</h2>
-                        </div>
-                        <div class="avatar-50 d-flex align-items-center justify-content-center rounded bg-warning bg-opacity-10">
-                            <i class="ph ph-users fs-4 text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl col-md-4 col-sm-6">
-            <div class="card card-stats h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">{{ __('analytics::analytics.likes_period') }}</p>
-                            <h2 class="fw-bold mb-0">{{ number_format($totalLikes) }}</h2>
-                        </div>
-                        <div class="avatar-50 d-flex align-items-center justify-content-center rounded bg-danger bg-opacity-10">
-                            <i class="ph ph-heart fs-4 text-danger"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl col-md-4 col-sm-6">
-            <div class="card card-stats h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">{{ __('analytics::analytics.total_videos') }}</p>
-                            <h2 class="fw-bold mb-0">{{ number_format($totalVideos) }}</h2>
-                        </div>
-                        <div class="avatar-50 d-flex align-items-center justify-content-center rounded bg-info bg-opacity-10">
-                            <i class="ph ph-video-camera fs-4 text-info"></i>
-                        </div>
+                    <div class="bg-{{ $kpi['color'] }} bg-opacity-10 rounded p-2">
+                        <i class="ph {{ $kpi['icon'] }} text-{{ $kpi['color'] }} fs-4"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @endforeach
+</div>
 
-    {{-- Charts Row --}}
-    <div class="row g-3 mb-4">
-        {{-- Views over time --}}
-        <div class="col-xl-8">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h6 class="mb-0">{{ __('analytics::analytics.views_over_time') }}</h6>
-                </div>
-                <div class="card-body">
-                    <div id="chart-views-timeline"></div>
-                </div>
-            </div>
+{{-- Courbes --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-trend-up me-2"></i>{{ __('analytics::analytics.views_over_time') }}</h6></div>
+            <div class="card-body p-2" style="position:relative;height:200px"><canvas id="viewsChart"></canvas></div>
         </div>
-
-        {{-- Top 5 donut --}}
-        <div class="col-xl-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h6 class="mb-0">{{ __('analytics::analytics.top_videos_share') }}</h6>
-                </div>
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <div id="chart-top-donut" style="width:100%"></div>
-                </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-device-mobile me-2"></i>{{ __('analytics::analytics.by_device') }}</h6></div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                @if($byDevice->count())
+                    <canvas id="deviceChart" style="max-height:170px;max-width:170px"></canvas>
+                @else
+                    <p class="text-muted small">{{ __('messages.no_record_found') }}</p>
+                @endif
             </div>
         </div>
     </div>
+</div>
 
-    {{-- Top Videos Table --}}
-    <div class="card mb-4">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            <h6 class="mb-0">{{ __('analytics::analytics.top_videos') }}</h6>
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-currency-circle-dollar me-2"></i>{{ __('analytics::analytics.revenue_over_time') }}</h6></div>
+            <div class="card-body p-2" style="position:relative;height:200px"><canvas id="revenueChart"></canvas></div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('analytics::analytics.video') }}</th>
-                            <th>{{ __('analytics::analytics.views') }}</th>
-                            <th>{{ __('analytics::analytics.likes') }}</th>
-                            <th style="min-width:200px">{{ __('analytics::analytics.share') }}</th>
-                        </tr>
-                    </thead>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-desktop me-2"></i>{{ __('analytics::analytics.by_platform') }}</h6></div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                @if($byPlatform->count())
+                    <canvas id="platformChart" style="max-height:170px;max-width:170px"></canvas>
+                @else
+                    <p class="text-muted small">{{ __('messages.no_record_found') }}</p>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Top Contenus + Pays --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-trophy me-2"></i>{{ __('analytics::analytics.top_content') }}</h6></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>{{ __('messages.name') }}</th>
+                        <th>{{ __('messages.type') }}</th>
+                        <th class="text-end">{{ __('analytics::analytics.views') }}</th>
+                        <th class="text-end">Watch time</th>
+                    </tr></thead>
                     <tbody>
-                        @forelse($topVideos as $index => $video)
-                            @php $percent = $totalViews > 0 ? round(($video->views_count / $totalViews) * 100, 1) : 0; @endphp
-                            <tr>
-                                <td class="text-muted">{{ $index + 1 }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        @if($video->poster_url)
-                                            <img src="{{ $video->poster_url }}" alt="" width="40" height="55"
-                                                 class="rounded object-fit-cover" style="object-fit:cover">
-                                        @else
-                                            <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
-                                                 style="width:40px;height:55px">
-                                                <i class="ph ph-video-camera text-muted"></i>
-                                            </div>
-                                        @endif
-                                        <span class="fw-medium">{{ $video->name }}</span>
-                                    </div>
-                                </td>
-                                <td><span class="badge bg-primary-subtle text-primary px-3 py-2">{{ number_format($video->views_count) }}</span></td>
-                                <td><span class="badge bg-danger-subtle text-danger px-3 py-2"><i class="ph ph-heart me-1"></i>{{ number_format($video->likes_count) }}</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="progress flex-grow-1" style="height:6px">
-                                            <div class="progress-bar bg-primary" style="width:{{ $percent }}%"></div>
-                                        </div>
-                                        <small class="text-muted" style="min-width:35px">{{ $percent }}%</small>
-                                    </div>
-                                </td>
-                            </tr>
+                        @forelse($topContent as $row)
+                        <tr>
+                            <td>{{ $row->content_name }}</td>
+                            <td><span class="badge bg-secondary">{{ $row->content_type ?? '—' }}</span></td>
+                            <td class="text-end fw-bold">{{ number_format($row->views) }}</td>
+                            <td class="text-end text-muted small">{{ round(($row->watch_time??0)/60) }} min</td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    {{ __('analytics::analytics.no_data') }}
-                                </td>
-                            </tr>
+                        <tr><td colspan="4" class="text-center text-muted py-4">{{ __('messages.no_record_found') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-credit-card me-2"></i>{{ __('analytics::analytics.payment_gateways') }}</h6></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>Gateway</th>
+                        <th class="text-end">{{ __('analytics::analytics.transactions') }}</th>
+                        <th class="text-end">Revenus</th>
+                    </tr></thead>
+                    <tbody>
+                        @php $totalRev = $gatewayStats->sum('revenue') ?: 1; @endphp
+                        @forelse($gatewayStats as $row)
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary text-uppercase">{{ $row['gateway'] }}</span>
+                            </td>
+                            <td class="text-end fw-bold">{{ number_format($row['transactions']) }}</td>
+                            <td class="text-end">
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <div class="progress flex-grow-1" style="height:6px;max-width:60px">
+                                        <div class="progress-bar bg-warning" style="width:{{ round($row['revenue']/$totalRev*100) }}%"></div>
+                                    </div>
+                                    <span class="small text-muted">{{ number_format($row['revenue'],0,',',' ') }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="3" class="text-center text-muted py-3">{{ __('messages.no_record_found') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+{{-- Partenaires --}}
+@if($partners->count())
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="ph ph-handshake me-2"></i>{{ __('analytics::analytics.partners') }}</h6></div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr>
+                <th>{{ __('partner::partner.title') }}</th>
+                <th class="text-end">{{ __('analytics::analytics.views') }}</th>
+                <th class="text-end">Watch time</th>
+                <th class="text-end">{{ __('messages.action') }}</th>
+            </tr></thead>
+            <tbody>
+                @foreach($partners as $p)
+                @php
+                    $pViews = $partnerViewStats[$p->id]->views ?? 0;
+                    $pTime  = $partnerViewStats[$p->id]->watch_time ?? 0;
+                @endphp
+                <tr>
+                    <td><strong>{{ $p->name }}</strong></td>
+                    <td class="text-end">{{ number_format($pViews) }}</td>
+                    <td class="text-end text-muted small">{{ round($pTime/60) }} min</td>
+                    <td class="text-end">
+                        <a href="{{ route('backend.analytics.partner', [$p->id, 'period'=>$period]) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="ph ph-chart-bar me-1"></i>{{ __('analytics::analytics.see_details') }}
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
+{{-- Lien Finance --}}
+<div class="alert alert-info d-flex align-items-center gap-3 mb-4">
+    <i class="ph ph-currency-circle-dollar fs-4"></i>
+    <div>
+        <strong>{{ __('analytics::analytics.finance_title') }}</strong> —
+        {{ __('analytics::analytics.finance_hint') }}
+        <a href="{{ route('backend.finance.index', ['period' => $period]) }}" class="btn btn-sm btn-primary ms-3">
+            <i class="ph ph-arrow-right me-1"></i>{{ __('analytics::analytics.see_finance') }}
+        </a>
+    </div>
+</div>
+
+{{-- Notations & Commentaires --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-star me-2"></i>{{ __('analytics::analytics.ratings') }}</h6></div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="display-5 fw-bold text-warning">{{ $ratingsStats['average'] }}</div>
+                    <div class="text-muted small">/ 5 — {{ number_format($ratingsStats['total']) }} {{ __('analytics::analytics.reviews') }}</div>
+                    <div class="mt-1">
+                        @for($i=1;$i<=5;$i++)
+                        <i class="ph {{ $i <= round($ratingsStats['average']) ? 'ph-star-fill text-warning' : 'ph-star text-muted' }}"></i>
+                        @endfor
+                    </div>
+                </div>
+                @foreach([5,4,3,2,1] as $star)
+                @php $pct = $ratingsStats['total'] > 0 ? round($ratingsStats['distribution'][$star] / $ratingsStats['total'] * 100) : 0; @endphp
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="small text-muted" style="width:20px">{{ $star }}★</span>
+                    <div class="progress flex-grow-1" style="height:6px">
+                        <div class="progress-bar bg-warning" style="width:{{ $pct }}%"></div>
+                    </div>
+                    <span class="small text-muted" style="width:30px">{{ $pct }}%</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-trophy me-2"></i>{{ __('analytics::analytics.top_rated') }}</h6></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>{{ __('messages.name') }}</th>
+                        <th class="text-end">Note</th>
+                        <th class="text-end">Avis</th>
+                    </tr></thead>
+                    <tbody>
+                        @forelse($topRated as $row)
+                        <tr>
+                            <td class="small">{{ $row->content_name }}</td>
+                            <td class="text-end">
+                                <span class="badge bg-warning text-dark">★ {{ number_format($row->avg_rating, 1) }}</span>
+                            </td>
+                            <td class="text-end text-muted small">{{ $row->review_count }}</td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="3" class="text-center text-muted py-3 small">{{ __('messages.no_record_found') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-chat-dots me-2"></i>{{ __('analytics::analytics.recent_comments') }}</h6></div>
+            <div class="card-body p-0" style="max-height:320px;overflow-y:auto">
+                @forelse($recentComments as $comment)
+                <div class="p-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="small fw-semibold">{{ $comment->entertainment?->name ?? '—' }}</span>
+                        <span class="badge bg-warning text-dark ms-2 flex-shrink-0">★ {{ $comment->rating }}</span>
+                    </div>
+                    <p class="small text-muted mb-1">{{ Str::limit($comment->review, 100) }}</p>
+                    <span class="text-muted" style="font-size:11px">{{ $comment->created_at?->diffForHumans() }}</span>
+                </div>
+                @empty
+                <div class="text-center text-muted py-4 small">{{ __('messages.no_record_found') }}</div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Likes / Dislikes --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-thumbs-up me-2"></i>{{ __('analytics::analytics.likes_dislikes') }}</h6></div>
+            <div class="card-body">
+                <div class="d-flex justify-content-around text-center mb-3">
+                    <div>
+                        <div class="fs-3 fw-bold text-success">{{ number_format($likesStats['likes']) }}</div>
+                        <div class="text-muted small"><i class="ph ph-thumbs-up me-1"></i>{{ __('analytics::analytics.likes') }}</div>
+                    </div>
+                    <div class="border-end"></div>
+                    <div>
+                        <div class="fs-3 fw-bold text-danger">{{ number_format($likesStats['dislikes']) }}</div>
+                        <div class="text-muted small"><i class="ph ph-thumbs-down me-1"></i>{{ __('analytics::analytics.dislikes') }}</div>
+                    </div>
+                    <div class="border-end"></div>
+                    <div>
+                        <div class="fs-3 fw-bold text-primary">{{ $likesStats['like_rate'] }}%</div>
+                        <div class="text-muted small">{{ __('analytics::analytics.like_rate') }}</div>
+                    </div>
+                </div>
+                <div class="progress" style="height:8px">
+                    <div class="progress-bar bg-success" style="width:{{ $likesStats['like_rate'] }}%"></div>
+                    <div class="progress-bar bg-danger" style="width:{{ 100 - $likesStats['like_rate'] }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-trend-up me-2"></i>{{ __('analytics::analytics.likes_over_time') }}</h6></div>
+            <div class="card-body"><canvas id="likesChart" height="90"></canvas></div>
+        </div>
+    </div>
+</div>
+
+{{-- Top contenus likés --}}
+<div class="card mb-4">
+    <div class="card-header"><h6 class="mb-0"><i class="ph ph-heart me-2"></i>{{ __('analytics::analytics.top_liked') }}</h6></div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr>
+                <th>{{ __('messages.name') }}</th>
+                <th class="text-end text-success"><i class="ph ph-thumbs-up"></i></th>
+                <th class="text-end text-danger"><i class="ph ph-thumbs-down"></i></th>
+                <th class="text-end">{{ __('analytics::analytics.like_rate') }}</th>
+            </tr></thead>
+            <tbody>
+                @forelse($topLiked as $row)
+                @php $total = $row->likes + $row->dislikes ?: 1; @endphp
+                <tr>
+                    <td>{{ $row->content_name }}</td>
+                    <td class="text-end fw-bold text-success">{{ number_format($row->likes) }}</td>
+                    <td class="text-end text-danger">{{ number_format($row->dislikes) }}</td>
+                    <td class="text-end">
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <div class="progress flex-grow-1" style="height:6px;max-width:80px">
+                                <div class="progress-bar bg-success" style="width:{{ round($row->likes/$total*100) }}%"></div>
+                            </div>
+                            <span class="small">{{ round($row->likes/$total*100) }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="4" class="text-center text-muted py-4">{{ __('messages.no_record_found') }}</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
 @endsection
 
 @push('after-scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const days = {{ $days }};
-    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-    const textColor = isDark ? '#adb5bd' : '#6c757d';
-    const gridColor = isDark ? '#343a40' : '#e9ecef';
+const C = ['#e63757','#00d4ff','#00b69b','#fd7e14','#6f42c1','#20c997','#0dcaf0','#ffc107'];
+const chartDefaults = { responsive: true, plugins: { legend: { display: false } } };
 
-    // ── Timeline chart ────────────────────────────────────────────
-    fetch(`{{ route('backend.analytics.chart_data') }}?days=${days}`)
-        .then(r => r.json())
-        .then(({ labels, data }) => {
-            new ApexCharts(document.getElementById('chart-views-timeline'), {
-                chart: { type: 'area', height: 280, toolbar: { show: false }, zoom: { enabled: false } },
-                series: [{ name: "{{ __('analytics::analytics.views') }}", data }],
-                xaxis: { categories: labels, labels: { style: { colors: textColor } }, axisBorder: { show: false }, axisTicks: { show: false } },
-                yaxis: { labels: { style: { colors: textColor } } },
-                dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 2 },
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } },
-                colors: ['#0d6efd'],
-                grid: { borderColor: gridColor, strokeDashArray: 4 },
-                tooltip: { theme: isDark ? 'dark' : 'light' },
-            }).render();
-        });
-
-    // ── Donut chart (top 5) ───────────────────────────────────────
-    fetch(`{{ route('backend.analytics.top_videos') }}?days=${days}`)
-        .then(r => r.json())
-        .then(({ labels, data }) => {
-            const top5Labels = labels.slice(0, 5);
-            const top5Data   = data.slice(0, 5).map(Number);
-
-            if (top5Data.every(v => v === 0)) {
-                document.getElementById('chart-top-donut').innerHTML =
-                    '<p class="text-center text-muted py-5">{{ __("analytics::analytics.no_data") }}</p>';
-                return;
-            }
-
-            new ApexCharts(document.getElementById('chart-top-donut'), {
-                chart: { type: 'donut', height: 280 },
-                series: top5Data,
-                labels: top5Labels,
-                legend: { position: 'bottom', labels: { colors: textColor } },
-                dataLabels: { enabled: true, formatter: (val) => val.toFixed(1) + '%' },
-                tooltip: { theme: isDark ? 'dark' : 'light' },
-                plotOptions: { pie: { donut: { size: '65%' } } },
-            }).render();
-        });
+new Chart(document.getElementById('viewsChart'), {
+    type: 'line',
+    data: { labels: @json($viewsPerDay->pluck('date')), datasets: [{ label:'Vues', data: @json($viewsPerDay->pluck('views')), borderColor:'#e63757', backgroundColor:'rgba(230,55,87,0.1)', fill:true, tension:0.4 }] },
+    options: chartDefaults
 });
+
+new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: { labels: @json($revenuePerDay->pluck('date')), datasets: [{ label:'FCFA', data: @json($revenuePerDay->pluck('revenue')), backgroundColor:'rgba(0,182,155,0.7)' }] },
+    options: chartDefaults
+});
+
+@if($byDevice->count())
+new Chart(document.getElementById('deviceChart'), {
+    type: 'doughnut',
+    data: { labels: @json($byDevice->pluck('device_type')), datasets: [{ data: @json($byDevice->pluck('views')), backgroundColor: C }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+});
+@endif
+
+@if($byPlatform->count())
+new Chart(document.getElementById('platformChart'), {
+    type: 'doughnut',
+    data: { labels: @json($byPlatform->pluck('platform')), datasets: [{ data: @json($byPlatform->pluck('views')), backgroundColor: C }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+});
+@endif
+// Abonnements chart
+const subsData = @json($subsPerDay);
+if (document.getElementById('subsChart') && subsData.length) {
+    new Chart(document.getElementById('subsChart'), {
+        type: 'bar',
+        data: {
+            labels: subsData.map(d => d.date),
+            datasets: [
+                { label: 'Nouveaux abonnés', data: subsData.map(d => d.count), backgroundColor: 'rgba(99,102,241,0.7)', yAxisID: 'y' },
+                { label: 'Revenus (FCFA)', data: subsData.map(d => d.revenue), type:'line', borderColor:'#ffc107', backgroundColor:'transparent', yAxisID: 'y1', tension:0.4 }
+            ]
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom' } },
+            scales:{
+                y:{ beginAtZero:true, position:'left' },
+                y1:{ beginAtZero:true, position:'right', grid:{ drawOnChartArea:false } }
+            }
+        }
+    });
+}
+
+// Likes chart
+const likesData = @json($likesPerDay);
+if (document.getElementById('likesChart') && likesData.length) {
+    new Chart(document.getElementById('likesChart'), {
+        type: 'bar',
+        data: {
+            labels: likesData.map(d => d.date),
+            datasets: [
+                { label: 'Likes', data: likesData.map(d => d.likes), backgroundColor: 'rgba(25,135,84,0.7)' },
+                { label: 'Dislikes', data: likesData.map(d => d.dislikes), backgroundColor: 'rgba(220,53,69,0.7)' }
+            ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { x: { stacked: false }, y: { beginAtZero: true } } }
+    });
+}
+
 </script>
 @endpush

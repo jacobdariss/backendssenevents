@@ -43,14 +43,20 @@ fi
 echo -e "${YELLOW}🗄️  Migrations base de données...${NC}"
 php artisan migrate --force
 
-# 6. Vider les caches
+# 6. Vider les caches (optimize:clear d'abord pour éviter Class "view" does not exist)
 echo -e "${YELLOW}🔄 Vidage des caches...${NC}"
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
 # 7. Permissions storage
 chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
+chmod -R 777 storage/app/public
+# Créer les dossiers nécessaires
+mkdir -p storage/app/public/partners
+chmod -R 777 storage/app/public/partners
 
 echo -e "${GREEN}✅ Déploiement réussi ! Branche: $BRANCH${NC}"
 echo -e "${GREEN}   Commit: $(git log --oneline -1)${NC}"

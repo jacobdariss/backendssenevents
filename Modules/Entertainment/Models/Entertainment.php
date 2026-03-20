@@ -63,6 +63,7 @@ class Entertainment extends BaseModel
     'video_quality_url',
     'poster_tv_url',
     'price',
+    'partner_proposed_price',
     'purchase_type',
     'access_duration',
     'discount',
@@ -78,6 +79,9 @@ class Entertainment extends BaseModel
     'enable_clips',
     'bunny_video_url',
     'bunny_trailer_url',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
 ];
 
     protected $casts = [
@@ -470,6 +474,7 @@ class Entertainment extends BaseModel
             'video_url_input',
             'movie_access',
             'price',
+    'partner_proposed_price',
             'purchase_type',
             'access_duration',
             'discount',
@@ -538,6 +543,7 @@ class Entertainment extends BaseModel
             'video_url_input',
             'movie_access',
             'price',
+    'partner_proposed_price',
             'purchase_type',
             'access_duration',
             'discount',
@@ -791,6 +797,7 @@ class Entertainment extends BaseModel
             'video_url_input',
             'movie_access',
             'price',
+    'partner_proposed_price',
             'purchase_type',
             'access_duration',
             'discount',
@@ -906,6 +913,7 @@ class Entertainment extends BaseModel
         'video_url_input',
         'movie_access',
         'price',
+    'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',
@@ -1010,6 +1018,7 @@ public static function get_top_movie($topMovieIds)
         'language',
         'movie_access',
         'price',
+    'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',
@@ -1197,6 +1206,7 @@ public static function get_first_tvshow($tvshow_id, $user_id, $profile_id)
         'plan_id',
         'movie_access',
         'price',
+    'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',
@@ -1675,4 +1685,9 @@ public static function get_movie($movieId, $user_id, $profile_id, $device_id)
         return parent::save($options);
     }
 
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
+    }
 }

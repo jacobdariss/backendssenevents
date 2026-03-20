@@ -114,13 +114,30 @@ class SeasonService
                 ->editColumn('updated_at', fn($data) => formatUpdatedAt($data->updated_at))
                 ->orderColumn('updated_at', 'updated_at $1')
                 ->orderColumns(['id'], '-:column $1')
-            ->rawColumns(['action', 'status', 'check','poster_url','entertainment_id'])
+            
+        ->addColumn('partner_name', function ($data) {
+            if (!empty($data->partner_id) && $data->partner) {
+                return '<span class="badge bg-info text-white">' . e($data->partner->name) . '</span>';
+            }
+            return '<span class="text-muted">—</span>';
+        })
+        ->addColumn('approval_col', function ($data) {
+            if (empty($data->partner_id)) return '—';
+            $status = $data->approval_status ?? 'pending';
+            $map = [
+                'pending'  => '<span class="badge bg-warning text-dark">Pending</span>',
+                'approved' => '<span class="badge bg-success">Approved</span>',
+                'rejected' => '<span class="badge bg-danger">Rejected</span>',
+            ];
+            return $map[$status] ?? '—';
+        })
+            ->rawColumns(['action', 'status', 'check','poster_url','entertainment_id','partner_name','approval_col'])
             ->toJson();
     }
 
     public function getFilteredData(array $filter)
     {
-        $query = $this->seasonRepository->query();
+        $query = $this->seasonRepository->query()->with('partner');
 
          if (isset($filter['moive_name'])) {
               $query->where('name', 'like', '%' . $filter['moive_name'] . '%');

@@ -615,7 +615,14 @@ class EntertainmentService
     public function storeEntertainment(Request $request)
     {
         // Get all request data
-        $data = $request->all();
+$data = $request->all();
+        // Attribution partenaire
+        if (!empty($data['partner_id'])) {
+            $data['approval_status'] = 'pending';
+        } else {
+            $data['partner_id']      = null;
+            $data['approval_status'] = null;
+        }
 
         // Handle movie access and related options
         if (isset($data['movie_access']) && $data['movie_access'] == "pay-per-view") {

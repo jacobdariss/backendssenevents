@@ -47,6 +47,7 @@ class Video extends BaseModel
         'enable_download_quality',
         'poster_tv_url',
         'price',
+        'partner_proposed_price',
         'purchase_type',
         'access_duration',
         'discount',
@@ -67,6 +68,9 @@ class Video extends BaseModel
         'enable_clips',
         'bunny_trailer_url',
         'bunny_video_url',
+        'partner_id',
+        'approval_status',
+        'rejection_reason',
     ];
 
     protected $casts = [
@@ -212,7 +216,10 @@ class Video extends BaseModel
             ->with(['plan:id,level'])
             ->whereIn('id', $videoIdsArray)
             ->where('status', 1)
-            ->where('deleted_at', null);
+            ->where('deleted_at', null)
+            ->where(function($q) {
+                $q->whereNull('release_date')->orWhereDate('release_date', '<=', now());
+            });
 
             if (request()->has('is_restricted')) {
                 $query->where('is_restricted', request()->is_restricted);
@@ -265,7 +272,8 @@ class Video extends BaseModel
             'download_url', 'description', 'download_type', 'enable_quality',
             'download_status', 'enable_download_quality',
             'status', 'enable_subtitle', 'subtitle_language', 'is_default_subtitle',
-            'price', 'purchase_type', 'access_duration', 'discount', 'available_for',
+            'price',
+        'partner_proposed_price', 'purchase_type', 'access_duration', 'discount', 'available_for',
             'plan_id','bunny_video_url', 'enable_clips'
         ])
         ->with([
@@ -328,4 +336,9 @@ class Video extends BaseModel
         return $query;
     }
 
+
+    public function partner()
+    {
+        return $this->belongsTo(\Modules\Partner\Models\Partner::class, 'partner_id');
+    }
 }

@@ -8,29 +8,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('entertainments', function (Blueprint $table) {
-            $table->string('approval_status', 20)->default('approved')->after('status');
-        });
-
-        Schema::table('videos', function (Blueprint $table) {
-            $table->string('approval_status', 20)->default('approved')->after('status');
-        });
-
-        Schema::table('live_tv_channel', function (Blueprint $table) {
-            $table->string('approval_status', 20)->default('approved')->after('status');
-        });
+        foreach (['entertainments', 'videos', 'live_tv_channel'] as $table) {
+            if (Schema::hasTable($table) && !Schema::hasColumn($table, 'approval_status')) {
+                Schema::table($table, function (Blueprint $t) {
+                    $t->string('approval_status', 20)->default('approved')->after('status');
+                });
+            }
+        }
     }
 
     public function down(): void
     {
-        Schema::table('entertainments', function (Blueprint $table) {
-            $table->dropColumn('approval_status');
-        });
-        Schema::table('videos', function (Blueprint $table) {
-            $table->dropColumn('approval_status');
-        });
-        Schema::table('live_tv_channel', function (Blueprint $table) {
-            $table->dropColumn('approval_status');
-        });
+        foreach (['entertainments', 'videos', 'live_tv_channel'] as $table) {
+            if (Schema::hasTable($table) && Schema::hasColumn($table, 'approval_status')) {
+                Schema::table($table, function (Blueprint $t) {
+                    $t->dropColumn('approval_status');
+                });
+            }
+        }
     }
 };

@@ -648,7 +648,7 @@ protected function checkDeviceLimit(User $user, string $deviceId = null, bool $i
             $file = $request->file('file_url');
 
             $file = $this->stripExif($file);
-           $activeDisk = env('ACTIVE_STORAGE', 'local');
+           $activeDisk = config('filesystems.active', 'local');
 
            $filename = $file->getClientOriginalName();
 
@@ -661,7 +661,7 @@ protected function checkDeviceLimit(User $user, string $deviceId = null, bool $i
 
             $folderPath = 'streamit-laravel/' .  $filename ;
             Storage::disk( $activeDisk )->put($folderPath, file_get_contents($file));
-            $baseUrl = env('DO_SPACES_URL');
+            $baseUrl = config('filesystems.disks.spaces.url');
             $file_url = $baseUrl . '/' . $folderPath;
         }
 

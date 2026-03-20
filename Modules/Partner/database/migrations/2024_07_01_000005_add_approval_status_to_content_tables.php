@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::table('entertainments', function (Blueprint $table) {
             if (!Schema::hasColumn('entertainments', 'approval_status')) {
                 $table->enum('approval_status', ['pending', 'approved', 'rejected'])
-                    ->default('pending')
+                    ->default('approved')
                     ->after('partner_id');
             }
         });
@@ -19,7 +19,7 @@ return new class extends Migration
         Schema::table('videos', function (Blueprint $table) {
             if (!Schema::hasColumn('videos', 'approval_status')) {
                 $table->enum('approval_status', ['pending', 'approved', 'rejected'])
-                    ->default('pending')
+                    ->default('approved')
                     ->after('partner_id');
             }
         });
@@ -27,7 +27,7 @@ return new class extends Migration
         Schema::table('live_tv_channel', function (Blueprint $table) {
             if (!Schema::hasColumn('live_tv_channel', 'approval_status')) {
                 $table->enum('approval_status', ['pending', 'approved', 'rejected'])
-                    ->default('pending')
+                    ->default('approved')
                     ->after('partner_id');
             }
         });

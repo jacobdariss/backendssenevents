@@ -90,6 +90,7 @@ return [
     'details' => 'Détails du Divertissement',
     'continuewatch_notfound' => 'Continuation de visionnage non trouvée',
     'continuewatch_delete' => 'Suivi de lecture supprimé avec succès !',
+    'movies'  => 'Films',
     'tvshows' => 'Séries TV',
     'seasons' => 'Saisons',
     'episode' => 'Épisode',
