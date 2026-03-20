@@ -138,9 +138,11 @@ class AnalyticsServiceTest extends TestCase
         $perDay = $this->analytics->viewsPerDay($this->from, $this->to);
 
         $this->assertNotEmpty($perDay);
+        // Les objets Eloquent issus de raw queries ont les propriétés directement accessibles
         $firstEntry = $perDay->first();
-        $this->assertArrayHasKey('date',  (array) $firstEntry);
-        $this->assertArrayHasKey('views', (array) $firstEntry);
+        $this->assertNotNull($firstEntry);
+        $this->assertTrue(isset($firstEntry->date),  'La clé "date" est manquante');
+        $this->assertTrue(isset($firstEntry->views), 'La clé "views" est manquante');
     }
 
     /** @test */
@@ -156,8 +158,10 @@ class AnalyticsServiceTest extends TestCase
         $this->assertContains('mobile',  $deviceTypes);
         $this->assertContains('desktop', $deviceTypes);
 
-        $mobileViews = $byDevice->firstWhere('device_type', 'mobile');
-        $this->assertEquals(2, $mobileViews->total);
+        // La colonne s'appelle "views" (pas "total") dans viewsByDevice
+        $mobileEntry = $byDevice->firstWhere('device_type', 'mobile');
+        $this->assertNotNull($mobileEntry);
+        $this->assertEquals(2, $mobileEntry->views);
     }
 
     /** @test */
