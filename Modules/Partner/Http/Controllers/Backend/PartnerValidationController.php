@@ -66,7 +66,7 @@ class PartnerValidationController extends Controller
 
         if (in_array($type, ['all', 'tvshow'])) {
             $tvshows = Entertainment::with('partner')
-                ->where('type', 'tv_show')
+                ->where('type', 'tvshow')
                 ->where('approval_status', $status)
                 ->whereNotNull('partner_id')
                 ->latest()

@@ -394,6 +394,15 @@ class TvShowService
             $query->where('status', $filter['column_status']);
         }
 
+        // Filtre par statut d'approbation partenaire
+        if (isset($filter['approval_status'])) {
+            if ($filter['approval_status'] === 'partner_only') {
+                $query->whereNotNull('partner_id');
+            } else {
+                $query->where('approval_status', $filter['approval_status']);
+            }
+        }
+
         return $query;
     }
 

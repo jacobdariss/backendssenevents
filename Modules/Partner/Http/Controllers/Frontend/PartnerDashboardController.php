@@ -98,7 +98,7 @@ class PartnerDashboardController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $query = \Modules\Entertainment\Models\Entertainment::where('partner_id', $partner->id)
-            ->where('type', 'tv_show')->latest();
+            ->where('type', 'tvshow')->latest();
         $items = $query->paginate(20);
 
         return view('partner::frontend.content_list', compact('partner', 'items') + [

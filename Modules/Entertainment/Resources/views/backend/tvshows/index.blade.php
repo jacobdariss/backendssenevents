@@ -63,6 +63,18 @@
                         </select>
                     </div>
                 </div>
+                <div>
+                    <div class="datatable-filter">
+                        <select name="approval_status" id="approval_status" class="select2 form-control" data-filter="select"
+                            style="width: 100%">
+                            <option value="">{{ __('messages.all') }}</option>
+                            <option value="pending">⏳ En attente</option>
+                            <option value="approved">✅ Approuvé</option>
+                            <option value="rejected">❌ Rejeté</option>
+                            <option value="partner_only">Partenaires</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="input-group flex-nowrap">
                     <span class="input-group-text pe-0" id="addon-wrapping"><i
                             class="fa-solid fa-magnifying-glass"></i></span>

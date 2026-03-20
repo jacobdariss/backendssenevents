@@ -41,7 +41,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
 
         $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
         $partnerFolder = 'partners/' . $partner->id;
@@ -57,7 +57,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
 
         $request->validate([
             'name'          => 'required|string|max:255',
@@ -96,7 +96,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
         $season = Season::where('id', $seasonId)->where('partner_id', $partner->id)->firstOrFail();
 
         $season->poster_url    = $season->poster_url    ? setBaseUrlWithFileName($season->poster_url,    'image', 'season') : null;
@@ -116,7 +116,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
         $season = Season::where('id', $seasonId)->where('partner_id', $partner->id)->firstOrFail();
 
         $request->validate([
@@ -155,7 +155,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow  = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
         $seasons = Season::where('entertainment_id', $tvshowId)
             ->where('partner_id', $partner->id)->latest()->paginate(20);
 
@@ -174,7 +174,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
         $season = Season::where('id', $seasonId)->where('partner_id', $partner->id)->firstOrFail();
 
         $page_type     = 'partners/' . $partner->id; // uploads go to partners/{id}/image/
@@ -191,7 +191,7 @@ class PartnerSeasonEpisodeController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $tvshow = Entertainment::where('id', $tvshowId)
-            ->where('partner_id', $partner->id)->where('type', 'tv_show')->firstOrFail();
+            ->where('partner_id', $partner->id)->where('type', 'tvshow')->firstOrFail();
         $season = Season::where('id', $seasonId)->where('partner_id', $partner->id)->firstOrFail();
 
         $request->validate([

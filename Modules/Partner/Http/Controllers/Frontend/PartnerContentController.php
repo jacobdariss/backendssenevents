@@ -192,7 +192,7 @@ class PartnerContentController extends Controller
         ]);
 
         $data                    = $request->except(['_token']);
-        $data['type']            = 'tv_show';
+        $data['type']            = 'tvshow';
         $data['partner_id']      = $partner->id;
         $data['approval_status'] = 'pending';
         $data['status']          = 0;
@@ -223,7 +223,7 @@ class PartnerContentController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $item = Entertainment::where('id', $id)->where('partner_id', $partner->id)
-            ->where('type', 'tv_show')->firstOrFail();
+            ->where('type', 'tvshow')->firstOrFail();
 
         $item->thumbnail_url = $item->thumbnail_url ? setBaseUrlWithFileName($item->thumbnail_url, 'image', 'movie') : null;
         $item->poster_url    = $item->poster_url    ? setBaseUrlWithFileName($item->poster_url,    'image', 'movie') : null;
@@ -244,7 +244,7 @@ class PartnerContentController extends Controller
         if (!$partner) return redirect()->route('partner.dashboard');
 
         $item = Entertainment::where('id', $id)->where('partner_id', $partner->id)
-            ->where('type', 'tv_show')->firstOrFail();
+            ->where('type', 'tvshow')->firstOrFail();
 
         $request->validate([
             'name'         => 'required|string|max:255',
