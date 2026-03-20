@@ -74,14 +74,20 @@ try {
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = document.querySelector('meta[name="baseUrl"]').getAttribute('content');
 
+  // Lire les paramètres depuis window.playerSettings (injecté par thumbnail.blade.php)
+  const _ps = window.playerSettings || {};
+
   const player = videojs('videoPlayer', {
     techOrder: ['vimeo', 'youtube', 'html5', 'hls', 'embed'],
-    autoplay: false,
+    autoplay: _ps.autoplay === true ? 'muted' : false,
+    muted:    _ps.mutedOnLoad === true || _ps.autoplay === true,
     controls: true,
+    playbackRates: _ps.speedControl !== false ? [0.5, 0.75, 1, 1.25, 1.5, 2] : [],
     controlBar: {
       subsCapsButton: {
         textTrackSettings: false // Disable "captions settings"
-      }
+      },
+      playbackRateMenuButton: _ps.speedControl !== false,
     }
   });
 
