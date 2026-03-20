@@ -101,14 +101,8 @@ class FinanceServiceTest extends TestCase
         $response = $this->actingAs($user)
                          ->get('/app/finance/export?period=30d');
 
-        // Doit soit rediriger (302) soit retourner une page non-CSV
-        // En aucun cas retourner un fichier CSV à un non-admin
-        $contentType = $response->headers->get('Content-Type', '');
-        $this->assertStringNotContainsString(
-            'text/csv',
-            $contentType,
-            'Un utilisateur non-admin ne doit pas recevoir un export CSV'
-        );
+        // Doit retourner 403 (accès refusé) — jamais du CSV
+        $response->assertStatus(403);
     }
 
     /** @test */

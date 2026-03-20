@@ -19,6 +19,13 @@ class ExportController extends Controller
     {
         $this->analytics = $analytics;
         $this->finance   = $finance;
+        // Sécurité : seuls les admins peuvent exporter
+        $this->middleware(function ($request, $next) {
+            if (!auth()->check() || (!auth()->user()->hasRole('admin') && !auth()->user()->hasRole('super-admin'))) {
+                abort(403, 'Accès réservé aux administrateurs.');
+            }
+            return $next($request);
+        });
     }
 
     // ── Export Analytics ─────────────────────────────────────────────────────
