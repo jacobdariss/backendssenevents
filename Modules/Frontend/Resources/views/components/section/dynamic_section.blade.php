@@ -63,15 +63,27 @@
     @endif
 
 @elseif($type === 'entertainment' && $hasData)
-    @if(($ct === 'movie' && isenablemodule('movie') == 1) || ($ct === 'tvshow' && isenablemodule('tvshow') == 1) || empty($ct))
+    @php
+        $isEpisodeMode = isset($data['mode']) && $data['mode'] === 'episodes';
+    @endphp
+    @if(($ct === 'movie' && isenablemodule('movie') == 1) || ($ct === 'tvshow' && isenablemodule('tvshow') == 1) || empty($ct) || $isEpisodeMode)
     <div id="{{ $slug }}-section" class="section-wraper scroll-section section-hidden">
-        @include('frontend::components.section.entertainment', [
-            'data'        => $sectionData,
-            'title'       => $sectionName,
-            'type'        => $ct ?: 'movie',
-            'slug'        => str_replace('-', '_', $slug),
-            'orientation' => $orientation,
-        ])
+        @if($isEpisodeMode)
+            @include('frontend::components.section.episode_homepage', [
+                'data'        => $sectionData,
+                'title'       => $sectionName,
+                'slug'        => str_replace('-', '_', $slug),
+                'orientation' => $orientation,
+            ])
+        @else
+            @include('frontend::components.section.entertainment', [
+                'data'        => $sectionData,
+                'title'       => $sectionName,
+                'type'        => $ct ?: 'movie',
+                'slug'        => str_replace('-', '_', $slug),
+                'orientation' => $orientation,
+            ])
+        @endif
     </div>
     @endif
 

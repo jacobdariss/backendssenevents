@@ -138,6 +138,82 @@
                     @endif
                 </div>
             </div>
+
+            {{-- Panneau Saisons / Épisodes (affiché uniquement si type=entertainment & content_type=tvshow) --}}
+            <div class="card mt-3" id="episode-picker-card" style="display:none!important">
+                <div class="card-body">
+                    <h5 class="card-title mb-1">
+                        <i class="ph ph-film-strip me-1 text-primary"></i>Sélection Saisons / Épisodes
+                    </h5>
+                    <p class="text-muted small mb-3">
+                        Sélectionnez une série, puis des saisons pour filtrer les épisodes à afficher.
+                    </p>
+
+                    {{-- Étape 1 : Série --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">1. Série TV</label>
+                        <select id="ep_tvshow_select" class="form-select select2-tvshow" data-placeholder="Choisir une série...">
+                            <option value=""></option>
+                            @php
+                                $tvshowOptions = \Modules\Entertainment\Models\Entertainment::where('status',1)
+                                    ->where('type','tvshow')->whereNull('deleted_at')
+                                    ->orderBy('name')->get(['id','name']);
+                                $preselectedTvshow = $episodePickerData['tvshows'][0]['id'] ?? null;
+                            @endphp
+                            @foreach($tvshowOptions as $tvshow)
+                            <option value="{{ $tvshow->id }}" {{ $preselectedTvshow == $tvshow->id ? 'selected' : '' }}>
+                                {{ $tvshow->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Étape 2 : Saisons --}}
+                    <div class="mb-3" id="ep_seasons_wrap" style="{{ $episodePickerData ? '' : 'display:none' }}">
+                        <label class="form-label fw-semibold small">2. Saisons</label>
+                        <select id="ep_seasons_select" class="form-select select2-seasons" multiple
+                                data-placeholder="Sélectionner une ou plusieurs saisons...">
+                            @if($episodePickerData)
+                                @foreach($episodePickerData['seasons'] as $s)
+                                <option value="{{ $s['id'] }}" selected>{{ $s['name'] }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    {{-- Étape 3 : Épisodes --}}
+                    <div class="mb-3" id="ep_episodes_wrap" style="{{ $episodePickerData ? '' : 'display:none' }}">
+                        <label class="form-label fw-semibold small">3. Épisodes à afficher</label>
+                        <div id="ep_loading" class="text-center py-2" style="display:none">
+                            <div class="spinner-border spinner-border-sm text-primary"></div>
+                        </div>
+                        <select name="episode_ids[]" id="ep_episodes_select" class="form-select select2-episodes"
+                                multiple data-placeholder="Sélectionner les épisodes...">
+                            @if($episodePickerData)
+                                @foreach($episodePickerData['episodes'] as $ep)
+                                <option value="{{ $ep['id'] }}"
+                                    {{ in_array($ep['id'], $episodePickerData['episode_ids']) ? 'selected' : '' }}>
+                                    {{ $ep['name'] }}
+                                </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        @if($episodePickerData)
+                        <div class="mt-2">
+                            <small class="text-success">
+                                <i class="ph ph-check-circle me-1"></i>
+                                <span id="ep_count_label">{{ count($episodePickerData['episode_ids']) }} épisode(s) sélectionné(s)</span>
+                            </small>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="alert alert-info py-2 px-3 small mb-0" id="ep_hint">
+                        <i class="ph ph-info me-1"></i>
+                        Si aucun épisode n'est sélectionné, la section affichera les séries (comportement standard).
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -153,12 +229,42 @@
 @push('after-scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Rechargement des options contenu quand type ou content_type change
+
     const typeSelect    = document.getElementById('type');
     const ctypeSelect   = document.getElementById('content_type');
     const pickerWrap    = document.getElementById('content-picker-wrap');
+    const episodeCard   = document.getElementById('episode-picker-card');
     const noSelectTypes = ['banner', 'genre', 'personality', 'language', 'payperview', 'continue_watching'];
 
+    // ── Affichage conditionnel du panneau épisodes ──────────────────────────
+    function toggleEpisodePicker() {
+        const isEntertainment = typeSelect.value === 'entertainment';
+        const isTvshow        = ctypeSelect.value === 'tvshow';
+        if (isEntertainment && isTvshow) {
+            episodeCard.style.removeProperty('display');
+            episodeCard.style.display = '';
+            episodeCard.removeAttribute('style'); // retire le !important inline
+            episodeCard.classList.remove('d-none');
+        } else {
+            episodeCard.style.setProperty('display', 'none', 'important');
+            // Vider la sélection épisodes quand on quitte tvshow
+            const epSel = document.getElementById('ep_episodes_select');
+            if (epSel && window.$ && $.fn.select2) {
+                $(epSel).val([]).trigger('change');
+            }
+        }
+    }
+
+    // Init au chargement
+    @if($section && $section->type === 'entertainment' && $section->content_type === 'tvshow')
+        episodeCard.style.removeProperty('display');
+        episodeCard.classList.remove('d-none');
+    @endif
+
+    typeSelect.addEventListener('change', toggleEpisodePicker);
+    ctypeSelect.addEventListener('change', toggleEpisodePicker);
+
+    // ── Rechargement des options contenu quand type/content_type change ─────
     function refreshContentOptions() {
         const type        = typeSelect.value;
         const contentType = ctypeSelect.value;
@@ -184,8 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             html += '</select>';
             pickerWrap.innerHTML = html;
-
-            // Init Select2
             if (window.$ && $.fn.select2) {
                 $('#content_ids').select2({ placeholder: 'Chercher et sélectionner...', allowClear: true, width: '100%' });
             }
@@ -195,12 +299,12 @@ document.addEventListener('DOMContentLoaded', function() {
     typeSelect.addEventListener('change', refreshContentOptions);
     ctypeSelect.addEventListener('change', refreshContentOptions);
 
-    // Init Select2 initial si disponible
+    // Init Select2 initial
     if (window.$ && $.fn.select2) {
         $('#content_ids').select2({ placeholder: 'Chercher et sélectionner...', allowClear: true, width: '100%' });
     }
 
-    // Masquer orientation pour les types sans vignettes
+    // ── Orientation : masquer pour types sans vignettes ─────────────────────
     const noCardTypes = ['banner', 'genre', 'language', 'personality', 'continue_watching'];
     function toggleOrientationWrap() {
         const wrap = document.getElementById('orientation-wrap');
@@ -208,6 +312,108 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     toggleOrientationWrap();
     typeSelect.addEventListener('change', toggleOrientationWrap);
+
+    // ── Episode Picker : AJAX cascadant ──────────────────────────────────────
+    const tvshowSelect  = document.getElementById('ep_tvshow_select');
+    const seasonsWrap   = document.getElementById('ep_seasons_wrap');
+    const episodesWrap  = document.getElementById('ep_episodes_wrap');
+    const episodesSel   = document.getElementById('ep_episodes_select');
+    const seasonsSelect = document.getElementById('ep_seasons_select');
+    const epLoading     = document.getElementById('ep_loading');
+
+    function initEpisodeSelect2() {
+        if (!window.$ || !$.fn.select2) return;
+        if (tvshowSelect)  $(tvshowSelect).select2({ placeholder: 'Choisir une série...', allowClear: true, width: '100%' });
+        if (seasonsSelect) $(seasonsSelect).select2({ placeholder: 'Sélectionner une ou plusieurs saisons...', allowClear: true, width: '100%' });
+        if (episodesSel)   $(episodesSel).select2({ placeholder: 'Sélectionner les épisodes...', allowClear: true, width: '100%' });
+    }
+    initEpisodeSelect2();
+
+    // Tvshow change → charger les saisons
+    if (tvshowSelect) {
+        $(tvshowSelect).on('change', function() {
+            const tvshowId = this.value;
+            if (!tvshowId) {
+                seasonsWrap.style.display  = 'none';
+                episodesWrap.style.display = 'none';
+                return;
+            }
+            epLoading && (epLoading.style.display = '');
+            seasonsWrap.style.display = '';
+            fetch('{{ route("backend.homepage-builder.tvshow-seasons") }}?tvshow_id=' + tvshowId)
+            .then(r => r.json())
+            .then(seasons => {
+                epLoading && (epLoading.style.display = 'none');
+                if (!seasons.length) {
+                    seasonsWrap.style.display = 'none';
+                    return;
+                }
+                // Reconstruire le select saisons
+                $(seasonsSelect).empty();
+                seasons.forEach(s => {
+                    $(seasonsSelect).append(new Option(s.name, s.id));
+                });
+                $(seasonsSelect).trigger('change');
+            })
+            .catch(() => epLoading && (epLoading.style.display = 'none'));
+        });
+    }
+
+    // Saisons change → charger les épisodes
+    if (seasonsSelect) {
+        $(seasonsSelect).on('change', function() {
+            const seasonIds = $(this).val();
+            if (!seasonIds || !seasonIds.length) {
+                episodesWrap.style.display = 'none';
+                return;
+            }
+            epLoading && (epLoading.style.display = '');
+            const qs = seasonIds.map(id => 'season_ids[]=' + id).join('&');
+            fetch('{{ route("backend.homepage-builder.season-episodes") }}?' + qs)
+            .then(r => r.json())
+            .then(episodes => {
+                epLoading && (epLoading.style.display = 'none');
+                if (!episodes.length) {
+                    episodesWrap.style.display = 'none';
+                    return;
+                }
+                const currentVals = $(episodesSel).val() || [];
+                $(episodesSel).empty();
+                episodes.forEach(ep => {
+                    const isSelected = currentVals.includes(String(ep.id));
+                    $(episodesSel).append(new Option(ep.name, ep.id, isSelected, isSelected));
+                });
+                $(episodesSel).trigger('change');
+                episodesWrap.style.display = '';
+                updateEpCount();
+            })
+            .catch(() => epLoading && (epLoading.style.display = 'none'));
+        });
+    }
+
+    // Compteur épisodes sélectionnés
+    function updateEpCount() {
+        const label = document.getElementById('ep_count_label');
+        if (!label || !episodesSel) return;
+        const count = $(episodesSel).val()?.length || 0;
+        label.textContent = count + ' épisode(s) sélectionné(s)';
+        const parent = label.closest('.mt-2');
+        if (parent) parent.style.display = count > 0 ? '' : 'none';
+    }
+    if (episodesSel) {
+        $(episodesSel).on('change', updateEpCount);
+    }
+
+    // Init : si tvshow déjà sélectionné au chargement → déclencher le chargement des saisons
+    @if($episodePickerData && isset($episodePickerData['tvshows'][0]))
+    // Les saisons et épisodes sont déjà injectés côté serveur
+    // Juste mettre à jour le compteur
+    setTimeout(function() {
+        updateEpCount();
+        if (seasonsWrap) seasonsWrap.style.display = '';
+        if (episodesWrap) episodesWrap.style.display = '';
+    }, 300);
+    @endif
 });
 
 function setOrientation(value) {
@@ -236,5 +442,8 @@ function setOrientation(value) {
 .orientation-vertical .orientation-thumb { width: 20px; height: 30px; background: var(--bs-border-color); border-radius: 3px; }
 .orientation-horizontal .orientation-thumb { width: 36px; height: 20px; background: var(--bs-border-color); border-radius: 3px; }
 .orientation-card.active .orientation-thumb { background: var(--bs-primary); opacity: .6; }
+
+#episode-picker-card { border-left: 3px solid var(--bs-primary); }
+#episode-picker-card .card-title { font-size: .95rem; }
 </style>
 @endpush

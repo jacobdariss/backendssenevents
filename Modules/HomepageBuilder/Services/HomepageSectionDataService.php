@@ -9,6 +9,7 @@ use Modules\LiveTV\Models\LiveTvChannel;
 use Modules\Genres\Models\Genres;
 use Modules\CastCrew\Models\CastCrew;
 use Modules\Constant\Models\Constant;
+use Modules\Episode\Models\Episode;
 use Modules\Entertainment\Transformers\Backend\CommonContentResourceV3;
 use Modules\Video\Transformers\Backend\VideoResourceV3;
 use Modules\LiveTV\Transformers\Backend\LiveTvChannelResourceV3;
@@ -30,9 +31,16 @@ class HomepageSectionDataService
         // Si des IDs sont sélectionnés manuellement, on les utilise
         $manualIds = $section->content_ids ?? [];
 
+        // Pour les séries TV : si des épisodes sont sélectionnés, on charge directement les épisodes
+        $episodeIds = $section->episode_ids ?? [];
+
         switch ($section->type) {
 
             case 'entertainment':
+                // Si des épisodes sont sélectionnés manuellement → mode "épisodes"
+                if (!empty($episodeIds)) {
+                    return $this->loadEpisodes($episodeIds, $request);
+                }
                 return $this->loadEntertainment($ct, $limit, $sort, $manualIds, $request);
 
             case 'video':
@@ -57,6 +65,55 @@ class HomepageSectionDataService
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Charge des épisodes sélectionnés manuellement pour une section homepage.
+     * Retourne un tableau de données légères adaptées au slider frontend.
+     */
+    private function loadEpisodes(array $ids, Request $request): array
+    {
+        $episodes = Episode::whereIn('id', $ids)
+            ->where('status', 1)
+            ->with(['season:id,name,season_number,entertainment_id', 'entertainment:id,name,slug'])
+            ->get(['id', 'name', 'slug', 'poster_url', 'poster_tv_url', 'episode_number',
+                   'season_id', 'entertainment_id', 'duration', 'release_date',
+                   'access', 'purchase_type', 'plan_id', 'IMDb_rating']);
+
+        // Respecter l'ordre de sélection manuelle
+        $ordered = collect($ids)->map(fn($id) => $episodes->firstWhere('id', $id))->filter()->values();
+
+        $data = $ordered->map(function ($ep) {
+            $posterBase = config('app.url');
+            $poster = !empty($ep->poster_tv_url)
+                ? setBaseUrlWithFileName($ep->poster_tv_url, 'image', 'episodes')
+                : (!empty($ep->poster_url) ? setBaseUrlWithFileName($ep->poster_url, 'image', 'episodes') : null);
+
+            $seasonLabel = $ep->season
+                ? ($ep->season->name ?: 'Saison ' . $ep->season->season_number)
+                : '';
+
+            return [
+                'id'                => $ep->id,
+                'name'              => $ep->name,
+                'slug'              => $ep->slug,
+                'poster_image'      => $poster,
+                'episode_number'    => $ep->episode_number,
+                'season_label'      => $seasonLabel,
+                'entertainment_id'  => $ep->entertainment_id,
+                'show_name'         => $ep->entertainment ? $ep->entertainment->name : '',
+                'show_slug'         => $ep->entertainment ? $ep->entertainment->slug : '',
+                'duration'          => $ep->duration,
+                'release_date'      => $ep->release_date,
+                'access'            => $ep->access,
+                'imdb_rating'       => $ep->IMDb_rating,
+                'is_episode'        => true,
+            ];
+        })->toArray();
+
+        return ['data' => $data, 'mode' => 'episodes'];
+    }
 
     private function loadEntertainment(?string $ct, int $limit, string $sort, array $ids, Request $request): array
     {
