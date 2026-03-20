@@ -88,9 +88,12 @@ class HomepageSectionDataService
         $ordered = collect($ids)->map(fn($id) => $episodes->firstWhere('id', $id))->filter()->values();
 
         $data = $ordered->map(function ($ep) {
-            $poster = !empty($ep->poster_tv_url)
-                ? setBaseUrlWithFileName($ep->poster_tv_url, 'image', 'episodes')
-                : (!empty($ep->poster_url) ? setBaseUrlWithFileName($ep->poster_url, 'image', 'episodes') : null);
+            // Même logique que EpisodeResourceV3 : poster_url avec page_type 'episode'
+            $poster = !empty($ep->poster_url)
+                ? setBaseUrlWithFileName($ep->poster_url, 'image', 'episode')
+                : (!empty($ep->poster_tv_url)
+                    ? setBaseUrlWithFileName($ep->poster_tv_url, 'image', 'episode')
+                    : null);
 
             $seasonLabel = $ep->seasondata
                 ? (!empty(trim((string)$ep->seasondata->name))

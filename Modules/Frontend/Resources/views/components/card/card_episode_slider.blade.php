@@ -38,15 +38,7 @@
         </div>
 
         <div class="card-body p-2">
-            <h6 class="mb-0 text-truncate" title="{{ $value['name'] }}">
-                <a href="{{ $value['slug'] ? route('episode-details', ['id' => $value['slug']]) : '#' }}"
-                   class="text-white text-decoration-none">
-                    {{ $value['name'] }}
-                </a>
-            </h6>
-            @if(!empty($value['show_name']))
-                <small class="text-muted text-truncate d-block">{{ $value['show_name'] }}</small>
-            @endif
+            {{-- Badge épisode uniquement, sans titre répété --}}
         </div>
 
     </div>
