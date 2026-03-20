@@ -76,7 +76,10 @@ class HomepageSectionDataService
     {
         $episodes = Episode::whereIn('id', $ids)
             ->where('status', 1)
-            ->with(['season:id,name,season_number,entertainment_id', 'entertainment:id,name,slug'])
+            ->with([
+                'seasondata:id,name,season_number,entertainment_id',
+                'entertainmentdata:id,name,slug',
+            ])
             ->get(['id', 'name', 'slug', 'poster_url', 'poster_tv_url', 'episode_number',
                    'season_id', 'entertainment_id', 'duration', 'release_date',
                    'access', 'purchase_type', 'plan_id', 'IMDb_rating']);
@@ -85,30 +88,31 @@ class HomepageSectionDataService
         $ordered = collect($ids)->map(fn($id) => $episodes->firstWhere('id', $id))->filter()->values();
 
         $data = $ordered->map(function ($ep) {
-            $posterBase = config('app.url');
             $poster = !empty($ep->poster_tv_url)
                 ? setBaseUrlWithFileName($ep->poster_tv_url, 'image', 'episodes')
                 : (!empty($ep->poster_url) ? setBaseUrlWithFileName($ep->poster_url, 'image', 'episodes') : null);
 
-            $seasonLabel = $ep->season
-                ? ($ep->season->name ?: 'Saison ' . $ep->season->season_number)
+            $seasonLabel = $ep->seasondata
+                ? (!empty(trim((string)$ep->seasondata->name))
+                    ? $ep->seasondata->name
+                    : 'Saison ' . $ep->seasondata->season_number)
                 : '';
 
             return [
-                'id'                => $ep->id,
-                'name'              => $ep->name,
-                'slug'              => $ep->slug,
-                'poster_image'      => $poster,
-                'episode_number'    => $ep->episode_number,
-                'season_label'      => $seasonLabel,
-                'entertainment_id'  => $ep->entertainment_id,
-                'show_name'         => $ep->entertainment ? $ep->entertainment->name : '',
-                'show_slug'         => $ep->entertainment ? $ep->entertainment->slug : '',
-                'duration'          => $ep->duration,
-                'release_date'      => $ep->release_date,
-                'access'            => $ep->access,
-                'imdb_rating'       => $ep->IMDb_rating,
-                'is_episode'        => true,
+                'id'               => $ep->id,
+                'name'             => $ep->name,
+                'slug'             => $ep->slug,
+                'poster_image'     => $poster,
+                'episode_number'   => $ep->episode_number,
+                'season_label'     => $seasonLabel,
+                'entertainment_id' => $ep->entertainment_id,
+                'show_name'        => $ep->entertainmentdata ? $ep->entertainmentdata->name : '',
+                'show_slug'        => $ep->entertainmentdata ? $ep->entertainmentdata->slug : '',
+                'duration'         => $ep->duration,
+                'release_date'     => $ep->release_date,
+                'access'           => $ep->access,
+                'imdb_rating'      => $ep->IMDb_rating,
+                'is_episode'       => true,
             ];
         })->toArray();
 

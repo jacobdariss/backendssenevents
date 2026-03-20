@@ -244,7 +244,7 @@ class HomepageBuilderController extends Controller
 
         // Retrouver les épisodes sauvegardés
         $episodes = Episode::whereIn('id', $episodeIds)
-            ->with(['season:id,name,season_number,entertainment_id'])
+            ->with(['seasondata:id,name,season_number,entertainment_id'])
             ->get(['id', 'name', 'episode_number', 'season_id']);
 
         if ($episodes->isEmpty()) {
@@ -261,7 +261,7 @@ class HomepageBuilderController extends Controller
             'tvshows'    => $tvshows->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->toArray(),
             'seasons'    => $seasons->map(fn($s) => ['id' => $s->id, 'name' => $s->name ?: 'Saison ' . $s->season_number])->toArray(),
             'episodes'   => $episodes->map(function ($ep) {
-                $sName = $ep->season ? ($ep->season->name ?: 'Saison ' . $ep->season->season_number) : '';
+                $sName = $ep->seasondata ? (!empty(trim((string)$ep->seasondata->name)) ? $ep->seasondata->name : 'Saison ' . $ep->seasondata->season_number) : '';
                 return [
                     'id'   => $ep->id,
                     'name' => ($ep->episode_number ? 'Ep.' . $ep->episode_number . ' — ' : '') . $ep->name
