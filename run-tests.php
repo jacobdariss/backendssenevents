@@ -7,7 +7,7 @@
  */
 
 define('SECRET', 'sen2026tests');
-define('ROOT',   dirname(__DIR__));
+define('ROOT',   __DIR__);
 define('PHP',    '/opt/plesk/php/8.4/bin/php');
 define('ARTISAN', ROOT . '/artisan');
 
