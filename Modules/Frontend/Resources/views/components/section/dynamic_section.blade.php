@@ -127,8 +127,9 @@
 @elseif($type === 'payperview' && $hasData)
     <div id="{{ $slug }}-section" class="section-wraper scroll-section section-hidden">
         @include('frontend::components.section.payperview', [
-            'data'  => $sectionData,
-            'title' => $sectionName,
+            'data'        => $sectionData,
+            'title'       => $sectionName,
+            'orientation' => $orientation,
         ])
     </div>
 @endif
