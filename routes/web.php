@@ -41,6 +41,13 @@ Route::get('/dev-run-tests', function () {
         abort(403, 'Token invalide');
     }
 
+    $php = '/opt/plesk/php/8.4/bin/php';
+
+    // Auto-nettoyage du cache routes/views/config au premier appel
+    exec($php . ' ' . escapeshellarg(base_path('artisan')) . ' route:clear 2>&1');
+    exec($php . ' ' . escapeshellarg(base_path('artisan')) . ' view:clear 2>&1');
+    exec($php . ' ' . escapeshellarg(base_path('artisan')) . ' config:clear 2>&1');
+
     $suite  = request('suite', 'Feature');
     $filter = request('filter', '');
     $php     = '/opt/plesk/php/8.4/bin/php';
