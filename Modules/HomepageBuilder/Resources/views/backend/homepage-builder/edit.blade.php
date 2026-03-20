@@ -452,5 +452,46 @@ function setOrientation(value) {
 
 #episode-picker-card { border-left: 3px solid var(--bs-primary); }
 #episode-picker-card .card-title { font-size: .95rem; }
+
+/* ── Select2 tags : compact & soft ─────────────────────────────────────── */
+.select2-container--default .select2-selection--multiple {
+    background-color: var(--bs-body-bg, #1a1a2e);
+    border-color: var(--bs-border-color);
+    border-radius: 6px;
+    min-height: 38px;
+    padding: 2px 4px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: rgba(var(--bs-primary-rgb), 0.15) !important;
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.35) !important;
+    color: var(--bs-body-color) !important;
+    border-radius: 4px !important;
+    font-size: 0.75rem !important;
+    padding: 1px 22px 1px 8px !important;
+    margin: 3px 3px !important;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: var(--bs-body-color) !important;
+    opacity: 0.5;
+    font-size: 0.85rem;
+    border-right: none !important;
+    padding: 0 4px 0 0 !important;
+    right: 4px;
+    left: auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.25) !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    padding-right: 4px;
+}
+
 </style>
 @endpush
