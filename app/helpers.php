@@ -1090,26 +1090,6 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
-        // Check if it's a local file
-        $filePath = str_replace(url('/storage'), 'public', $decryptedUrl);
-        if (Storage::exists($filePath)) {
-            $actualPath = Storage::path($filePath);
-            $fileMimeType = mime_content_type($actualPath);
-
-            // Heuristic: check for x265/HEVC in filename or extension
-            $isHEVC = false;
-            if (preg_match('/\.(mkv|hevc)$/i', $actualPath) || stripos($actualPath, 'x265') !== false || stripos($actualPath, 'hevc') !== false) {
-                $isHEVC = true;
-            }
-
-            return [
-                'platform' => 'local',
-                'url' => $actualPath,
-                'mimeType' => $fileMimeType,
-                'isHEVC' => $isHEVC
-            ];
-        }
-
         // Check for embedded iframe-type URL — supporte les iframes multi-lignes et Cloudflare Stream
         if (str_contains($decryptedUrl, '<iframe')) {
             // Regex avec flag s (DOTALL) pour iframes multi-lignes
@@ -1128,9 +1108,27 @@ function decryptVideoUrl($encryptedUrl)
         }
 
 
-        // Si aucune condition n'a matché — URL externe générique (mp4, etc.)
+        // Check if it's a local file
+        $filePath = str_replace(url('/storage'), 'public', $decryptedUrl);
+        if (Storage::exists($filePath)) {
+            $actualPath = Storage::path($filePath);
+            $fileMimeType = mime_content_type($actualPath);
+
+            $isHEVC = false;
+            if (preg_match('/\.(mkv|hevc)$/i', $actualPath) || stripos($actualPath, 'x265') !== false || stripos($actualPath, 'hevc') !== false) {
+                $isHEVC = true;
+            }
+
+            return [
+                'platform' => 'local',
+                'url' => $actualPath,
+                'mimeType' => $fileMimeType,
+                'isHEVC' => $isHEVC
+            ];
+        }
+
+        // URL externe générique (mp4, etc.)
         if (filter_var($decryptedUrl, FILTER_VALIDATE_URL)) {
-            // Heuristic: check for x265/HEVC in URL
             $isHEVC = false;
             if (preg_match('/\.(mkv|hevc)$/i', $decryptedUrl) || stripos($decryptedUrl, 'x265') !== false || stripos($decryptedUrl, 'hevc') !== false) {
                 $isHEVC = true;
