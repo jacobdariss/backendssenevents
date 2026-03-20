@@ -1,35 +1,9 @@
 <?php
 if (($_GET['token'] ?? '') !== 'debug2026') { die('Acces refuse'); }
 
-$html = '<div style="position: relative; padding-top: 56.25%;">
-  <iframe
-    src="https://customer-myvckkqiszi5ayhh.cloudflarestream.com/ef7a9d985f33822651c1f13433e673a6/iframe?autoplay=true"
-    loading="lazy"
-    style="border: none;"
-    allowfullscreen="true"
-  ></iframe>
-</div>';
-
-echo '<pre style="font-family:monospace;padding:20px">';
+echo '<pre style="font:13px monospace;padding:20px;background:#111;color:#eee">';
 echo "PHP " . PHP_VERSION . "\n\n";
 
-echo "1. str_contains iframe: " . (str_contains($html, '<iframe') ? 'OUI' : 'NON') . "\n\n";
-
-$r1 = '/<iframe[^>]*\bsrc=["\x27](https?[^"\x27]+)["\x27][^>]*>/is';
-if (preg_match($r1, $html, $m)) {
-    echo "2. Regex1: OK\n   " . htmlspecialchars($m[1]) . "\n\n";
-} else {
-    echo "2. Regex1: FAIL\n\n";
-}
-
-$r2 = '/\bsrc\s*=\s*["\x27](https?[^"\x27]+)["\x27]/i';
-if (preg_match($r2, $html, $m)) {
-    echo "3. Regex2: OK\n   " . htmlspecialchars($m[1]) . "\n\n";
-} else {
-    echo "3. Regex2: FAIL\n\n";
-}
-
-// Test avec le vrai decryptVideoUrl
 chdir('/var/www/vhosts/senevents.africa/plateforme.senevents.africa');
 require 'vendor/autoload.php';
 $app = require 'bootstrap/app.php';
@@ -37,16 +11,58 @@ $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 use Illuminate\Support\Facades\Crypt;
 
-$encrypted = Crypt::encryptString($html);
-$result = decryptVideoUrl(urlencode($encrypted));
-echo "4. decryptVideoUrl:\n";
-print_r($result);
+// Test 1 : HTML iframe Cloudflare
+$html = '<div style="position: relative; padding-top: 56.25%;">
+  <iframe
+    src="https://customer-myvckkqiszi5ayhh.cloudflarestream.com/ef7a9d985f33822651c1f13433e673a6/iframe?autoplay=true&poster=https%3A%2F%2Fcustomer-myvckkqiszi5ayhh.cloudflarestream.com%2Fef7a9d985f33822651c1f13433e673a6%2Fthumbnails%2Fthumbnail.jpg"
+    loading="lazy"
+    allowfullscreen="true"
+  ></iframe>
+</div>';
 
-echo "\n\n--- Test URL directe Cloudflare ---\n";
-$directUrl = 'https://customer-myvckkqiszi5ayhh.cloudflarestream.com/ef7a9/iframe';
-$encrypted2 = Crypt::encryptString($directUrl);
-$result2 = decryptVideoUrl(urlencode($encrypted2));
-echo "decryptVideoUrl (URL directe):\n";
-print_r($result2);
+echo "=== Test 1 : iframe HTML ===\n";
+try {
+    $enc = Crypt::encryptString($html);
+    echo "Chiffré OK (longueur: " . strlen($enc) . ")\n";
+    $dec = Crypt::decryptString($enc);
+    echo "Déchiffré OK (longueur: " . strlen($dec) . ")\n";
+    $result = decryptVideoUrl(urlencode($enc));
+    echo "decryptVideoUrl: ";
+    print_r($result);
+} catch (Exception $e) {
+    echo "EXCEPTION: " . $e->getMessage() . "\n";
+}
+
+// Test 2 : URL directe Cloudflare
+echo "\n=== Test 2 : URL directe Cloudflare ===\n";
+$url = 'https://customer-myvckkqiszi5ayhh.cloudflarestream.com/ef7a9d985f33822651c1f13433e673a6/iframe?autoplay=true';
+try {
+    $enc2 = Crypt::encryptString($url);
+    $result2 = decryptVideoUrl(urlencode($enc2));
+    echo "decryptVideoUrl: ";
+    print_r($result2);
+} catch (Exception $e) {
+    echo "EXCEPTION: " . $e->getMessage() . "\n";
+}
+
+// Test 3 : Lire un vrai film Embedded depuis la DB
+echo "\n=== Test 3 : Film Embedded en base ===\n";
+try {
+    $movie = \DB::table('entertainments')
+        ->where('video_upload_type', 'Embedded')
+        ->whereNotNull('video_url_input')
+        ->first();
+    if ($movie) {
+        echo "Film trouvé: " . $movie->name . "\n";
+        echo "video_url_input (50 chars): " . substr($movie->video_url_input, 0, 50) . "\n";
+        $result3 = decryptVideoUrl(urlencode($movie->video_url_input));
+        echo "decryptVideoUrl: ";
+        print_r($result3);
+    } else {
+        echo "Aucun film Embedded trouvé en base\n";
+    }
+} catch (Exception $e) {
+    echo "EXCEPTION: " . $e->getMessage() . "\n";
+}
 
 echo '</pre>';

@@ -1110,21 +1110,6 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
-        // If it's an external URL
-        if (filter_var($decryptedUrl, FILTER_VALIDATE_URL)) {
-            // Heuristic: check for x265/HEVC in URL
-            $isHEVC = false;
-            if (preg_match('/\.(mkv|hevc)$/i', $decryptedUrl) || stripos($decryptedUrl, 'x265') !== false || stripos($decryptedUrl, 'hevc') !== false) {
-                $isHEVC = true;
-            }
-
-            return [
-                'platform' => 'local',
-                'url' => $decryptedUrl,
-                'isHEVC' => $isHEVC
-            ];
-        }
-
         // Check for embedded iframe-type URL — supporte les iframes multi-lignes et Cloudflare Stream
         if (str_contains($decryptedUrl, '<iframe')) {
             // Regex avec flag s (DOTALL) pour iframes multi-lignes
@@ -1143,7 +1128,21 @@ function decryptVideoUrl($encryptedUrl)
         }
 
 
-        // If no conditions are met
+        // Si aucune condition n'a matché — URL externe générique (mp4, etc.)
+        if (filter_var($decryptedUrl, FILTER_VALIDATE_URL)) {
+            // Heuristic: check for x265/HEVC in URL
+            $isHEVC = false;
+            if (preg_match('/\.(mkv|hevc)$/i', $decryptedUrl) || stripos($decryptedUrl, 'x265') !== false || stripos($decryptedUrl, 'hevc') !== false) {
+                $isHEVC = true;
+            }
+
+            return [
+                'platform' => 'local',
+                'url' => $decryptedUrl,
+                'isHEVC' => $isHEVC
+            ];
+        }
+
         return ['error' => 'File not found'];
     } catch (\Exception $e) {
         return ['error' => 'Invalid encrypted URL'];
