@@ -12,14 +12,13 @@ use League\Csv\Writer;
 
 class ExportController extends Controller
 {
-    protected function analytics(): AnalyticsService
-    {
-        return app(AnalyticsService::class);
-    }
+    protected AnalyticsService $analytics;
+    protected FinanceService $finance;
 
-    protected function finance(): FinanceService
+    public function __construct(AnalyticsService $analytics, FinanceService $finance)
     {
-        return app(FinanceService::class);
+        $this->analytics = $analytics;
+        $this->finance   = $finance;
     }
 
     // ── Export Analytics ─────────────────────────────────────────────────────
@@ -27,7 +26,7 @@ class ExportController extends Controller
     {
         $period    = $request->get('period', '30d');
         $partnerId = $request->get('partner_id');
-        [$from, $to] = $this->analytics()->getPeriodDates($period);
+        [$from, $to] = $this->analytics->getPeriodDates($period);
 
         $csv = Writer::createFromString();
         $csv->setDelimiter(',');
@@ -39,7 +38,7 @@ class ExportController extends Controller
         $csv->insertOne([]);
 
         // ─ KPIs ─
-        $stats = $this->analytics()->globalStats($from, $to);
+        $stats = $this->analytics->globalStats($from, $to);
         $csv->insertOne(['=== KPIs ===']);
         $csv->insertOne(['Vues totales', $stats['total_views']]);
         $csv->insertOne(['Temps de visionnage (heures)', $stats['watch_time']['hours']]);
@@ -51,7 +50,7 @@ class ExportController extends Controller
         // ─ Vues par jour ─
         $csv->insertOne(['=== VUES PAR JOUR ===']);
         $csv->insertOne(['Date', 'Vues']);
-        foreach ($this->analytics()->viewsPerDay($from, $to, $partnerId) as $row) {
+        foreach ($this->analytics->viewsPerDay($from, $to, $partnerId) as $row) {
             $csv->insertOne([$row->date, $row->views]);
         }
         $csv->insertOne([]);
@@ -59,7 +58,7 @@ class ExportController extends Controller
         // ─ Par device ─
         $csv->insertOne(['=== PAR APPAREIL ===']);
         $csv->insertOne(['Appareil', 'Vues']);
-        foreach ($this->analytics()->viewsByDevice($from, $to, $partnerId) as $row) {
+        foreach ($this->analytics->viewsByDevice($from, $to, $partnerId) as $row) {
             $csv->insertOne([$row->device_type ?? 'Inconnu', $row->views]);
         }
         $csv->insertOne([]);
@@ -67,7 +66,7 @@ class ExportController extends Controller
         // ─ Par plateforme ─
         $csv->insertOne(['=== PAR PLATEFORME ===']);
         $csv->insertOne(['Plateforme', 'Vues']);
-        foreach ($this->analytics()->viewsByPlatform($from, $to, $partnerId) as $row) {
+        foreach ($this->analytics->viewsByPlatform($from, $to, $partnerId) as $row) {
             $csv->insertOne([$row->platform ?? 'Inconnu', $row->views]);
         }
         $csv->insertOne([]);
@@ -75,7 +74,7 @@ class ExportController extends Controller
         // ─ Top contenus ─
         $csv->insertOne(['=== TOP CONTENUS ===']);
         $csv->insertOne(['Contenu', 'Type', 'Vues', 'Watch time (min)']);
-        foreach ($this->analytics()->topContent($from, $to, $partnerId) as $row) {
+        foreach ($this->analytics->topContent($from, $to, $partnerId) as $row) {
             $csv->insertOne([
                 $row->content_name ?? 'Contenu #' . $row->entertainment_id,
                 $row->content_type ?? '—',
@@ -86,7 +85,7 @@ class ExportController extends Controller
         $csv->insertOne([]);
 
         // ─ Likes ─
-        $likes = $this->analytics()->likesStats($from, $to, $partnerId);
+        $likes = $this->analytics->likesStats($from, $to, $partnerId);
         $csv->insertOne(['=== LIKES / DISLIKES ===']);
         $csv->insertOne(['Likes', $likes['likes']]);
         $csv->insertOne(['Dislikes', $likes['dislikes']]);
@@ -94,7 +93,7 @@ class ExportController extends Controller
         $csv->insertOne([]);
 
         // ─ Notations ─
-        $ratings = $this->analytics()->ratingsStats($from, $to, $partnerId);
+        $ratings = $this->analytics->ratingsStats($from, $to, $partnerId);
         $csv->insertOne(['=== NOTATIONS ===']);
         $csv->insertOne(['Note moyenne', $ratings['average'] . ' / 5']);
         $csv->insertOne(['Nombre d\'avis', $ratings['total']]);
@@ -113,7 +112,7 @@ class ExportController extends Controller
     public function financeExport(Request $request)
     {
         $period = $request->get('period', '30d');
-        [$from, $to] = $this->finance()->getPeriodDates($period);
+        [$from, $to] = $this->finance->getPeriodDates($period);
 
         $csv = Writer::createFromString();
         $csv->setDelimiter(',');
@@ -125,7 +124,7 @@ class ExportController extends Controller
         $csv->insertOne([]);
 
         // ─ KPIs ─
-        $kpis = $this->finance()->globalKpis($from, $to);
+        $kpis = $this->finance->globalKpis($from, $to);
         $csv->insertOne(['=== KPIs FINANCIERS ===']);
         $csv->insertOne(['Revenus totaux (FCFA)',       $kpis['total_revenue']]);
         $csv->insertOne(['Revenus PPV (FCFA)',           $kpis['ppv_revenue']]);
@@ -137,7 +136,7 @@ class ExportController extends Controller
         $csv->insertOne([]);
 
         // ─ Revenus par jour ─
-        $revenuePerDay = $this->finance()->revenuePerDay($from, $to);
+        $revenuePerDay = $this->finance->revenuePerDay($from, $to);
         $csv->insertOne(['=== REVENUS PAR JOUR ===']);
         $csv->insertOne(['Date', 'Revenus PPV (FCFA)', 'Revenus Abonnements (FCFA)', 'Total']);
         foreach ($revenuePerDay['labels'] as $i => $date) {
@@ -150,7 +149,7 @@ class ExportController extends Controller
         // ─ Par gateway ─
         $csv->insertOne(['=== PASSERELLES DE PAIEMENT ===']);
         $csv->insertOne(['Gateway', 'Transactions', 'Revenus (FCFA)']);
-        foreach ($this->finance()->revenueByGateway($from, $to) as $row) {
+        foreach ($this->finance->revenueByGateway($from, $to) as $row) {
             $csv->insertOne([$row['gateway'], $row['transactions'], $row['revenue']]);
         }
         $csv->insertOne([]);
@@ -158,7 +157,7 @@ class ExportController extends Controller
         // ─ Revenus par partenaire ─
         $csv->insertOne(['=== REVENUS PAR PARTENAIRE ===']);
         $csv->insertOne(['Partenaire', 'Commission (%)', 'Revenus PPV (FCFA)', 'Commission (FCFA)', 'Net plateforme (FCFA)']);
-        foreach ($this->finance()->revenueByPartner($from, $to) as $row) {
+        foreach ($this->finance->revenueByPartner($from, $to) as $row) {
             $csv->insertOne([
                 $row['partner']->name,
                 $row['rate'],
@@ -172,13 +171,13 @@ class ExportController extends Controller
         // ─ Top contenus PPV ─
         $csv->insertOne(['=== TOP CONTENUS PPV ===']);
         $csv->insertOne(['Contenu', 'Type', 'Achats', 'Revenus (FCFA)']);
-        foreach ($this->finance()->topPpvContent($from, $to) as $row) {
+        foreach ($this->finance->topPpvContent($from, $to) as $row) {
             $csv->insertOne([$row->content_name, $row->type, $row->purchases, $row->revenue]);
         }
         $csv->insertOne([]);
 
         // ─ Abonnements ─
-        $subs = $this->finance()->subscriptionDetails($from, $to);
+        $subs = $this->finance->subscriptionDetails($from, $to);
         $csv->insertOne(['=== ABONNEMENTS ===']);
         $csv->insertOne(['Nouveaux abonnés', $subs['new']]);
         $csv->insertOne(['Abonnés actifs', $subs['active']]);
@@ -195,7 +194,7 @@ class ExportController extends Controller
         // ─ Transactions récentes ─
         $csv->insertOne(['=== TRANSACTIONS RÉCENTES ===']);
         $csv->insertOne(['Date', 'Type', 'Gateway', 'Montant (FCFA)', 'Statut', 'ID Transaction']);
-        foreach ($this->finance()->recentTransactions($from, $to, 50) as $tx) {
+        foreach ($this->finance->recentTransactions($from, $to, 50) as $tx) {
             $csv->insertOne([
                 $tx['date'],
                 $tx['type'],

@@ -12,34 +12,36 @@ use Modules\Video\Models\Video;
 
 class AnalyticsController extends Controller
 {
-    protected function analytics(): AnalyticsService
+    protected AnalyticsService $analytics;
+
+    public function __construct(AnalyticsService $analytics)
     {
-        return app(AnalyticsService::class);
+        $this->analytics = $analytics;
     }
 
     public function index(Request $request)
     {
         $period = $request->get('period', '30d');
-        [$from, $to] = $this->analytics()->getPeriodDates($period);
+        [$from, $to] = $this->analytics->getPeriodDates($period);
 
-        $stats         = $this->analytics()->globalStats($from, $to);
-        $viewsPerDay   = $this->analytics()->viewsPerDay($from, $to);
-        $byDevice      = $this->analytics()->viewsByDevice($from, $to);
-        $byPlatform    = $this->analytics()->viewsByPlatform($from, $to);
-        $byCountry     = $this->analytics()->viewsByCountry($from, $to);
-        $gatewayStats  = $this->analytics()->paymentGatewayStats($from, $to);
-        $topContent    = $this->analytics()->topContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
-        $revenuePerDay = $this->analytics()->revenuePerDay($from, $to);
-        $subsStats     = $this->analytics()->subscriptionStats($from, $to);
-        $subsPerDay    = $this->analytics()->subscriptionsPerDay($from, $to);
-        $subsByPlan    = $this->analytics()->subscriptionsByPlan($from, $to);
-        $churnRate     = $this->analytics()->churnRate($from, $to);
-        $ratingsStats  = $this->analytics()->ratingsStats($from, $to);
-        $topRated      = $this->analytics()->topRatedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
-        $recentComments= $this->analytics()->recentComments($from, $to, null, 8);
-        $likesStats    = $this->analytics()->likesStats($from, $to);
-        $likesPerDay   = $this->analytics()->likesPerDay($from, $to);
-        $topLiked      = $this->analytics()->topLikedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $stats         = $this->analytics->globalStats($from, $to);
+        $viewsPerDay   = $this->analytics->viewsPerDay($from, $to);
+        $byDevice      = $this->analytics->viewsByDevice($from, $to);
+        $byPlatform    = $this->analytics->viewsByPlatform($from, $to);
+        $byCountry     = $this->analytics->viewsByCountry($from, $to);
+        $gatewayStats  = $this->analytics->paymentGatewayStats($from, $to);
+        $topContent    = $this->analytics->topContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $revenuePerDay = $this->analytics->revenuePerDay($from, $to);
+        $subsStats     = $this->analytics->subscriptionStats($from, $to);
+        $subsPerDay    = $this->analytics->subscriptionsPerDay($from, $to);
+        $subsByPlan    = $this->analytics->subscriptionsByPlan($from, $to);
+        $churnRate     = $this->analytics->churnRate($from, $to);
+        $ratingsStats  = $this->analytics->ratingsStats($from, $to);
+        $topRated      = $this->analytics->topRatedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $recentComments= $this->analytics->recentComments($from, $to, null, 8);
+        $likesStats    = $this->analytics->likesStats($from, $to);
+        $likesPerDay   = $this->analytics->likesPerDay($from, $to);
+        $topLiked      = $this->analytics->topLikedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $partners      = Partner::where('status', 1)->orderBy('name')->get();
 
         // Pré-charger les stats partenaires en une seule requête (évite N+1 en vue)
@@ -67,25 +69,25 @@ class AnalyticsController extends Controller
     {
         $partner = Partner::findOrFail($partnerId);
         $period  = $request->get('period', '30d');
-        [$from, $to] = $this->analytics()->getPeriodDates($period);
+        [$from, $to] = $this->analytics->getPeriodDates($period);
 
         $stats = [
-            'total_views' => $this->analytics()->totalViews($from, $to, $partnerId),
-            'watch_time'  => $this->analytics()->totalWatchTime($from, $to, $partnerId),
-            'ppv_revenue' => $this->analytics()->ppvRevenue($from, $to, $partnerId),
+            'total_views' => $this->analytics->totalViews($from, $to, $partnerId),
+            'watch_time'  => $this->analytics->totalWatchTime($from, $to, $partnerId),
+            'ppv_revenue' => $this->analytics->ppvRevenue($from, $to, $partnerId),
         ];
-        $viewsPerDay = $this->analytics()->viewsPerDay($from, $to, $partnerId);
-        $byDevice    = $this->analytics()->viewsByDevice($from, $to, $partnerId);
-        $byPlatform  = $this->analytics()->viewsByPlatform($from, $to, $partnerId);
-        $byCountry    = $this->analytics()->viewsByCountry($from, $to, $partnerId);
+        $viewsPerDay = $this->analytics->viewsPerDay($from, $to, $partnerId);
+        $byDevice    = $this->analytics->viewsByDevice($from, $to, $partnerId);
+        $byPlatform  = $this->analytics->viewsByPlatform($from, $to, $partnerId);
+        $byCountry    = $this->analytics->viewsByCountry($from, $to, $partnerId);
         $gatewayStats = collect(); // Le partenaire n'a pas encore de paiements directs
-        $topContent  = $this->analytics()->topContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
-        $ratingsStats = $this->analytics()->ratingsStats($from, $to, $partnerId);
-        $topRated     = $this->analytics()->topRatedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
-        $recentComments = $this->analytics()->recentComments($from, $to, $partnerId, 8);
-        $likesStats  = $this->analytics()->likesStats($from, $to, $partnerId);
-        $likesPerDay = $this->analytics()->likesPerDay($from, $to, $partnerId);
-        $topLiked    = $this->analytics()->topLikedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $topContent  = $this->analytics->topContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $ratingsStats = $this->analytics->ratingsStats($from, $to, $partnerId);
+        $topRated     = $this->analytics->topRatedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
+        $recentComments = $this->analytics->recentComments($from, $to, $partnerId, 8);
+        $likesStats  = $this->analytics->likesStats($from, $to, $partnerId);
+        $likesPerDay = $this->analytics->likesPerDay($from, $to, $partnerId);
+        $topLiked    = $this->analytics->topLikedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $module_action = 'Analytics';
 
         return view('analytics::backend.analytics.partner', compact(
