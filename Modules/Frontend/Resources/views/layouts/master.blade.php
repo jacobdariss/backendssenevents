@@ -727,7 +727,7 @@
 
             const createMuteButton = (onToggle) => {
                 const button = document.createElement('button');
-                button.textContent = 'Unmute';
+                button.textContent = '{{ __('messages.unmute') }}';
                 Object.assign(button.style, {
                     position: 'absolute',
                     top: '10px',
@@ -795,7 +795,7 @@
 
                             const muteButton = createMuteButton((button) => {
                                 activePlayer.muted = !activePlayer.muted;
-                                button.textContent = activePlayer.muted ? 'Unmute' : 'Mute';
+                                button.textContent = activePlayer.muted ? '{{ __('messages.unmute') }}' : 'Mute';
                             });
                             previewContainer.appendChild(muteButton);
                         }
@@ -819,7 +819,7 @@
                                         controlVimeoPlayer(activePlayer, 'setVolume',
                                             isMuted ? 0 : 1);
                                     }
-                                    button.textContent = isMuted ? 'Unmute' : 'Mute';
+                                    button.textContent = isMuted ? '{{ __('messages.unmute') }}' : 'Mute';
                                 });
                                 previewContainer.appendChild(muteButton);
                             }

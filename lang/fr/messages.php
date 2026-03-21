@@ -1335,7 +1335,7 @@ return [
   'submitting' => 'Envoi en cours...',
   'my_review' => 'Mon Avis',
   'failed_to_submit_review' => 'Échec de l\'envoi de l\'avis. Veuillez réessayer.',
-  'unmute' => 'Réactiver le son',
+  'unmute' => 'Activer le son',
     'skip_trailer' => 'Passer la bande-annonce',
   'skip_intro' => 'Passer l\'intro',
   'previous_episode' => 'Épisode précédent',
