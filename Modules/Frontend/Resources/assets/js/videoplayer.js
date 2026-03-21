@@ -891,6 +891,7 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdPlayed = true;
         handleWatchButtonClick(button);
         mountSkipIntroFrom(button);
+        loadAdsAndStartInterval();
       });
     }
   });
