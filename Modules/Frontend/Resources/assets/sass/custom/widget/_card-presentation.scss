@@ -27,13 +27,14 @@
   }
 }
 
-.card-size-medium {
-  // Default sizes — no overrides needed
+// Medium = nouveau défaut plus grand (2/3 au lieu de 2/2.8)
+.iq-card .block-images .image-box img {
+  aspect-ratio: 2 / 3 !important;
 }
 
 .card-size-large {
   .iq-card .block-images .image-box img {
-    aspect-ratio: 2 / 3.2;
+    aspect-ratio: 2 / 3.4 !important;
   }
   .genres-img {
     height: 260px !important;

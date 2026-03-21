@@ -136,6 +136,9 @@
         /* Réduire l'espacement vertical entre les titres de section et les cartes */
         .section-wraper .main-title { margin-bottom: 0 !important; }
         .section-wraper .d-flex.my-2 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
+        /* Réduire le margin-bottom du slider entre les catégories */
+        .section-wraper .card-style-slider .slick-list.draggable { margin-bottom: 0.5rem !important; }
+        .section-wraper .card-style-slider { margin-bottom: 0 !important; }
         .banner-section {
             padding-left: 0 !important;
             padding-right: 0 !important;
@@ -158,8 +161,10 @@
         }
 
         /* ========== Taille des cartes (HomepageBuilder settings) ========== */
-        .card-size-small .iq-card .block-images .image-box img { aspect-ratio: 2/2.4; }
-        .card-size-large .iq-card .block-images .image-box img { aspect-ratio: 2/3.2; }
+        /* Medium = nouveau défaut plus grand que l'original */
+        .iq-card .block-images .image-box img { aspect-ratio: 2/3 !important; }
+        .card-size-small .iq-card .block-images .image-box img { aspect-ratio: 2/2.4 !important; }
+        .card-size-large .iq-card .block-images .image-box img { aspect-ratio: 2/3.4 !important; }
         .card-size-small .genres-img { height: 180px !important; }
         .card-size-large .genres-img { height: 260px !important; }
         .card-size-small .cast-image { height: 100px !important; width: 100px !important; }
@@ -168,6 +173,7 @@
         .card-size-large .top-ten-img { height: 380px !important; }
         .card-size-small .continue-watch-card .continue-watch-image { height: 110px !important; }
         .card-size-large .continue-watch-card .continue-watch-image { height: 165px !important; }
+        .cards-horizontal .iq-card .block-images .image-box img { aspect-ratio: 16/9 !important; }
         .cards-horizontal.card-size-small .iq-card .block-images .image-box img { aspect-ratio: 16/8 !important; }
         .cards-horizontal.card-size-large .iq-card .block-images .image-box img { aspect-ratio: 16/10 !important; }
 
