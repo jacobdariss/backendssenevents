@@ -828,10 +828,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       showCustomAdThenPlayMain(function () {
         customAdPlayed = true;
-        // Charger les VAST puis lancer la vidéo principale
         handleWatchButtonClick(watchNowButton);
         mountSkipIntroFrom(watchNowButton);
-        loadAdsAndStartInterval();
       });
     })
   }
@@ -896,7 +894,6 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdPlayed = true;
         handleWatchButtonClick(button);
         mountSkipIntroFrom(button);
-        loadAdsAndStartInterval();
       });
     }
   });
@@ -1113,15 +1110,12 @@ document.addEventListener('DOMContentLoaded', function () {
           createQualitySelector(player, qualityOptions, subtitleInfo, baseUrl);
 
           player.one('loadedmetadata', async function () {
-            player.currentTime(lastWatchedTime)
-            if (document.querySelector('#videoPlayer').getAttribute('data-movie-access') === 'free') {
-              player.muted(true) // Mute the player for autoplay
-              try {
-                await player.play() // Attempt to autoplay
-                isPopupShown = false // Reset flag when video starts playing successfully
-              } catch (error) {
-                console.error('Error trying to autoplay:', error)
-              }
+            if (lastWatchedTime > 0) player.currentTime(lastWatchedTime);
+            try {
+              await player.play(); // Démarrer pour tous les types d'accès
+              isPopupShown = false;
+            } catch (error) {
+              console.error('Error trying to autoplay:', error);
             }
           })
         })
@@ -3650,21 +3644,11 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     let customAdChecked = false;
-    player.one('play', function () {
-      // Si le watchNowButton/seasonWatchBtn a déjà géré les pubs → ne rien faire
-      // (évite le double appel loadAdsAndStartInterval)
-      if (customAdPlayed && customAdChecked) {
-        return;
+    player.on('play', function () {
+      // Lancer les VAST ads à chaque play si pas encore fait
+      if (!adQueue || adQueue.length === 0) {
+        loadAdsAndStartInterval();
       }
-      if (!customAdPlayed && !customAdChecked) {
-        customAdChecked = true;
-        player.pause();
-        showCustomAdThenPlayMain(function () {
-          loadAdsAndStartInterval();
-        });
-        return;
-      }
-      loadAdsAndStartInterval();
     });
 
     player.on('ended', function () {
