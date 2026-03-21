@@ -823,14 +823,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Reset custom ad flag for new content selection
       customAdPlayed = false;
-      customAdAttempts = 0; // Reset attempts counter
+      customAdAttempts = 0;
+      customAdChecked = true; // Marquer : watchNowButton gère les pubs
 
       showCustomAdThenPlayMain(function () {
-        loadAdsAndStartInterval();
-        // 3. Only after the ad is done, play the main content
+        customAdPlayed = true;
+        // Charger les VAST puis lancer la vidéo principale
         handleWatchButtonClick(watchNowButton);
-        // Mount Skip Intro for this watch
         mountSkipIntroFrom(watchNowButton);
+        loadAdsAndStartInterval();
       });
     })
   }
@@ -888,13 +889,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Reset custom ad flag for new episode selection
       customAdPlayed = false;
-      customAdAttempts = 0; // Reset attempts counter
+      customAdAttempts = 0;
+      customAdChecked = true; // Marquer : seasonWatchBtn gère les pubs
 
       showCustomAdThenPlayMain(function () {
-        loadAdsAndStartInterval();
+        customAdPlayed = true;
         handleWatchButtonClick(button);
-        // Mount Skip Intro for this season watch
         mountSkipIntroFrom(button);
+        loadAdsAndStartInterval();
       });
     }
   });
@@ -3649,11 +3651,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let customAdChecked = false;
     player.one('play', function () {
+      // Si le watchNowButton/seasonWatchBtn a déjà géré les pubs → ne rien faire
+      // (évite le double appel loadAdsAndStartInterval)
+      if (customAdPlayed && customAdChecked) {
+        return;
+      }
       if (!customAdPlayed && !customAdChecked) {
         customAdChecked = true;
         player.pause();
         showCustomAdThenPlayMain(function () {
-          loadAdsAndStartInterval(); // custom ad → puis VAST si besoin
+          loadAdsAndStartInterval();
         });
         return;
       }
