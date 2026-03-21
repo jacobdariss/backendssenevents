@@ -21,6 +21,10 @@ class VideoPlayerSettingSeeder extends Seeder
             'player_subtitles_default'  => '0',
             'player_watermark_position' => 'top-right',
             'player_forward_seconds'    => '10',
+            'ppv_watermark_enabled'     => '1',
+            'ppv_watermark_content'     => 'name_email',
+            'ppv_watermark_opacity'     => '20',
+            'ppv_watermark_interval'    => '15',
         ];
 
         foreach ($defaults as $key => $value) {
@@ -31,3 +35,4 @@ class VideoPlayerSettingSeeder extends Seeder
         }
     }
 }
+// Note: Ajout automatique des settings filigrane PPV (run via db:seed)

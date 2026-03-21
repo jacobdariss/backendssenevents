@@ -79,6 +79,15 @@
 <script src="{{ mix('js/videoplayer.min.js') }}"></script>
 <script>
     var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+    // Filigrane PPV
+    window.watermarkConfig = {
+        enabled:  {{ setting('ppv_watermark_enabled', 1) ? 'true' : 'false' }},
+        content:  '{{ setting('ppv_watermark_content', 'name_email') }}',
+        opacity:  {{ (int) setting('ppv_watermark_opacity', 20) }} / 100,
+        interval: {{ (int) setting('ppv_watermark_interval', 15) }} * 1000,
+        userName: '{{ auth()->check() ? addslashes(auth()->user()->name) : '' }}',
+        userEmail:'{{ auth()->check() ? addslashes(auth()->user()->email) : '' }}',
+    };
     var loginUrl = "{{ route('login') }}";
     var skipTrailerText = "{{ __('messages.skip_trailer') }}";
     var skipIntroText = "{{ __('messages.skip_intro') }}";

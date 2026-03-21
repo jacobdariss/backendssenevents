@@ -3807,4 +3807,90 @@ document.addEventListener('DOMContentLoaded', function () {
   //     player.on('userinactive', () => player.userActive(true));
   //   });
   // }
+  // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
+  function initPPVWatermark() {
+    const cfg = window.watermarkConfig;
+    if (!cfg || !cfg.enabled) return;
+
+    const access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
+    if (access !== 'pay-per-view') return;
+
+    const wrapper = document.querySelector('.video-player-wrapper');
+    if (!wrapper) return;
+
+    // Créer le canvas overlay
+    const canvas = document.createElement('canvas');
+    canvas.id = 'ppv-watermark';
+    Object.assign(canvas.style, {
+      position:      'absolute',
+      top:           '0',
+      left:          '0',
+      width:         '100%',
+      height:        '100%',
+      pointerEvents: 'none',
+      zIndex:        '999',
+    });
+    wrapper.appendChild(canvas);
+
+    function buildText() {
+      const parts = [];
+      if (cfg.content === 'name_email' || cfg.content === 'name') parts.push(cfg.userName);
+      if (cfg.content === 'name_email' || cfg.content === 'email') parts.push(cfg.userEmail);
+      if (cfg.content === 'datetime') parts.push(new Date().toLocaleString('fr-FR'));
+      return parts.filter(Boolean).join('  |  ');
+    }
+
+    function drawWatermark() {
+      const rect = wrapper.getBoundingClientRect();
+      canvas.width  = rect.width  || wrapper.offsetWidth;
+      canvas.height = rect.height || wrapper.offsetHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const text = buildText();
+      if (!text) return;
+
+      const fontSize = Math.max(12, Math.min(canvas.width / 40, 18));
+      ctx.font      = `${fontSize}px Arial, sans-serif`;
+      ctx.fillStyle = `rgba(255, 255, 255, ${cfg.opacity})`;
+      ctx.shadowColor   = 'rgba(0,0,0,0.6)';
+      ctx.shadowBlur    = 4;
+
+      // Position aléatoire dans la zone de lecture (évite les bords)
+      const margin = fontSize * 3;
+      const maxX = canvas.width  - ctx.measureText(text).width - margin;
+      const maxY = canvas.height - margin;
+      const x = margin + Math.random() * Math.max(0, maxX - margin);
+      const y = margin + Math.random() * Math.max(0, maxY - margin);
+
+      ctx.fillText(text, x, y);
+    }
+
+    // Démarrer quand la vidéo joue
+    player.on('playing', function() {
+      drawWatermark();
+      if (window._watermarkTimer) clearInterval(window._watermarkTimer);
+      window._watermarkTimer = setInterval(drawWatermark, cfg.interval);
+    });
+
+    player.on('pause', function() {
+      if (window._watermarkTimer) { clearInterval(window._watermarkTimer); }
+    });
+
+    player.on('ended', function() {
+      if (window._watermarkTimer) { clearInterval(window._watermarkTimer); }
+      const cv = document.getElementById('ppv-watermark');
+      if (cv) { const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, cv.width, cv.height); }
+    });
+
+    // Redessiner au redimensionnement
+    window.addEventListener('resize', drawWatermark);
+  }
+
+  // Initialiser après chargement du player
+  player.ready(function() {
+    setTimeout(initPPVWatermark, 500);
+  });
+  // ─────────────────────────────────────────────────────────────────────────
+
 });
