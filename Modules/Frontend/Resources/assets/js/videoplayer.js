@@ -3896,7 +3896,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (cv) { const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, cv.width, cv.height); }
     });
 
-    // Redessiner au redimensionnement
+    // Dessiner immédiatement + redessiner au redimensionnement
+    setTimeout(drawWatermark, 200);
     window.addEventListener('resize', drawWatermark);
   }
 

@@ -81,7 +81,7 @@
     var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
     // Filigrane PPV
     window.watermarkConfig = {
-        enabled:  {{ setting('ppv_watermark_enabled', 1) ? 'true' : 'false' }},
+        enabled:  {{ (setting('ppv_watermark_enabled', '1') !== '0' && setting('ppv_watermark_enabled', '1') !== null) ? 'true' : 'false' }},
         content:  '{{ setting('ppv_watermark_content', 'name_email') }}',
         opacity:  {{ (int) setting('ppv_watermark_opacity', 20) }} / 100,
         interval: {{ (int) setting('ppv_watermark_interval', 15) }} * 1000,
