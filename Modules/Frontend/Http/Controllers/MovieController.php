@@ -147,11 +147,11 @@ public function moviesListBylanguage(string $language)
 
                 
 
-            // ✅ Encrypt URLs (Local et externes — decryptVideoUrl gère les deux)
-            if (!empty($movie->trailer_url)) {
+            // ✅ Encrypt external URLs
+            if (!empty($movie->trailer_url) && $movie->trailer_url_type !== 'Local') {
                 $movie->trailer_url = Crypt::encryptString($movie->trailer_url);
             }
-            if (!empty($movie->video_url_input)) {
+            if (!empty($movie->video_url_input) && $movie->video_upload_type !== 'Local') {
                 $movie->video_url_input = Crypt::encryptString($movie->video_url_input);
             }
 

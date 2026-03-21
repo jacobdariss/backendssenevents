@@ -74,20 +74,14 @@ try {
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = document.querySelector('meta[name="baseUrl"]').getAttribute('content');
 
-  // Lire les paramètres depuis window.playerSettings (injecté par thumbnail.blade.php)
-  const _ps = window.playerSettings || {};
-
   const player = videojs('videoPlayer', {
     techOrder: ['vimeo', 'youtube', 'html5', 'hls', 'embed'],
-    autoplay: _ps.autoplay === true ? 'muted' : false,
-    muted:    _ps.mutedOnLoad === true || _ps.autoplay === true,
+    autoplay: false,
     controls: true,
-    playbackRates: _ps.speedControl !== false ? [0.5, 0.75, 1, 1.25, 1.5, 2] : [],
     controlBar: {
       subsCapsButton: {
         textTrackSettings: false // Disable "captions settings"
-      },
-      playbackRateMenuButton: _ps.speedControl !== false,
+      }
     }
   });
 
@@ -732,12 +726,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.scrollTo({ top: 0, behavior: 'smooth' })
 
-    // Endpoint léger : watch-time pour CE contenu uniquement
     const entertainmentId  = button.getAttribute('data-entertainment-id')
     const entertainmentType = button.getAttribute('data-entertainment-type')
     const plan_id = button.getAttribute('data-plan-id')
 
-    // watch-time + subscription en parallèle
     const watchTimeFetch = fetch(`${baseUrl}/api/v3/watch-time/${entertainmentType}/${entertainmentId}`)
       .then(r => r.json()).catch(() => ({ watched_time: 0 }))
     const subFetch = (accessType === 'paid' && plan_id)
@@ -758,7 +750,11 @@ document.addEventListener('DOMContentLoaded', function () {
       lastWatchedTime = timeStringToSeconds(wtData.total_watched_time)
     }
 
-    playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+    if (accessType === 'free' || accessType === 'pay-per-view') {
+      playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+    } else {
+      handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+    }
 
     isWatchHistorySaved = false // Reset flag
   }
@@ -3594,15 +3590,11 @@ document.addEventListener('DOMContentLoaded', function () {
       originalConsoleError.apply(console, args);
     };
 
-    // IMA setup — uniquement si ce n'est PAS du livetv
-    if (contentType === 'livetv') {
-      return;
-    }
+    // LiveTV : pas de pubs
+    if (contentType === 'livetv') { return; }
 
-    // IMA initialisé lazily pour éviter le chargement de imasdk.googleapis.com
-    // au démarrage de la page (CDN Google lent depuis l'Afrique → pause 15s)
+    // IMA lazy — chargé seulement si pubs VAST existent (évite pause 15s CDN Google)
     let imaInitialized = false;
-
     window.initIMAIfNeeded = function() {
       if (imaInitialized) return;
       if (!window.google || !window.google.ima) {
@@ -3617,28 +3609,15 @@ document.addEventListener('DOMContentLoaded', function () {
       try {
         const adsRenderingSettings = new google.ima.AdsRenderingSettings();
         adsRenderingSettings.enablePreloading = true;
-        adsRenderingSettings.uiElements = [
-          google.ima.UiElements.AD_ATTRIBUTION,
-          google.ima.UiElements.COUNTDOWN,
-        ];
+        adsRenderingSettings.uiElements = [google.ima.UiElements.AD_ATTRIBUTION, google.ima.UiElements.COUNTDOWN];
         adsRenderingSettings.useStyledLinearAds = true;
         player.ima({
-          id: 'videoPlayer',
-          adTagUrl: '',
-          debug: false,
-          showControlsForJSAds: true,
-          adsRenderingSettings: adsRenderingSettings,
-          disableCustomPlaybackForIOS10Plus: true,
-          contribAdsSettings: {
-            prerollTimeout: 5000,
-            postrollTimeout: 5000,
-            disablePlayContentBehindAd: true
-          }
+          id: 'videoPlayer', adTagUrl: '', debug: false, showControlsForJSAds: true,
+          adsRenderingSettings: adsRenderingSettings, disableCustomPlaybackForIOS10Plus: true,
+          contribAdsSettings: { prerollTimeout: 5000, postrollTimeout: 5000, disablePlayContentBehindAd: true }
         });
         imaInitialized = true;
-      } catch(e) {
-        console.warn('IMA init failed:', e);
-      }
+      } catch(e) { console.warn('IMA init failed:', e); }
     };
 
     let customAdChecked = false;
@@ -3647,10 +3626,12 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdChecked = true;
         player.pause();
         showCustomAdThenPlayMain(function () {
+          player.ima.initializeAdDisplayContainer();
           loadAdsAndStartInterval();
         });
         return;
       }
+      player.ima.initializeAdDisplayContainer();
       loadAdsAndStartInterval();
     });
 
@@ -3782,8 +3763,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // console.log('Loaded ad types:', adQueue.map(a => a.type));
 
         const hasPreRoll = adQueue.some(ad => ad.type === 'pre-roll');
-
-        // Init IMA lazily seulement si des pubs VAST existent
         if (adQueue.length > 0 && typeof window.initIMAIfNeeded === 'function') {
           window.initIMAIfNeeded();
         }

@@ -729,12 +729,12 @@ function formatCurrency($number, $noOfDecimal, $decimalSeparator, $thousandSepar
 
     if ($currencyPosition == 'right' || $currencyPosition == 'right_with_space') {
 
-        $currencyString .= $integerPart;
-
         if ($noOfDecimal > 0) {
-            $currencyString .= $decimalSeparator . $decimalPart;
+            $currencyString .= $integerPart . $decimalSeparator . $decimalPart;
         }
-        $currencyString .= ' ';
+        if ($currencyPosition == 'right_with_space') {
+            $currencyString .= ' ';
+        }
         $currencyString .= $currencySymbol;
     }
 
@@ -1090,23 +1090,20 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
-        // Check for embedded iframe-type URL — supporte les iframes multi-lignes et Cloudflare Stream
+        // Check for embedded iframe AVANT Storage::exists (évite exception sur HTML multi-lignes)
         if (str_contains($decryptedUrl, '<iframe')) {
-            // Regex avec flag s (DOTALL) pour iframes multi-lignes
-            if (preg_match('/<iframe[^>]*\bsrc=["\'](https?[^"\']+)["\'][^>]*>/is', $decryptedUrl, $embedMatch)) {
+            if (preg_match('/<iframe[^>]*\bsrc=["\x27](https?[^"\x27]+)["\x27][^>]*>/is', $decryptedUrl, $embedMatch)) {
                 return ['platform' => 'embedded', 'url' => $embedMatch[1]];
             }
-            // Fallback : src= n'importe où dans le code
-            if (preg_match('/\bsrc\s*=\s*["\'](https?[^"\']+)["\']/i', $decryptedUrl, $embedMatch)) {
+            if (preg_match('/\bsrc\s*=\s*["\x27](https?[^"\x27]+)["\x27]/i', $decryptedUrl, $embedMatch)) {
                 return ['platform' => 'embedded', 'url' => $embedMatch[1]];
             }
         }
 
-        // OR: URL directe embeddable (Cloudflare Stream, short.icu, embed.*, player.*, iframe.*)
+        // URL directe Cloudflare Stream / short.icu / embed / player
         if (preg_match('/^https?:\/\/.*(cloudflarestream\.com|short\.icu|iframe\.|embed\.|player\.)/i', $decryptedUrl)) {
             return ['platform' => 'embedded', 'url' => $decryptedUrl];
         }
-
 
         // Check if it's a local file
         $filePath = str_replace(url('/storage'), 'public', $decryptedUrl);
@@ -1127,7 +1124,7 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
-        // URL externe générique (mp4, etc.)
+        // If it's an external URL
         if (filter_var($decryptedUrl, FILTER_VALIDATE_URL)) {
             $isHEVC = false;
             if (preg_match('/\.(mkv|hevc)$/i', $decryptedUrl) || stripos($decryptedUrl, 'x265') !== false || stripos($decryptedUrl, 'hevc') !== false) {
@@ -1141,6 +1138,8 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
+
+        // If no conditions are met
         return ['error' => 'File not found'];
     } catch (\Exception $e) {
         return ['error' => 'Invalid encrypted URL'];
