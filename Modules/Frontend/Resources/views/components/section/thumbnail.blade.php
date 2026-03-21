@@ -40,6 +40,31 @@
                 </iframe>
             </div>
 
+            <!-- Bouton Réactiver le son -->
+            <button id="unmuteBtn" style="
+                display: none;
+                position: absolute;
+                bottom: 70px;
+                right: 16px;
+                z-index: 1000;
+                background: rgba(20,20,20,0.85);
+                color: #fff;
+                border: 1.5px solid rgba(255,255,255,0.3);
+                border-radius: 6px;
+                padding: 7px 14px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                backdrop-filter: blur(6px);
+                gap: 6px;
+                align-items: center;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='rgba(220,30,30,0.9)'"
+               onmouseout="this.style.background='rgba(20,20,20,0.85)'">
+                <i class="ph ph-speaker-simple-x" style="font-size:15px;"></i>
+                {{ __("messages.unmute") }}
+            </button>
+
             <!-- Custom Ad Modal -->
             <div id="customAdModal">
                 <div id="customAdContent">

@@ -1640,6 +1640,7 @@ return [
     'edit' => 'Edit',
     'delete' => 'Delete',
     'failed_to_submit_review' => 'Failed to submit review. Please try again.',
+    'unmute' => 'Unmute',
     'skip_trailer' => 'Skip Trailer',
     'skip_intro' => 'Skip Intro',
     'previous_episode' => 'Previous Episode',
