@@ -115,7 +115,7 @@
 
         /* Ensure proper spacing for card-style-slider */
         .card-style-slider .slick-general:not(.slick-initialized) {
-            margin-bottom: 0.5rem !important;
+            margin-bottom: 1.5rem !important;
             overflow: visible !important;
         }
 
@@ -136,7 +136,7 @@
         .section-wraper .main-title { margin-bottom: 0 !important; }
         .section-wraper .d-flex.my-2 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
         /* Réduire l'espacement entre les catégories */
-        .card-style-slider .slick-list.draggable { margin-bottom: 0.5rem !important; }
+        .card-style-slider .slick-list.draggable { margin-bottom: 1.5rem !important; }
         .card-style-slider { margin-bottom: 0 !important; }
         .banner-section {
             padding-left: 0 !important;
