@@ -443,6 +443,10 @@ class SettingsController extends Controller
             'player_subtitles_default',
             'player_watermark_position',
             'player_forward_seconds',
+            'ppv_watermark_enabled',
+            'ppv_watermark_content',
+            'ppv_watermark_opacity',
+            'ppv_watermark_interval',
         ];
         $data = $this->fieldsData($fields);
         return view('setting::backend.setting.section-pages.video-player', compact('data'));
