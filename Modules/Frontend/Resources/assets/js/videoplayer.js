@@ -74,40 +74,6 @@ try {
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = document.querySelector('meta[name="baseUrl"]').getAttribute('content');
 
-  // ── Bouton "Réactiver le son" ────────────────────────────────────────
-  (function() {
-    const btn = document.getElementById('unmuteBtn');
-    if (!btn) return;
-
-    function syncBtn() {
-      const vid = document.getElementById('videoPlayer');
-      if (!vid) return;
-      const muted = vid.muted || vid.volume === 0;
-      btn.style.display = muted ? 'inline-flex' : 'none';
-    }
-
-    btn.addEventListener('click', function() {
-      const vid = document.getElementById('videoPlayer');
-      if (!vid) return;
-      vid.muted = false;
-      vid.volume = 1;
-      try {
-        const vjsPlayer = videojs.getPlayer('videoPlayer');
-        if (vjsPlayer) { vjsPlayer.muted(false); vjsPlayer.volume(1); }
-      } catch(e) {}
-      btn.style.display = 'none';
-    });
-
-    const vid = document.getElementById('videoPlayer');
-    if (vid) {
-      vid.addEventListener('volumechange', syncBtn);
-      vid.addEventListener('play', syncBtn);
-      vid.addEventListener('playing', syncBtn);
-      setTimeout(syncBtn, 1000);
-      setTimeout(syncBtn, 3000);
-    }
-  })();
-  // ────────────────────────────────────────────────────────────────────
 
   const player = videojs('videoPlayer', {
     techOrder: ['vimeo', 'youtube', 'html5', 'hls', 'embed'],
