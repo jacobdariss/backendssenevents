@@ -32,11 +32,6 @@ class CustomAdsSettingController extends Controller
                         isset($limitation['limitation_value']) &&
                         $limitation['limitation_value'] == 0
                     ) {
-                        Log::info('CustomAds are disabled for this user', [
-                            'user_id' => $user->id,
-                            'subscription_plan' => $subscription['plan_type'],
-                            'plan_limitations' => $planLimitations
-                        ]);
                         // Ads are disabled for this user   
                         return ApiResponse::success([], __('messages.ads_are_disabled_in_your_subscription'), 200);
                     }
@@ -146,15 +141,6 @@ class CustomAdsSettingController extends Controller
             $targets = json_decode($ad->target_categories, true);
             return is_array($targets) && count($targets) > 0;
         })->values();
-
-
-            Log::info('CustomAds query result', [
-                'content_type' => $contentType,
-                'content_id' => $contentId,
-                'current_date' => $currentDate,
-                'ads_found' => $filteredAds->count(),
-                'ads' => $filteredAds->toArray()
-            ]);
 
             return response()->json([
                 'success' => true,
