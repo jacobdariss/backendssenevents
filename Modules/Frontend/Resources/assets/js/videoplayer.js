@@ -3615,7 +3615,12 @@ document.addEventListener('DOMContentLoaded', function () {
       originalConsoleError.apply(console, args);
     };
 
-    // IMA setup
+    // IMA setup — uniquement si ce n'est PAS du livetv
+    if (contentType === 'livetv') {
+      // LiveTV : pas de pubs, démarrage direct
+      return;
+    }
+
     const adsRenderingSettings = new google.ima.AdsRenderingSettings();
     adsRenderingSettings.enablePreloading = true;
     adsRenderingSettings.uiElements = [
@@ -3640,6 +3645,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let customAdChecked = false;
     player.one('play', function () {
+      // Vérifier si des pubs sont disponibles dans le prefetch
+      // Si pas de pubs custom ET pas de pubs VAST → démarrer directement sans pause
+      const _hasCustomAds = window._prefetchedCustomAds?.data?.some(a => a.placement === 'player' && a.status == 1);
+      const _hasVastAds   = window._prefetchedVastAds?.data?.length > 0;
+
+      if (!_hasCustomAds && !_hasVastAds && window._prefetchedCustomAds !== undefined) {
+        // Pas de pubs — démarrer directement sans pauser
+        customAdPlayed = true;
+        customAdChecked = true;
+        player.ima.initializeAdDisplayContainer();
+        startPlaybackInterval();
+        return;
+      }
+
       if (!customAdPlayed && !customAdChecked) {
         customAdChecked = true;
         player.pause();
