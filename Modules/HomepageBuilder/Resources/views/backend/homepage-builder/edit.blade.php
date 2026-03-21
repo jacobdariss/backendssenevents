@@ -13,6 +13,12 @@
     @csrf
     @if($section) @method('PUT') @endif
 
+    @if($errors->any())
+    <div class="alert alert-danger mb-3">
+        <ul class="mb-0">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    </div>
+    @endif
+
     <div class="row g-4">
         {{-- Colonne gauche --}}
         <div class="col-lg-7">
