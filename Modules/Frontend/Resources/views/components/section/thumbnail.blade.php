@@ -55,7 +55,7 @@
                    data-movie-access="{{ $dataAccess ?? '' }}"
                    data-plan-id="{{ $plan_id ?? '' }}"
                    data-watch-time="{{ $watched_time ?? 0 }}"
-                   @if ($type != 'Local') data-encrypted="{{ $data }}" @endif
+                   @if(!empty($data)) data-encrypted="{{ $data }}" @endif
                    @if (isset($content_type) && isset($content_id))
                        data-contentType="{{ $content_type }}"
                        data-contentId="{{ $content_id }}"
@@ -72,9 +72,7 @@
                    playsinline webkit-playsinline
                    x-webkit-airplay="allow"
                    preload="metadata">
-                @if ($type == 'Local')
-                    <source src="{{ $data }}" type="video/mp4" id="videoSource">
-                @endif
+                {{-- Local : vidéo chargée via /video/stream/{encrypted} comme les autres --}}
             </video>
 
             <!-- Vimeo iframe -->
