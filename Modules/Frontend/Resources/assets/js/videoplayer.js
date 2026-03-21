@@ -3813,7 +3813,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
   function initPPVWatermark() {
     const cfg = window.watermarkConfig;
-    if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) return;
+    console.log('[PPV Watermark] config:', cfg);
+    console.log('[PPV Watermark] data-movie-access:', document.getElementById('videoPlayer')?.getAttribute('data-movie-access'));
+    if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) {
+      console.log('[PPV Watermark] disabled or missing config');
+      return;
+    }
 
     const access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
     if (access !== 'pay-per-view') return;
