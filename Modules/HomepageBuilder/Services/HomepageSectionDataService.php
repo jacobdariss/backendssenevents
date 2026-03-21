@@ -82,7 +82,8 @@ class HomepageSectionDataService
             ])
             ->get(['id', 'name', 'slug', 'poster_url', 'poster_tv_url', 'episode_number',
                    'season_id', 'entertainment_id', 'duration', 'release_date',
-                   'access', 'purchase_type', 'plan_id', 'IMDb_rating']);
+                   'access', 'purchase_type', 'plan_id', 'IMDb_rating',
+                   'trailer_url', 'trailer_url_type']);
 
         // Respecter l'ordre de sélection manuelle
         $ordered = collect($ids)->map(fn($id) => $episodes->firstWhere('id', $id))->filter()->values();
@@ -116,6 +117,8 @@ class HomepageSectionDataService
                 'access'           => $ep->access,
                 'imdb_rating'      => $ep->IMDb_rating,
                 'is_episode'       => true,
+                'trailer_url'      => $ep->trailer_url ?? '',
+                'trailer_url_type' => $ep->trailer_url_type ?? '',
             ];
         })->toArray();
 
