@@ -130,6 +130,8 @@
         .section-wraper {
             padding-left: 6.25em;
             padding-right: 6.25em;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
         }
         .banner-section {
             padding-left: 0 !important;
