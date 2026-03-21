@@ -23,7 +23,7 @@
                     <h5 class="main-title text-capitalize mb-0">{{ $title ?? __('messages.lbl_clips') }}</h5>
                 </div>
                 <div class="card-style-slider">
-                    <div class="slick-general" data-items="5.5" data-items-desktop="5" data-items-laptop="4.5"
+                    <div class="slick-general" data-items="4.5" data-items-desktop="4" data-items-laptop="3.5"
                             data-items-tab="3.5" data-items-mobile-sm="2.5" data-items-mobile="2.5" data-speed="1000"
                             data-autoplay="false" data-center="false" data-infinite="false" data-navigation="true"
                             data-pagination="false" data-spacing="12">
