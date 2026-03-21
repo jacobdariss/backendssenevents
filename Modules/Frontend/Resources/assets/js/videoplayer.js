@@ -1100,21 +1100,6 @@ document.addEventListener('DOMContentLoaded', function () {
       //     return;
       //   }
       // If supported, fetch and set video source
-      // Précharger custom-ads et vast-ads EN PARALLÈLE avec le déchiffrement du stream
-      // Évite la pause de 15s au premier play
-      const _adParams = new URLSearchParams();
-      if (contentId) _adParams.append('content_id', contentId);
-      if (contentType) _adParams.append('type', contentType);
-      if (contentVideoType) _adParams.append('video_type', contentVideoType);
-      Promise.all([
-        fetch(`${baseUrl}/api/custom-ads/get-active?${_adParams}`).then(r=>r.json()).catch(()=>null),
-        fetch(`${baseUrl}/api/vast-ads/get-active?${_adParams}`).then(r=>r.json()).catch(()=>null),
-      ]).then(([customAdsData, vastAdsData]) => {
-        // Stocker en cache pour que player.one('play') les utilise sans re-fetcher
-        if (customAdsData !== null) window._prefetchedCustomAds = customAdsData;
-        if (vastAdsData !== null) window._prefetchedVastAds = vastAdsData;
-      });
-
       fetch(`${baseUrl}/video/stream/${encodeURIComponent(videoUrl)}`)
         .then((response) => response.json())
         .then((data) => {
@@ -3246,12 +3231,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (currentCategoryId) params.append('category_id', currentCategoryId);
     if (contentVideoType) params.append('video_type', contentVideoType);
     const CustomapiUrl = `${baseUrl}/api/custom-ads/get-active?${params.toString()}`;
-    // Utiliser le prefetch si disponible, sinon fetch
-    const _customAdPromise = window._prefetchedCustomAds !== undefined
-      ? Promise.resolve(window._prefetchedCustomAds)
-      : fetch(CustomapiUrl).then(res => res.json());
-    window._prefetchedCustomAds = undefined; // consommer le cache
-    _customAdPromise
+    fetch(CustomapiUrl).then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.data)) {
           const ad = data.data.find(item => item.placement === 'player' && item.status == 1);
@@ -3772,12 +3752,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const apiUrl = `${baseUrl}/api/vast-ads/get-active?${params.toString()}`;
-    // Utiliser le prefetch si disponible, sinon fetch
-    const _vastPromise = window._prefetchedVastAds !== undefined
-      ? Promise.resolve(window._prefetchedVastAds)
-      : fetch(apiUrl).then(res => res.json());
-    window._prefetchedVastAds = undefined; // consommer le cache
-    _vastPromise
+    fetch(apiUrl).then(res => res.json())
       .then(response => {
         // console.log('Ads API response', response);
         // Backend responses use either `status` (ApiResponse) or `success` (some endpoints).
