@@ -743,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const subFetch = (accessType === 'paid' && plan_id)
       ? CheckSubscription(plan_id)
-      : Promise.resolve(accessType !== 'paid')
+      : Promise.resolve(true) // free / pay-per-view / autres : accès direct
 
     const [wtData, canPlay] = await Promise.all([watchTimeFetch, subFetch])
 
@@ -827,6 +827,7 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdPlayed = true;
         handleWatchButtonClick(watchNowButton);
         mountSkipIntroFrom(watchNowButton);
+        loadAdsAndStartInterval();
       });
     })
   }
