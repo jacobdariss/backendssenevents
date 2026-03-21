@@ -226,6 +226,62 @@
         </div>
     </div>
 
+
+    {{-- Filigrane utilisateur PPV ─────────────────────────────────────────── --}}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user-shield me-2 text-warning"></i>Filigrane utilisateur (PPV)</h5>
+            <small class="text-muted">Affiche les informations de l'utilisateur en filigrane sur les contenus Pay Per View.</small>
+        </div>
+        <div class="card-body">
+            <div class="mb-4 d-flex align-items-center gap-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="ppv_watermark_enabled" id="ppvWatermarkToggle"
+                           value="1" {{ ($data['ppv_watermark_enabled'] ?? '1') == '1' ? 'checked' : '' }}>
+                    <label class="form-check-label fw-semibold" for="ppvWatermarkToggle">
+                        Activer le filigrane sur les contenus PPV
+                    </label>
+                </div>
+            </div>
+            <div id="ppvWatermarkOptions" style="{{ ($data['ppv_watermark_enabled'] ?? '1') == '1' ? '' : 'opacity:0.4;pointer-events:none' }}">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold mb-2">Informations affichées</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        @foreach(['name_email' => 'Nom + Email', 'name' => 'Nom seulement', 'email' => 'Email seulement', 'datetime' => 'Date et heure'] as $val => $lbl)
+                        <label class="border rounded-2 px-3 py-2 cursor-pointer d-flex align-items-center gap-2
+                            {{ ($data['ppv_watermark_content'] ?? 'name_email') === $val ? 'border-primary bg-primary bg-opacity-10' : '' }}">
+                            <input type="radio" name="ppv_watermark_content" value="{{ $val }}"
+                                   {{ ($data['ppv_watermark_content'] ?? 'name_email') === $val ? 'checked' : '' }}>
+                            {{ $lbl }}
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">
+                            Opacité
+                            <span class="badge bg-secondary ms-1" id="opacityVal">{{ $data['ppv_watermark_opacity'] ?? '20' }}%</span>
+                        </label>
+                        <input type="range" class="form-range" name="ppv_watermark_opacity"
+                               min="5" max="80" step="5"
+                               value="{{ $data['ppv_watermark_opacity'] ?? '20' }}"
+                               oninput="document.getElementById('opacityVal').textContent = this.value + '%'">
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Discret (5%)</span><span>Visible (80%)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Déplacement toutes les (secondes)</label>
+                        <input type="number" class="form-control" name="ppv_watermark_interval"
+                               min="5" max="120" value="{{ $data['ppv_watermark_interval'] ?? '15' }}">
+                        <div class="form-text">Le filigrane change de position aléatoirement à cet intervalle.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Bouton enregistrer bas --}}
     <div class="d-flex justify-content-end mb-4">
         <button type="submit" class="btn btn-primary btn-lg">
@@ -246,6 +302,24 @@ document.addEventListener('DOMContentLoaded', function () {
             delayBox.style.opacity = toggle.checked ? '1' : '0.4';
         });
     }
+    // Toggle filigrane PPV
+    const ppvToggle = document.getElementById('ppvWatermarkToggle');
+    const ppvOptions = document.getElementById('ppvWatermarkOptions');
+    if (ppvToggle && ppvOptions) {
+        ppvToggle.addEventListener('change', () => {
+            ppvOptions.style.opacity = ppvToggle.checked ? '1' : '0.4';
+            ppvOptions.style.pointerEvents = ppvToggle.checked ? '' : 'none';
+        });
+    }
+    // Radios filigrane contenu
+    document.querySelectorAll('input[name="ppv_watermark_content"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('input[name="ppv_watermark_content"]').forEach(r => {
+                r.closest('label').classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
+            });
+            this.closest('label').classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
+        });
+    });
     // Highlight radio watermark au clic
     document.querySelectorAll('input[name="player_watermark_position"]').forEach(radio => {
         radio.addEventListener('change', function () {
