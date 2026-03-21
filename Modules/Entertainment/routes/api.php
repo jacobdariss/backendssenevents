@@ -63,5 +63,6 @@ Route::prefix('v3')->middleware(['throttle:api'])->group(function () {
 Route::group(['prefix'=>'v3','middleware' => ['auth:sanctum', 'checkApiDevice']], function () {
     Route::get('continuewatch-list', [WatchlistController::class, 'continuewatchListV3']);
     Route::get('watch-list', [WatchlistController::class, 'watchListV3']);
+    Route::get('watch-time/{type}/{id}', [WatchlistController::class, 'getWatchTime']);
 
 });

@@ -732,35 +732,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.scrollTo({ top: 0, behavior: 'smooth' })
 
-    fetch(`${baseUrl}/api/continuewatch-list`)
-      .then((response) => response.json())
-      .then(async (data) => {
+    // Utiliser l'endpoint léger watch-time au lieu de charger tout continuewatch-list
+    const entertainmentId  = button.getAttribute('data-entertainment-id')
+    const entertainmentType = button.getAttribute('data-entertainment-type')
+    const plan_id = button.getAttribute('data-plan-id')
 
-        const entertainmentId = button.getAttribute('data-entertainment-id')
-        const entertainmentType = button.getAttribute('data-entertainment-type')
-        const matchingVideo = data.data.find((item) => item.entertainment_id === parseInt(entertainmentId) && item.entertainment_type === entertainmentType)
-        let lastWatchedTime = 0
-        if (matchingVideo && matchingVideo.total_watched_time) {
-          lastWatchedTime = timeStringToSeconds(matchingVideo.total_watched_time)
-        }
-        if (accessType === 'paid') {
-          const plan_id = button.getAttribute('data-plan-id');
-          let canPlay = plan_id ? await CheckSubscription(plan_id) : false;
+    // Paralléliser : watch-time + subscription en même temps
+    const watchTimeFetch = fetch(`${baseUrl}/api/v3/watch-time/${entertainmentType}/${entertainmentId}`)
+      .then(r => r.json()).catch(() => ({ watched_time: 0 }))
 
-          if (!canPlay) {
-            player.pause()
-            isPopupShown = true // Mark that popup was shown
-            $('#DeviceSupport').modal('show') // Show device support modal if not supported
-            return // Stop further execution
-          }
-        }
-        if (accessType === 'free' || accessType === 'pay-per-view') {
-          playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-        } else {
-          handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-        }
-      })
-      .catch((error) => console.error('Error fetching continue watch:', error))
+    const subFetch = (accessType === 'paid' && plan_id)
+      ? CheckSubscription(plan_id)
+      : Promise.resolve(accessType !== 'paid')
+
+    const [wtData, canPlay] = await Promise.all([watchTimeFetch, subFetch])
+
+    if (!canPlay) {
+      player.pause()
+      isPopupShown = true
+      $('#DeviceSupport').modal('show')
+      return
+    }
+
+    let lastWatchedTime = 0
+    if (wtData && wtData.total_watched_time) {
+      lastWatchedTime = timeStringToSeconds(wtData.total_watched_time)
+    }
+
+    if (accessType === 'free' || accessType === 'pay-per-view') {
+      playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+    } else {
+      handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+    }
 
     isWatchHistorySaved = false // Reset flag
   }

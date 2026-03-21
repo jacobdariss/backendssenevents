@@ -788,4 +788,30 @@ class WatchlistController extends Controller
         // Return cached response
         // return response()->json($cachedResponse['data'], 200);
     }
+
+    /**
+     * Endpoint léger — retourne uniquement le watched_time pour un contenu donné.
+     * Utilisé au démarrage du lecteur pour éviter de charger tout continuewatch-list.
+     */
+    public function getWatchTime(Request $request, string $type, int $id)
+    {
+        $userId    = auth()->id();
+        $profileId = $request->has('profile_id') && $request->profile_id
+            ? $request->profile_id
+            : getCurrentProfile($userId, $request);
+
+        $row = \Modules\Entertainment\Models\ContinueWatch::where('user_id', $userId)
+            ->where('profile_id', $profileId)
+            ->where('entertainment_type', $type)
+            ->where('entertainment_id', $id)
+            ->select('total_watched_time', 'watched_time')
+            ->first();
+
+        return response()->json([
+            'status'            => true,
+            'total_watched_time' => $row?->total_watched_time ?? null,
+            'watched_time'      => $row?->watched_time ?? 0,
+        ]);
+    }
+
 }
