@@ -1,4 +1,4 @@
-<div class="language-block">
+<div class="language-block {{ $presentClass ?? '' }}">
     <div class="d-flex align-items-center justify-content-between my-2 me-2">
         <h5 class="main-title text-capitalize mb-0">{{ $title }}</h5>
         @if (count($popular_language) > 0)
@@ -8,8 +8,15 @@
         @endif
     </div>
     <div class="card-style-slider slide-data-less">
-        <div class="slick-general slick-general-language" data-items="5" data-items-laptop="4.5" data-items-tab="3"
-            data-items-mobile-sm="3.5" data-items-mobile="2.5" data-speed="1000" data-autoplay="false"
+        @php
+            $ipr = $itemsPerRow ?? 5;
+            $diLaptop = min($ipr - 0.5, 4.5);
+            $diTab    = min($ipr - 2, 3);
+            $diMobSm  = min($ipr - 1.5, 3.5);
+            $diMob    = 2.5;
+        @endphp
+        <div class="slick-general slick-general-language" data-items="{{ $ipr }}" data-items-laptop="{{ $diLaptop }}" data-items-tab="{{ $diTab }}"
+            data-items-mobile-sm="{{ $diMobSm }}" data-items-mobile="{{ $diMob }}" data-speed="1000" data-autoplay="false"
             data-center="false" data-infinite="false" data-navigation="true" data-pagination="false" data-spacing="12">
             @foreach ($popular_language as $data)
                 <div class="slick-item">

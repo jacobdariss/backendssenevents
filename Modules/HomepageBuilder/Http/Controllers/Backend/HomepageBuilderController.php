@@ -75,11 +75,17 @@ class HomepageBuilderController extends Controller
             'card_orientation' => 'nullable|in:vertical,horizontal',
             'content_ids'      => 'nullable|array',
             'episode_ids'      => 'nullable|array',
+            'settings'                  => 'nullable|array',
+            'settings.card_size'        => 'nullable|in:small,medium,large',
+            'settings.badge_size'       => 'nullable|in:small,medium,large',
+            'settings.hover_effect'     => 'nullable|in:none,subtle,zoom',
+            'settings.items_per_row'    => 'nullable|integer|min:3|max:7',
         ]);
         $data['content_ids']      = !empty($data['content_ids']) ? $data['content_ids'] : null;
         $data['episode_ids']      = !empty($data['episode_ids']) ? $data['episode_ids'] : null;
         $data['card_orientation'] = $request->input('card_orientation', 'vertical');
         $data['is_active']        = $request->boolean('is_active', $section->is_active);
+        $data['settings']         = $request->input('settings', []);
         $section->update($data);
         HomepageSection::clearCache();
         return redirect()->route('backend.homepage-builder.index')
@@ -117,6 +123,11 @@ class HomepageBuilderController extends Controller
             'card_orientation' => 'nullable|in:vertical,horizontal',
             'content_ids'      => 'nullable|array',
             'episode_ids'      => 'nullable|array',
+            'settings'                  => 'nullable|array',
+            'settings.card_size'        => 'nullable|in:small,medium,large',
+            'settings.badge_size'       => 'nullable|in:small,medium,large',
+            'settings.hover_effect'     => 'nullable|in:none,subtle,zoom',
+            'settings.items_per_row'    => 'nullable|integer|min:3|max:7',
         ]);
         $data['slug']             = Str::slug($data['name']) . '-' . uniqid();
         $data['position']         = HomepageSection::max('position') + 1;
@@ -124,6 +135,7 @@ class HomepageBuilderController extends Controller
         $data['card_orientation'] = $request->input('card_orientation', 'vertical');
         $data['content_ids']      = !empty($data['content_ids']) ? $data['content_ids'] : null;
         $data['episode_ids']      = !empty($data['episode_ids']) ? $data['episode_ids'] : null;
+        $data['settings']         = $request->input('settings', []);
         HomepageSection::create($data);
         HomepageSection::clearCache();
         return redirect()->route('backend.homepage-builder.index')->with('success', 'Section créée');

@@ -97,6 +97,76 @@
                                value="{{ old('card_orientation', $section?->card_orientation ?? 'vertical') }}">
                     </div>
 
+                    {{-- Présentation des cartes --}}
+                    @php $settings = old('settings', $section?->settings ?? []); @endphp
+                    <div class="mt-4" id="presentation-wrap">
+                        <label class="form-label fw-semibold">Présentation des cartes</label>
+
+                        {{-- Taille des cartes --}}
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Taille des cartes</label>
+                            <div class="d-flex gap-2">
+                                @foreach(['small' => 'Petit', 'medium' => 'Moyen', 'large' => 'Grand'] as $val => $lbl)
+                                <div class="presentation-option {{ ($settings['card_size'] ?? 'medium') === $val ? 'active' : '' }}"
+                                     data-field="card_size" data-value="{{ $val }}" onclick="setPresentation('card_size', '{{ $val }}')">
+                                    <div class="presentation-icon presentation-size-{{ $val }}">
+                                        <div class="p-thumb"></div><div class="p-thumb"></div><div class="p-thumb"></div>
+                                    </div>
+                                    <span>{{ $lbl }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                            <input type="hidden" name="settings[card_size]" id="setting_card_size"
+                                   value="{{ $settings['card_size'] ?? 'medium' }}">
+                        </div>
+
+                        {{-- Taille des badges --}}
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Badges (premium, location, note)</label>
+                            <div class="d-flex gap-2">
+                                @foreach(['small' => 'Discret', 'medium' => 'Normal', 'large' => 'Visible'] as $val => $lbl)
+                                <div class="presentation-option {{ ($settings['badge_size'] ?? 'medium') === $val ? 'active' : '' }}"
+                                     data-field="badge_size" data-value="{{ $val }}" onclick="setPresentation('badge_size', '{{ $val }}')">
+                                    <div class="presentation-icon">
+                                        <span class="badge-preview badge-preview-{{ $val }}"><i class="ph ph-crown"></i></span>
+                                    </div>
+                                    <span>{{ $lbl }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                            <input type="hidden" name="settings[badge_size]" id="setting_badge_size"
+                                   value="{{ $settings['badge_size'] ?? 'medium' }}">
+                        </div>
+
+                        {{-- Effet hover --}}
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Effet au survol</label>
+                            <div class="d-flex gap-2">
+                                @foreach(['none' => 'Aucun', 'subtle' => 'Subtil', 'zoom' => 'Zoom + Elévation'] as $val => $lbl)
+                                <div class="presentation-option {{ ($settings['hover_effect'] ?? 'subtle') === $val ? 'active' : '' }}"
+                                     data-field="hover_effect" data-value="{{ $val }}" onclick="setPresentation('hover_effect', '{{ $val }}')">
+                                    <div class="presentation-icon hover-icon-{{ $val }}">
+                                        <div class="p-thumb"></div>
+                                    </div>
+                                    <span>{{ $lbl }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                            <input type="hidden" name="settings[hover_effect]" id="setting_hover_effect"
+                                   value="{{ $settings['hover_effect'] ?? 'subtle' }}">
+                        </div>
+
+                        {{-- Nombre de cartes par ligne --}}
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Cartes par ligne (desktop)</label>
+                            <select name="settings[items_per_row]" class="form-select form-select-sm" style="max-width:200px">
+                                @foreach([3 => '3', 4 => '4', 5 => '5 (défaut)', 6 => '6', 7 => '7'] as $val => $lbl)
+                                <option value="{{ $val }}" {{ ($settings['items_per_row'] ?? 5) == $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="mt-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
@@ -311,14 +381,17 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#content_ids').select2({ placeholder: 'Chercher et sélectionner...', allowClear: true, width: '100%' });
     }
 
-    // ── Orientation : masquer pour types sans vignettes ─────────────────────
+    // ── Orientation & Présentation : masquer pour types sans vignettes ────
     const noCardTypes = ['banner', 'genre', 'language', 'personality', 'continue_watching'];
-    function toggleOrientationWrap() {
-        const wrap = document.getElementById('orientation-wrap');
-        if (wrap) wrap.style.display = noCardTypes.includes(typeSelect.value) ? 'none' : '';
+    function togglePresentationWraps() {
+        const hide = noCardTypes.includes(typeSelect.value);
+        const orientWrap = document.getElementById('orientation-wrap');
+        const presentWrap = document.getElementById('presentation-wrap');
+        if (orientWrap) orientWrap.style.display = hide ? 'none' : '';
+        if (presentWrap) presentWrap.style.display = hide ? 'none' : '';
     }
-    toggleOrientationWrap();
-    typeSelect.addEventListener('change', toggleOrientationWrap);
+    togglePresentationWraps();
+    typeSelect.addEventListener('change', togglePresentationWraps);
 
     // ── Episode Picker : AJAX cascadant ──────────────────────────────────────
     const tvshowSelect  = document.getElementById('ep_tvshow_select');
@@ -429,6 +502,13 @@ function setOrientation(value) {
         el.classList.toggle('active', el.dataset.value === value);
     });
 }
+
+function setPresentation(field, value) {
+    document.getElementById('setting_' + field).value = value;
+    document.querySelectorAll('.presentation-option[data-field="' + field + '"]').forEach(el => {
+        el.classList.toggle('active', el.dataset.value === value);
+    });
+}
 </script>
 
 <style>
@@ -452,6 +532,34 @@ function setOrientation(value) {
 
 #episode-picker-card { border-left: 3px solid var(--bs-primary); }
 #episode-picker-card .card-title { font-size: .95rem; }
+
+/* ── Présentation des cartes ──────────────────────────────────────────── */
+.presentation-option {
+    cursor: pointer;
+    border: 2px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    padding: 8px 14px;
+    text-align: center;
+    transition: all .2s ease;
+    min-width: 90px;
+    font-size: .8rem;
+    color: var(--bs-body-color);
+}
+.presentation-option:hover { border-color: var(--bs-primary); }
+.presentation-option.active { border-color: var(--bs-primary); background: rgba(var(--bs-primary-rgb),.08); color: var(--bs-primary); }
+.presentation-icon { display: flex; gap: 3px; justify-content: center; align-items: center; margin-bottom: 6px; min-height: 28px; }
+.presentation-size-small .p-thumb { width: 14px; height: 20px; background: var(--bs-border-color); border-radius: 2px; }
+.presentation-size-medium .p-thumb { width: 18px; height: 26px; background: var(--bs-border-color); border-radius: 2px; }
+.presentation-size-large .p-thumb { width: 22px; height: 32px; background: var(--bs-border-color); border-radius: 2px; }
+.presentation-option.active .p-thumb { background: var(--bs-primary); opacity: .6; }
+.badge-preview { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bs-warning); color: #fff; }
+.badge-preview-small { width: 18px; height: 18px; font-size: .6rem; }
+.badge-preview-medium { width: 24px; height: 24px; font-size: .75rem; }
+.badge-preview-large { width: 32px; height: 32px; font-size: 1rem; }
+.presentation-option.active .badge-preview { background: var(--bs-primary); }
+.hover-icon-none .p-thumb { width: 24px; height: 30px; background: var(--bs-border-color); border-radius: 2px; }
+.hover-icon-subtle .p-thumb { width: 24px; height: 30px; background: var(--bs-border-color); border-radius: 2px; transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+.hover-icon-zoom .p-thumb { width: 28px; height: 34px; background: var(--bs-border-color); border-radius: 2px; transform: translateY(-4px); box-shadow: 0 6px 12px rgba(0,0,0,.3); }
 
 /* ── Select2 : container ────────────────────────────────────────────────── */
 .select2-container--default .select2-selection--multiple {

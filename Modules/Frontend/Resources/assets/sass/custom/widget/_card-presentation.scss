@@ -1,0 +1,219 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// Dynamic card presentation classes — controlled by HomepageBuilder settings
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Card Size ─────────────────────────────────────────────────────────────
+// Overrides the default aspect-ratio on .iq-card images
+
+.card-size-small {
+  .iq-card .block-images .image-box img {
+    aspect-ratio: 2 / 2.4;
+  }
+  .genres-img {
+    height: 180px !important;
+  }
+  .cast-image {
+    height: 100px !important;
+    width: 100px !important;
+  }
+  .top-ten-img {
+    height: 280px !important;
+  }
+  .continue-watch-card .continue-watch-image {
+    height: 110px !important;
+  }
+  .channel-img {
+    max-height: 100px;
+  }
+}
+
+.card-size-medium {
+  // Default sizes — no overrides needed
+}
+
+.card-size-large {
+  .iq-card .block-images .image-box img {
+    aspect-ratio: 2 / 3.2;
+  }
+  .genres-img {
+    height: 260px !important;
+  }
+  .cast-image {
+    height: 160px !important;
+    width: 160px !important;
+  }
+  .top-ten-img {
+    height: 380px !important;
+  }
+  .continue-watch-card .continue-watch-image {
+    height: 165px !important;
+  }
+  .channel-img {
+    max-height: 160px;
+  }
+}
+
+// ── Badge Size ────────────────────────────────────────────────────────────
+// Overrides the default badge dimensions
+
+.badge-size-small {
+  .product-premium {
+    height: 1.25rem !important;
+    width: 1.25rem !important;
+    line-height: 1.35rem !important;
+    i { font-size: 0.6rem !important; }
+  }
+  .product-rent {
+    font-size: 0.625rem !important;
+    padding: 0.2rem 0.35rem !important;
+    gap: 0.15rem !important;
+    i { font-size: 0.625rem !important; }
+  }
+  .ratting-value {
+    font-size: 0.625rem !important;
+    padding: 0.2rem 0.35rem !important;
+  }
+  .product-new {
+    padding: 0.25rem 0.4rem !important;
+    font-size: 0.6rem !important;
+  }
+}
+
+.badge-size-medium {
+  // Default sizes — no overrides needed
+}
+
+.badge-size-large {
+  .product-premium {
+    height: 2.5rem !important;
+    width: 2.5rem !important;
+    line-height: 2.6rem !important;
+    i { font-size: 1rem !important; }
+  }
+  .product-rent {
+    font-size: 0.875rem !important;
+    padding: 0.45rem 0.7rem !important;
+    gap: 0.3rem !important;
+    i { font-size: 1rem !important; }
+  }
+  .ratting-value {
+    font-size: 0.875rem !important;
+    padding: 0.45rem 0.65rem !important;
+    font-weight: 600;
+  }
+  .product-new {
+    padding: 0.5rem 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+// ── Hover Effects ─────────────────────────────────────────────────────────
+
+.hover-none {
+  .iq-card,
+  .genres-card,
+  .cast-card,
+  .livetv-card,
+  .continue-watch-card,
+  .channel-card,
+  .language-card {
+    transition: none !important;
+    &:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.hover-subtle {
+  .iq-card,
+  .genres-card,
+  .cast-card,
+  .livetv-card,
+  .continue-watch-card,
+  .channel-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+.hover-zoom {
+  .slick-item,
+  .swiper-slide {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: scale(1.06) translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+      position: relative;
+    }
+  }
+  .iq-card .block-images .image-box img {
+    transition: transform 0.3s ease;
+  }
+  .iq-card:hover .block-images .image-box img {
+    mix-blend-mode: inherit;
+  }
+  .genres-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: scale(1.06) translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+  }
+  .cast-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: scale(1.06) translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+  }
+  .livetv-card,
+  .channel-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: scale(1.06) translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+  }
+  .continue-watch-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: scale(1.06) translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+  }
+  .language-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    &:hover {
+      transform: scale(1.06) translateY(-8px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// ── Horizontal orientation override for card-size ──────────────────────────
+.cards-horizontal {
+  &.card-size-small .iq-card .block-images .image-box img {
+    aspect-ratio: 16 / 8 !important;
+  }
+  &.card-size-large .iq-card .block-images .image-box img {
+    aspect-ratio: 16 / 10 !important;
+  }
+}
+
+// ── Responsive : disable zoom on mobile/touch ─────────────────────────────
+@media (max-width: 767.98px) {
+  .hover-zoom {
+    .slick-item,
+    .swiper-slide {
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+}

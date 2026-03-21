@@ -1,5 +1,5 @@
 @php $orientationClass = (!empty($orientation) && $orientation === "horizontal") ? "cards-horizontal" : ""; @endphp
-<div class="streamit-block {{ $orientationClass }}">
+<div class="streamit-block {{ $orientationClass }} {{ $presentClass ?? '' }}">
     <div class="d-flex align-items-center justify-content-between my-2 me-2">
         <h5 class="main-title text-capitalize mb-0">{{ $title }}</h5>
 
@@ -30,8 +30,16 @@
         @endif
     </div>
       <div class="card-style-slider {{ count($data) <= 6 ? 'slide-data-less' : '' }}">
-          <div class="slick-general slick-general-video-section" data-items="5" data-items-desktop="4.5"
-              data-items-laptop="4.5" data-items-tab="3.5" data-items-mobile-sm="3.5" data-items-mobile="2.5"
+          @php
+              $ipr = $itemsPerRow ?? 5;
+              $diDesktop = $ipr - 0.5;
+              $diLaptop  = min($ipr - 1, 4);
+              $diTab     = min($ipr - 1.5, 3.5);
+              $diMobSm   = min($ipr - 1.5, 3.5);
+              $diMob     = 2.5;
+          @endphp
+          <div class="slick-general slick-general-video-section" data-items="{{ $ipr }}" data-items-desktop="{{ $diDesktop }}"
+              data-items-laptop="{{ $diLaptop }}" data-items-tab="{{ $diTab }}" data-items-mobile-sm="{{ $diMobSm }}" data-items-mobile="{{ $diMob }}"
               data-speed="1000" data-autoplay="false" data-center="false" data-infinite="false" data-navigation="true"
               data-pagination="false" data-spacing="12">
 

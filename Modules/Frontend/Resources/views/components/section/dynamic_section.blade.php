@@ -9,6 +9,14 @@
     $ct          = $section->content_type;
     $orientation = $section->card_orientation ?? 'vertical';
 
+    // Settings de présentation dynamique
+    $stg          = $section->settings ?? [];
+    $cardSize     = $stg['card_size'] ?? 'medium';
+    $badgeSize    = $stg['badge_size'] ?? 'medium';
+    $hoverEffect  = $stg['hover_effect'] ?? 'subtle';
+    $itemsPerRow  = (int) ($stg['items_per_row'] ?? 5);
+    $presentClass = "card-size-{$cardSize} badge-size-{$badgeSize} hover-{$hoverEffect}";
+
     // Mapper le slug vers la clé cachedResult existante
     $slugToKey = [
         'banner'            => 'sliders',
@@ -74,6 +82,8 @@
                 'title'       => $sectionName,
                 'slug'        => str_replace('-', '_', $slug),
                 'orientation' => $orientation,
+                'presentClass' => $presentClass,
+                'itemsPerRow'  => $itemsPerRow,
             ])
         @else
             @include('frontend::components.section.entertainment', [
@@ -82,6 +92,8 @@
                 'type'        => $ct ?: 'movie',
                 'slug'        => str_replace('-', '_', $slug),
                 'orientation' => $orientation,
+                'presentClass' => $presentClass,
+                'itemsPerRow'  => $itemsPerRow,
             ])
         @endif
     </div>
@@ -96,6 +108,8 @@
             'type'        => 'video',
             'slug'        => str_replace('-', '_', $slug),
             'orientation' => $orientation,
+            'presentClass' => $presentClass,
+            'itemsPerRow'  => $itemsPerRow,
         ])
     </div>
     @endif
@@ -106,6 +120,8 @@
         @include('frontend::components.section.tvchannel', [
             'top_channel' => isset($sectionData['data']) ? $sectionData['data'] : $sectionData,
             'title'       => $sectionName,
+            'presentClass' => $presentClass,
+            'itemsPerRow'  => $itemsPerRow,
         ])
     </div>
     @endif
@@ -116,6 +132,8 @@
             'genres' => isset($sectionData['data']) ? $sectionData['data'] : $sectionData,
             'title'  => $sectionName,
             'slug'   => $slug,
+            'presentClass' => $presentClass,
+            'itemsPerRow'  => $itemsPerRow,
         ])
     </div>
 
@@ -125,6 +143,8 @@
             'data'  => $sectionData,
             'title' => $sectionName,
             'slug'  => $slug,
+            'presentClass' => $presentClass,
+            'itemsPerRow'  => $itemsPerRow,
         ])
     </div>
 
@@ -133,6 +153,8 @@
         @include('frontend::components.section.language', [
             'popular_language' => isset($sectionData['data']) ? $sectionData['data'] : $sectionData,
             'title'            => $sectionName,
+            'presentClass' => $presentClass,
+            'itemsPerRow'  => $itemsPerRow,
         ])
     </div>
 
@@ -142,6 +164,8 @@
             'data'        => $sectionData,
             'title'       => $sectionName,
             'orientation' => $orientation,
+            'presentClass' => $presentClass,
+            'itemsPerRow'  => $itemsPerRow,
         ])
     </div>
 @endif
