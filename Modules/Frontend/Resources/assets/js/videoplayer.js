@@ -759,11 +759,8 @@ document.addEventListener('DOMContentLoaded', function () {
       lastWatchedTime = timeStringToSeconds(wtData.total_watched_time)
     }
 
-    if (accessType === 'free' || accessType === 'pay-per-view') {
-      playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-    } else {
-      handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-    }
+    // canPlay déjà vérifié via Promise.all ci-dessus — lancer directement
+    playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
 
     isWatchHistorySaved = false // Reset flag
   }
