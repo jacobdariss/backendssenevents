@@ -80,6 +80,7 @@
 <script>
     var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
     // Filigrane PPV
+    window.adsSystemEnabled = {{ setting('ads_system_enabled', '0') == '1' ? 'true' : 'false' }};
     window.watermarkConfig = {
         enabled:  {{ (setting('ppv_watermark_enabled', '1') !== '0' && setting('ppv_watermark_enabled', '1') !== null) ? 'true' : 'false' }},
         content:  '{{ setting('ppv_watermark_content', 'name_email') }}',

@@ -3600,6 +3600,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // LiveTV : pas de pubs
     if (contentType === 'livetv') { return; }
 
+    // Pubs désactivées globalement
+    if (!window.adsSystemEnabled) { return; }
+
     // IMA lazy — chargé seulement si pubs VAST existent (évite pause 15s CDN Google)
     let imaInitialized = false;
     window.initIMAIfNeeded = function() {
