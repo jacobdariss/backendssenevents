@@ -475,7 +475,7 @@ return [
                 'rules'    => 'boolean',
                 'class'    => '',
                 'value'    => '1',
-                'help'     => 'Affiche les infos de l'utilisateur en filigrane sur les contenus Pay Per View.',
+                'help'     => "Affiche les infos de l'utilisateur en filigrane sur les contenus Pay Per View.",
             ],
             [
                 'type'     => 'select',
