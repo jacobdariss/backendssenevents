@@ -5,9 +5,12 @@
         <link rel="stylesheet" href="{{ asset('css/videojs.ima.css') }}">
         <script src="{{ asset('js/videojs/video.min.js') }}"></script>
         <script src="{{ asset('js/videojs/videojs-youtube.min.js') }}"></script>
-        <script src="{{ asset('js/videojs/ima3.js') }}"></script>
+        {{-- IMA chargé seulement pour le contenu non-livetv --}}
+        @if(!isset($content_type) || $content_type !== 'livetv')
         <script src="{{ asset('js/videojs/videojs-contrib-ads.min.js') }}"></script>
         <script src="{{ asset('js/videojs/videojs.ima.min.js') }}"></script>
+        {{-- ima3.js (SDK Google IMA) chargé lazily via JS uniquement si VAST ads existent --}}
+        @endif
 
         <div class="video-player">
 

@@ -3073,7 +3073,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const vastUrl = ad.url;
         debugLog('Loading VAST XML', { vastUrl });
 
-        player.ima.initializeAdDisplayContainer(); // ✅ ensure fresh IMA container
+        if (typeof window.initIMAIfNeeded === 'function') window.initIMAIfNeeded();
+        if (!player.ima) { console.warn('IMA not available'); index++; playNextAd(); return; }
+        player.ima.initializeAdDisplayContainer();
         player.ima.changeAdTag(vastUrl);
         player.ima.requestAds();
         player.ima.playAdBreak();
@@ -3601,27 +3603,49 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    const adsRenderingSettings = new google.ima.AdsRenderingSettings();
-    adsRenderingSettings.enablePreloading = true;
-    adsRenderingSettings.uiElements = [
-      google.ima.UiElements.AD_ATTRIBUTION,
-      google.ima.UiElements.COUNTDOWN,
-    ];
-    adsRenderingSettings.useStyledLinearAds = true;
+    // IMA est initialisé lazily dans initIMAIfNeeded()
+    // pour ne pas charger imasdk.googleapis.com au démarrage de la page
+    let imaInitialized = false;
 
-    player.ima({
-      id: 'videoPlayer',
-      adTagUrl: '',
-      debug: false,
-      showControlsForJSAds: true,
-      adsRenderingSettings: adsRenderingSettings,
-      disableCustomPlaybackForIOS10Plus: true,
-      contribAdsSettings: {
-        prerollTimeout: 2000,  // 2s max — si pas de pub, ne pas bloquer la lecture
-        postrollTimeout: 2000,
-        disablePlayContentBehindAd: true
+    window.initIMAIfNeeded = function() {
+      if (imaInitialized) return;
+      // Si ima3.js n'est pas encore chargé, le charger dynamiquement
+      if (!window.google || !window.google.ima) {
+        if (window._imaLoading) return;
+        window._imaLoading = true;
+        const s = document.createElement('script');
+        s.src = '/js/videojs/ima3.js';
+        s.onload = () => { window._imaLoading = false; window.initIMAIfNeeded(); };
+        document.head.appendChild(s);
+        return;
       }
-    });
+      try {
+        const adsRenderingSettings = new google.ima.AdsRenderingSettings();
+        adsRenderingSettings.enablePreloading = true;
+        adsRenderingSettings.uiElements = [
+          google.ima.UiElements.AD_ATTRIBUTION,
+          google.ima.UiElements.COUNTDOWN,
+        ];
+        adsRenderingSettings.useStyledLinearAds = true;
+
+        player.ima({
+          id: 'videoPlayer',
+          adTagUrl: '',
+          debug: false,
+          showControlsForJSAds: true,
+          adsRenderingSettings: adsRenderingSettings,
+          disableCustomPlaybackForIOS10Plus: true,
+          contribAdsSettings: {
+            prerollTimeout: 5000,
+            postrollTimeout: 5000,
+            disablePlayContentBehindAd: true
+          }
+        });
+        imaInitialized = true;
+      } catch(e) {
+        console.warn('IMA init failed:', e);
+      }
+    };
 
     let customAdChecked = false;
     player.one('play', function () {
@@ -3629,14 +3653,11 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdChecked = true;
         player.pause();
         showCustomAdThenPlayMain(function () {
-          player.ima.initializeAdDisplayContainer();
-          loadAdsAndStartInterval(); // ✅ NEW central logic
+          loadAdsAndStartInterval(); // custom ad → puis VAST si besoin
         });
         return;
       }
-
-      player.ima.initializeAdDisplayContainer();
-      loadAdsAndStartInterval(); // ✅ in case no custom ad
+      loadAdsAndStartInterval();
     });
 
     player.on('ended', function () {
@@ -3765,6 +3786,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const hasPreRoll = adQueue.some(ad => ad.type === 'pre-roll');
 
+        // Initialiser IMA lazily seulement si des pubs VAST existent
+        if (adQueue.length > 0 && typeof window.initIMAIfNeeded === 'function') {
+          window.initIMAIfNeeded();
+        }
+
         // Wait for metadata to be loaded before scheduling ads
         if (player.readyState() >= 1) {
           markAdCuesForAvailableAds();
@@ -3779,7 +3805,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ensure playback interval starts after ads setup
         const startVideo = () => {
           player.play();
-          // console.log("[AD DEBUG] Starting playback interval");
           startPlaybackInterval();
         };
 
