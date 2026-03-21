@@ -16,6 +16,10 @@ class CustomAdsSettingController extends Controller
     public function getActiveAds(Request $request)
     {
         try {
+            // Vérifier si le système de pubs est activé globalement
+            if (!setting('ads_system_enabled', 0)) {
+                return \App\Http\Responses\ApiResponse::success([], 'Ads disabled', 200);
+            }
             $user = auth('sanctum')->user(); // safe, no exception
             if ($user && !$user->relationLoaded('subscriptionPackage')) {
                 $user->load('subscriptionPackage');

@@ -227,6 +227,26 @@
     </div>
 
 
+    {{-- Gestionnaire de publicités ─────────────────────────────────────────── --}}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-ad me-2 text-info"></i>Gestionnaire de publicités</h5>
+            <small class="text-muted">Active ou désactive toutes les publicités (Custom Ads + VAST) sur la plateforme.</small>
+        </div>
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <label class="form-label fw-semibold mb-0" for="adsSystemToggle">Activer le système de publicités</label>
+                    <div class="text-muted small mt-1">Quand désactivé, aucune pub ne sera diffusée quelle que soit la configuration.</div>
+                </div>
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" name="ads_system_enabled" id="adsSystemToggle"
+                           value="1" {{ ($data['ads_system_enabled'] ?? '0') == '1' ? 'checked' : '' }}>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Filigrane utilisateur PPV ─────────────────────────────────────────── --}}
     <div class="card mb-4">
         <div class="card-header">

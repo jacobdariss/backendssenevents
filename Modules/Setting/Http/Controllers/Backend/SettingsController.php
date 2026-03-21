@@ -443,6 +443,7 @@ class SettingsController extends Controller
             'player_subtitles_default',
             'player_watermark_position',
             'player_forward_seconds',
+            'ads_system_enabled',
             'ppv_watermark_enabled',
             'ppv_watermark_content',
             'ppv_watermark_opacity',
@@ -466,6 +467,7 @@ class SettingsController extends Controller
             'player_subtitles_default'  => 'boolean',
             'player_watermark_position' => 'nullable|string|in:top-left,top-right,bottom-left,bottom-right',
             'player_forward_seconds'    => 'nullable|integer|min:5|max:120',
+            'ads_system_enabled'        => 'boolean',
             'ppv_watermark_enabled'     => 'boolean',
             'ppv_watermark_content'     => 'nullable|string|in:name_email,name,email,datetime',
             'ppv_watermark_opacity'     => 'nullable|integer|min:5|max:80',
@@ -477,6 +479,7 @@ class SettingsController extends Controller
             'player_autoplay', 'player_muted_on_load', 'player_continue_watching',
             'player_skip_intro', 'player_speed_control', 'player_download_enabled',
             'player_subtitles_default',
+            'ads_system_enabled',
             'ppv_watermark_enabled',
         ];
         foreach ($checkboxes as $cb) {

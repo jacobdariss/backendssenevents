@@ -21,6 +21,7 @@ class VideoPlayerSettingSeeder extends Seeder
             'player_subtitles_default'  => '0',
             'player_watermark_position' => 'top-right',
             'player_forward_seconds'    => '10',
+            'ads_system_enabled'        => '0',
             'ppv_watermark_enabled'     => '1',
             'ppv_watermark_content'     => 'name_email',
             'ppv_watermark_opacity'     => '20',
