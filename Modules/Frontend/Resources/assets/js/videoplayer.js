@@ -821,10 +821,11 @@ document.addEventListener('DOMContentLoaded', function () {
       // Reset custom ad flag for new content selection
       customAdPlayed = false;
       customAdAttempts = 0;
-      customAdChecked = true; // Marquer : watchNowButton gère les pubs
+      customAdChecked = false; // Reset — player.one('play') gérera les VAST après chargement
 
       showCustomAdThenPlayMain(function () {
-        customAdPlayed = true;
+        customAdPlayed = true;  // custom ad faite
+        customAdChecked = true; // marquer pour player.one('play')
         handleWatchButtonClick(watchNowButton);
         mountSkipIntroFrom(watchNowButton);
       });
@@ -885,10 +886,11 @@ document.addEventListener('DOMContentLoaded', function () {
       // Reset custom ad flag for new episode selection
       customAdPlayed = false;
       customAdAttempts = 0;
-      customAdChecked = true; // Marquer : seasonWatchBtn gère les pubs
+      customAdChecked = false;
 
       showCustomAdThenPlayMain(function () {
         customAdPlayed = true;
+        customAdChecked = true;
         handleWatchButtonClick(button);
         mountSkipIntroFrom(button);
       });
