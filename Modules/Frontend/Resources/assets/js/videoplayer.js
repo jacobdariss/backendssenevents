@@ -3636,6 +3636,9 @@ document.addEventListener('DOMContentLoaded', function () {
       loadAdsAndStartInterval();
     });
 
+    // Filigrane PPV — initialisé dans le player.ready principal
+    initPPVWatermark();
+
     player.on('ended', function () {
       debugLog('Video ended, checking for remaining ads');
       hideSkipButton();
@@ -3810,7 +3813,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
   function initPPVWatermark() {
     const cfg = window.watermarkConfig;
-    if (!cfg || !cfg.enabled) return;
+    if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) return;
 
     const access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
     if (access !== 'pay-per-view') return;
@@ -3866,12 +3869,14 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.fillText(text, x, y);
     }
 
-    // Démarrer quand la vidéo joue
-    player.on('playing', function() {
+    // Démarrer quand la vidéo joue (play + playing pour couvrir tous les cas)
+    function startWatermark() {
       drawWatermark();
       if (window._watermarkTimer) clearInterval(window._watermarkTimer);
       window._watermarkTimer = setInterval(drawWatermark, cfg.interval);
-    });
+    }
+    player.on('play', startWatermark);
+    player.on('playing', startWatermark);
 
     player.on('pause', function() {
       if (window._watermarkTimer) { clearInterval(window._watermarkTimer); }
@@ -3887,10 +3892,6 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('resize', drawWatermark);
   }
 
-  // Initialiser après chargement du player
-  player.ready(function() {
-    setTimeout(initPPVWatermark, 500);
-  });
   // ─────────────────────────────────────────────────────────────────────────
 
 });
