@@ -131,7 +131,7 @@ class TvShowController extends Controller
                 abort(404, 'TV show not found.');
             }
 
-            if (!empty($tvshow->trailer_url) && $tvshow->trailer_url_type !== 'Local') {
+            if (!empty($tvshow->trailer_url)) {
                 $tvshow->trailer_url = Crypt::encryptString($tvshow->trailer_url);
             }
 
@@ -270,12 +270,12 @@ class TvShowController extends Controller
                 ->where('slug', $slug)
                 ->firstOrFail();
 
-            // Encrypt external URLs
-            if (!empty($episode->trailer_url) && $episode->trailer_url_type !== 'Local') {
+            // Encrypt URLs (Local et externes)
+            if (!empty($episode->trailer_url)) {
                 $episode->trailer_url = Crypt::encryptString($episode->trailer_url);
             }
 
-            if (!empty($episode->video_url_input) && $episode->video_upload_type !== 'Local') {
+            if (!empty($episode->video_url_input)) {
                 $episode->video_url_input = Crypt::encryptString($episode->video_url_input);
             }
 

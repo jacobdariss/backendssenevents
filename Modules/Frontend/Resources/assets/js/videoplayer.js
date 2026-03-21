@@ -1067,29 +1067,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo = []) {
-    const datatype = watchNowButton?.getAttribute('data-type') || seasonWatchBtn?.getAttribute('data-type')
-
-    if (datatype === 'Local') {
-      const videoSource = document.querySelectorAll('#videoSource');
-
-      videoSource.src = videoUrl;
-
-      const videoPlayer = videojs('videoPlayer');
-      videoPlayer.src({ type: 'video/mp4', src: videoUrl });
-      setSubtitle(videoPlayer, subtitleInfo);
-      videoPlayer.load();
-      videoPlayer.one('loadedmetadata', () => {
-        if (lastWatchedTime > 0) {
-          videoPlayer.currentTime(lastWatchedTime);
-        }
-        videoPlayer.play().then(() => {
-          isPopupShown = false // Reset flag when video starts playing successfully
-        }).catch(() => { });
-      });
-
-      // Use the reusable function
-      createQualitySelector(player, qualityOptions, subtitleInfo, baseUrl);
-    } else {
+    // Toutes les URLs passent par /video/stream (décryptage + détection plateforme)
+    {
       // // Check device support BEFORE fetching/setting video source
       // CheckDeviceType().then(isDeviceSupported => {
       //   if (!isDeviceSupported) {

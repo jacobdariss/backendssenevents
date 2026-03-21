@@ -77,11 +77,11 @@ class VideoController extends Controller
                 abort(404, 'Video not found.');
             }
 
-            if (!empty($video->trailer_url) && $video->trailer_url_type !== 'Local') {
+            if (!empty($video->trailer_url)) {
                 $video->trailer_url = Crypt::encryptString($video->trailer_url);
             }
 
-            if (!empty($video->video_url_input) && $video->video_upload_type !== 'Local') {
+            if (!empty($video->video_url_input)) {
                 $video->video_url_input = Crypt::encryptString($video->video_url_input);
             }
 
