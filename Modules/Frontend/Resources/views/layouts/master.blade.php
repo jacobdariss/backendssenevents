@@ -115,9 +115,8 @@
 
         /* Ensure proper spacing for card-style-slider */
         .card-style-slider .slick-general:not(.slick-initialized) {
-            margin-bottom: 3.75rem !important;
+            margin-bottom: 0.5rem !important;
             overflow: visible !important;
-            /* add bottom space between sections */
         }
 
         .card-style-slider .slick-general:not(.slick-initialized)>* {
@@ -136,9 +135,9 @@
         /* Réduire l'espacement vertical entre les titres de section et les cartes */
         .section-wraper .main-title { margin-bottom: 0 !important; }
         .section-wraper .d-flex.my-2 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
-        /* Réduire le margin-bottom du slider entre les catégories */
-        .section-wraper .card-style-slider .slick-list.draggable { margin-bottom: 0.5rem !important; }
-        .section-wraper .card-style-slider { margin-bottom: 0 !important; }
+        /* Réduire l'espacement entre les catégories */
+        .card-style-slider .slick-list.draggable { margin-bottom: 0.5rem !important; }
+        .card-style-slider { margin-bottom: 0 !important; }
         .banner-section {
             padding-left: 0 !important;
             padding-right: 0 !important;
