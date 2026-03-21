@@ -757,6 +757,9 @@ document.addEventListener('DOMContentLoaded', function () {
       handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
     }
 
+    // Filigrane PPV — déclenché ici car le player.ready IMA le bloquait
+    if (accessType === 'pay-per-view') initPPVWatermark('pay-per-view');
+
     isWatchHistorySaved = false // Reset flag
   }
 
@@ -1097,9 +1100,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((data) => {
           setVideoSource(player, data.platform, data.videoId, data.url, data.mimeType, qualityOptions, subtitleInfo)
           player.load()
-          // Filigrane PPV
+          // Filigrane PPV (fallback pour autoplay)
           const _access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
-          if (_access === 'pay-per-view') initPPVWatermark();
+          if (_access === 'pay-per-view') initPPVWatermark(_access);
           setSubtitle(player, subtitleInfo);
 
           // Use the reusable function for quality selector
@@ -3811,11 +3814,12 @@ document.addEventListener('DOMContentLoaded', function () {
   //   });
   // }
   // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
-  function initPPVWatermark() {
+  function initPPVWatermark(accessType) {
     const cfg = window.watermarkConfig;
     if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) return;
 
-    const access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
+    // Accepter l'access passé en paramètre OU lire depuis data-movie-access
+    const access = accessType || document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
     if (access !== 'pay-per-view') return;
 
     const wrapper = document.querySelector('.video-player-wrapper');
