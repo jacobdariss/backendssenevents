@@ -264,7 +264,7 @@
                                 $type = 'HLS';
                                 $video_url = $episodeData['bunny_video_url'];
                             } elseif ($episodeData['video_upload_type'] == 'Local') {
-                                $video_url = $episodeData['video_url_input'];
+                                $video_url = Crypt::encryptString($episodeData['video_url_input']);
                             } else {
                                 $video_url = Crypt::encryptString($episodeData['video_url_input']);
                             }
@@ -393,7 +393,7 @@
                             @endphp
                             @if (!empty($plan_type) && ($video_upload_type == 'Local' || $video_upload_type == 'URL'))
                             @php
-                            $video_url11 = ($video_upload_type == "URL") ? Crypt::decryptString($video_url) : $video_url;
+                            $video_url11 = Crypt::decryptString($video_url); // URL toujours chiffrée maintenant
                             @endphp
                             <li>
                                 <button class="action-btn btn btn-dark" data-name="{{ $video_url11 }}" id="castme">
