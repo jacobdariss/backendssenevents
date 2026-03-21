@@ -221,9 +221,18 @@ class HomepageSectionDataService
             $query->orderByDesc('created_at');
         }
 
-        return [
-            'data' => $query->limit($limit)->get(),
-        ];
+        $items = $query->limit($limit)->get();
+
+        $data = $items->map(function ($cast) {
+            return [
+                'id'            => $cast->id,
+                'name'          => $cast->name,
+                'type'          => $cast->type,
+                'profile_image' => setBaseUrlWithFileName($cast->file_url, 'image', 'castcrew'),
+            ];
+        })->all();
+
+        return ['data' => $data];
     }
 
     private function loadLanguages(int $limit, array $ids): array
