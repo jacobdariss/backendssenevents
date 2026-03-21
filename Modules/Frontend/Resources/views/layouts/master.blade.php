@@ -130,9 +130,12 @@
         .section-wraper {
             padding-left: 6.25em;
             padding-right: 6.25em;
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
+            padding-top: 0;
+            padding-bottom: 0;
         }
+        /* Réduire l'espacement vertical entre les titres de section et les cartes */
+        .section-wraper .main-title { margin-bottom: 0 !important; }
+        .section-wraper .d-flex.my-2 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
         .banner-section {
             padding-left: 0 !important;
             padding-right: 0 !important;
