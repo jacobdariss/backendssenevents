@@ -827,7 +827,6 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdPlayed = true;
         handleWatchButtonClick(watchNowButton);
         mountSkipIntroFrom(watchNowButton);
-        loadAdsAndStartInterval();
       });
     })
   }
@@ -892,7 +891,6 @@ document.addEventListener('DOMContentLoaded', function () {
         customAdPlayed = true;
         handleWatchButtonClick(button);
         mountSkipIntroFrom(button);
-        loadAdsAndStartInterval();
       });
     }
   });
@@ -3622,11 +3620,18 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     let customAdChecked = false;
-    player.on('play', function () {
-      // Lancer les VAST ads à chaque play si pas encore fait
-      if (!adQueue || adQueue.length === 0) {
-        loadAdsAndStartInterval();
+    player.one('play', function () {
+      if (!customAdPlayed && !customAdChecked) {
+        // Premier play (trailer ou autoplay) : vérifier custom ads
+        customAdChecked = true;
+        player.pause();
+        showCustomAdThenPlayMain(function () {
+          loadAdsAndStartInterval();
+        });
+        return;
       }
+      // customAdPlayed=true : vidéo principale → lancer VAST ads
+      loadAdsAndStartInterval();
     });
 
     player.on('ended', function () {
