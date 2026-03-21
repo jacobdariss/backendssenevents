@@ -1097,6 +1097,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((data) => {
           setVideoSource(player, data.platform, data.videoId, data.url, data.mimeType, qualityOptions, subtitleInfo)
           player.load()
+          // Filigrane PPV
+          const _access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
+          if (_access === 'pay-per-view') initPPVWatermark();
           setSubtitle(player, subtitleInfo);
 
           // Use the reusable function for quality selector
@@ -3636,9 +3639,6 @@ document.addEventListener('DOMContentLoaded', function () {
       loadAdsAndStartInterval();
     });
 
-    // Filigrane PPV — initialisé dans le player.ready principal
-    initPPVWatermark();
-
     player.on('ended', function () {
       debugLog('Video ended, checking for remaining ads');
       hideSkipButton();
@@ -3813,12 +3813,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
   function initPPVWatermark() {
     const cfg = window.watermarkConfig;
-    console.log('[PPV Watermark] config:', cfg);
-    console.log('[PPV Watermark] data-movie-access:', document.getElementById('videoPlayer')?.getAttribute('data-movie-access'));
-    if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) {
-      console.log('[PPV Watermark] disabled or missing config');
-      return;
-    }
+    if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) return;
 
     const access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
     if (access !== 'pay-per-view') return;
@@ -3874,12 +3869,16 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.fillText(text, x, y);
     }
 
-    // Démarrer quand la vidéo joue (play + playing pour couvrir tous les cas)
+    // Démarrer au premier timeupdate (plus fiable — IMA peut bloquer play/playing)
+    let _wmStarted = false;
     function startWatermark() {
+      if (_wmStarted) return;
+      _wmStarted = true;
       drawWatermark();
       if (window._watermarkTimer) clearInterval(window._watermarkTimer);
       window._watermarkTimer = setInterval(drawWatermark, cfg.interval);
     }
+    player.one('timeupdate', startWatermark);
     player.on('play', startWatermark);
     player.on('playing', startWatermark);
 
