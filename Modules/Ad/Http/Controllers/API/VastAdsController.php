@@ -37,11 +37,6 @@ class VastAdsController extends Controller
                         isset($limitation['limitation_value']) &&
                         $limitation['limitation_value'] == 0
                     ) {
-                        Log::info('Ads are disabled for this user', [
-                            'user_id' => $user->id,
-                            'subscription_plan' => $subscription['plan_type'],
-                            'plan_limitations' => $planLimitations
-                        ]);
                         return ApiResponse::success([], __('messages.ads_are_disabled_in_your_subscription'), 200);
                     }
                 }
@@ -63,13 +58,6 @@ class VastAdsController extends Controller
             }
 
             $currentDate = Carbon::now()->format('Y-m-d');
-
-            Log::info('VastAds API called', [
-                'content_id' => $contentId,
-                'content_type' => $contentType,
-                'current_date' => $currentDate,
-                'request_params' => $request->all()
-            ]);
 
             $query = VastAdsSetting::active();
 
@@ -170,22 +158,8 @@ class VastAdsController extends Controller
                 return is_array($targets) && count($targets) > 0;
             })->values();
 
-            Log::info('VastAds query result', [
-                'content_type' => $contentType,
-                'content_id' => $contentId,
-                'current_date' => $currentDate,
-                'ads_found' => $filteredAds->count(),
-                'ads' => $filteredAds->toArray()
-            ]);
-
             return ApiResponse::success($filteredAds, __('messages.vast_ads_list'), 200);
         } catch (\Exception $e) {
-            Log::error('Error in getActiveAds:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'content_id' => $request->input('content_id'),
-                'type' => $request->input('type')
-            ]);
 
             return ApiResponse::error($e->getMessage(), 500);
         }

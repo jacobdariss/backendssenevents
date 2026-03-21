@@ -3632,7 +3632,7 @@ document.addEventListener('DOMContentLoaded', function () {
     player.ima({
       id: 'videoPlayer',
       adTagUrl: '',
-      debug: true,
+      debug: false,
       showControlsForJSAds: true,
       adsRenderingSettings: adsRenderingSettings,
       disableCustomPlaybackForIOS10Plus: true,
