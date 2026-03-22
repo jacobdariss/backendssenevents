@@ -32,12 +32,18 @@ class CurrencyChange
 
     public function format($amount)
     {
+        $amount = is_numeric($amount) ? (float) $amount : 0;
 
-        $noOfDecimal = $this->defaultCurrency->no_of_decimal ?? 0;
-        $decimalSeparator = $this->defaultCurrency->decimal_separator ?? '';
-        $thousandSeparator = $this->defaultCurrency->thousand_separator ?? '';
-        $currencyPosition = $this->defaultCurrency->currency_position ?? 'left';
-        $currencySymbol = $this->defaultCurrency->currency_symbol ?? '';
+        if (!$this->defaultCurrency) {
+            // Fallback XOF : pas de devise configurée
+            return number_format($amount, 0, '.', ' ') . ' XOF';
+        }
+
+        $noOfDecimal       = $this->defaultCurrency->no_of_decimal       ?? 0;
+        $decimalSeparator  = $this->defaultCurrency->decimal_separator    ?? '';
+        $thousandSeparator = $this->defaultCurrency->thousand_separator   ?? ' ';
+        $currencyPosition  = $this->defaultCurrency->currency_position    ?? 'right_with_space';
+        $currencySymbol    = $this->defaultCurrency->currency_symbol      ?? 'XOF';
 
         return formatCurrency($amount, $noOfDecimal, $decimalSeparator, $thousandSeparator, $currencyPosition, $currencySymbol);
     }
