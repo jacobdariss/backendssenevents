@@ -11,7 +11,71 @@
 
         </div>
 
-        <form id="form-submit" method="POST" class="requires-validation" novalidate>
+        {{-- ── Gestion du menu langue ─────────────────────────────────────── --}}
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center gap-2">
+            <i class="ph ph-globe fs-5"></i>
+            <h6 class="mb-0">Gestion du menu langue</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('backend.settings.language-menu-settings.save') }}">
+                @csrf
+
+                {{-- Toggle affichage menu --}}
+                <div class="d-flex align-items-center justify-content-between p-3 rounded mb-3"
+                     style="background:rgba(55,138,221,0.08);border:1px solid rgba(55,138,221,0.2)">
+                    <div>
+                        <div class="fw-semibold">Afficher le sélecteur de langue</div>
+                        <small class="text-muted">Affiche ou masque le menu de sélection de langue dans l'interface client</small>
+                    </div>
+                    <div class="form-check form-switch ms-3">
+                        <input class="form-check-input" type="checkbox" name="language_menu_enabled"
+                               id="language_menu_enabled" role="switch"
+                               {{ ($languageMenuEnabled ?? '1') == '1' ? 'checked' : '' }}
+                               style="width:2.5rem;height:1.3rem">
+                    </div>
+                </div>
+
+                {{-- Langues actives --}}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-2">Langues actives dans le menu</label>
+                    <small class="text-muted d-block mb-3">Seules les langues cochées seront affichées dans le menu de sélection</small>
+                    <div class="row g-2">
+                        @foreach($languages as $lang)
+                        @php
+                            $flagSrc = asset('flags/' . $lang['id'] . '.png');
+                            $isEnabled = in_array($lang['id'], $enabledLanguages ?? array_column($languages, 'id'));
+                        @endphp
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <label class="d-flex align-items-center gap-3 p-3 rounded cursor-pointer"
+                                   style="background:{{ $isEnabled ? 'rgba(29,158,117,0.1);border:1px solid rgba(29,158,117,0.25)' : 'rgba(128,128,128,0.08);border:1px solid rgba(128,128,128,0.15)' }};transition:.15s">
+                                <input type="checkbox" name="enabled_languages[]" value="{{ $lang['id'] }}"
+                                       class="form-check-input flex-shrink-0"
+                                       {{ $isEnabled ? 'checked' : '' }}
+                                       style="width:1.1rem;height:1.1rem">
+                                <img src="{{ $flagSrc }}" width="22" alt="{{ $lang['id'] }}"
+                                     onerror="this.src='{{ asset('flags/globe.png') }}'">
+                                <div>
+                                    <div class="fw-semibold small">{{ strtoupper($lang['id']) }}</div>
+                                    <div class="text-muted" style="font-size:11px">{{ $lang['name'] }}</div>
+                                </div>
+                            </label>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ph ph-floppy-disk me-1"></i>{{ __('messages.save') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ── Éditeur de traductions ───────────────────────────────────────── --}}
+    <form id="form-submit" method="POST" class="requires-validation" novalidate>
             @csrf
             <div class="container p-0">
                 <div class="row gy-3">

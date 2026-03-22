@@ -199,7 +199,25 @@ class SettingsController extends Controller
         }
         $fields = ['language_setting_1', 'language_setting_2'];
         $data = $this->fieldsData($fields);
-        return view('setting::backend.setting.section-pages.language-settings', compact('data', 'languages'));
+
+        // Paramètres du menu langue
+        $languageMenuEnabled = \App\Models\Setting::get('language_menu_enabled', '1');
+        $enabledLanguages    = json_decode(\App\Models\Setting::get('enabled_languages', json_encode(array_keys($query_data))), true) ?? array_keys($query_data);
+
+        return view('setting::backend.setting.section-pages.language-settings', compact('data', 'languages', 'languageMenuEnabled', 'enabledLanguages'));
+    }
+
+    public function saveLanguageMenuSettings(Request $request)
+    {
+        $menuEnabled     = $request->has('language_menu_enabled') ? '1' : '0';
+        $enabledLangs    = $request->input('enabled_languages', []);
+
+        \App\Models\Setting::add('language_menu_enabled', $menuEnabled, 'string', null);
+        \App\Models\Setting::add('enabled_languages', json_encode($enabledLangs), 'string', null);
+
+        \Illuminate\Support\Facades\Cache::forget('setting');
+
+        return redirect()->back()->with('success', __('messages.save_setting'));
     }
 
     public function notificationConfiguration()
