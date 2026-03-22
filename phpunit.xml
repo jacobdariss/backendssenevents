@@ -23,8 +23,14 @@
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!--
+            ⚠️  DANGER : Tests sur la vraie base MySQL de production.
+            RÈGLE ABSOLUE : Utiliser UNIQUEMENT DatabaseTransactions — JAMAIS RefreshDatabase.
+            RefreshDatabase appelle migrate:fresh et EFFACE TOUTES LES DONNÉES.
+            Incident 20/03/2026 : migrate:fresh a vidé settings/mobile_settings → rollback DB requis.
+        -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <!-- DatabaseTransactions utilise la vraie DB — chaque test est rollback automatiquement -->
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

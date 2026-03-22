@@ -7,13 +7,7 @@
         <!-- YouTube Support -->
         <script src="{{ asset('js/videojs/videojs-youtube.min.js') }}"></script>
 
-        <!-- IMA SDK -->
-        <script src="{{ asset('js/videojs/ima3.js') }}"></script>
-
-        <!-- Video.js Ads & IMA plugins -->
-        <script src="{{ asset('js/videojs/videojs-contrib-ads.min.js') }}"></script>
-        <script src="{{ asset('js/videojs/videojs.ima.min.js') }}"></script>
-        <link href="{{ asset('css/videojs.ima.css') }}" rel="stylesheet">
+        {{-- IMA/contrib-ads désactivés (option 1 — fichiers supprimés) --}}
 
         <div class="video-player">
             <video id="videoPlayer" class="video-js vjs-default-skin vjs-ima" controls width="560" height="315" muted
@@ -40,6 +34,53 @@
                 </iframe>
             </div>
 
+            <!-- Filigrane PPV — overlay HTML direct -->
+            @if(isset($dataAccess) && $dataAccess === 'pay-per-view' && auth()->check())
+            <div id="ppv-watermark-overlay" style="
+                display:none;
+                position:absolute;
+                top:0;left:0;width:100%;height:100%;
+                pointer-events:none;
+                z-index:998;
+                overflow:hidden;
+            ">
+                <span id="ppv-wm-text" style="
+                    position:absolute;
+                    color:rgba(255,255,255,0.5);
+                    font-size:14px;
+                    font-weight:600;
+                    text-shadow:1px 1px 3px rgba(0,0,0,0.8);
+                    white-space:nowrap;
+                    user-select:none;
+                ">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }} — {{ auth()->user()->email }}</span>
+            </div>
+            @endif
+
+            <!-- Bouton Réactiver le son -->
+            <button id="unmuteBtn" style="
+                display: none;
+                position: absolute;
+                bottom: 70px;
+                right: 16px;
+                z-index: 1000;
+                background: rgba(20,20,20,0.85);
+                color: #fff;
+                border: 1.5px solid rgba(255,255,255,0.3);
+                border-radius: 6px;
+                padding: 7px 14px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                backdrop-filter: blur(6px);
+                gap: 6px;
+                align-items: center;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='rgba(220,30,30,0.9)'"
+               onmouseout="this.style.background='rgba(20,20,20,0.85)'">
+                <i class="ph ph-speaker-simple-x" style="font-size:15px;"></i>
+                {{ __("messages.unmute") }}
+            </button>
+
             <!-- Custom Ad Modal -->
             <div id="customAdModal">
                 <div id="customAdContent">
@@ -54,7 +95,130 @@
 <script src="{{ mix('js/videoplayer.min.js') }}"></script>
 <script>
     var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+    // Filigrane PPV
+    window.adsSystemEnabled = {{ setting('ads_system_enabled', '0') == '1' ? 'true' : 'false' }};
+    window.watermarkConfig = {
+        enabled:   true,
+        content:  '{{ setting('ppv_watermark_content', 'name_email') }}',
+        opacity:   0.5,
+        interval:  10000,
+        userName: '{{ auth()->check() ? addslashes(trim(auth()->user()->first_name . ' ' . auth()->user()->last_name)) : '' }}',
+        userEmail:'{{ auth()->check() ? addslashes(auth()->user()->email) : 'test@test.com' }}',
+    };
+    console.log('[Watermark] config:', window.watermarkConfig);
+
+    // ── Filigrane PPV — init autonome (indépendant de videoplayer.js) ──
+    (function() {
+        function startWatermark() {
+            var overlay = document.getElementById('ppv-watermark-overlay');
+            var wmText  = document.getElementById('ppv-wm-text');
+            if (!overlay || !wmText) return;
+            if (overlay._wmDone) return;
+            overlay._wmDone = true;
+
+            var cfg = window.watermarkConfig || {};
+            if (!cfg.enabled) return;
+
+            var content = cfg.content || 'name_email';
+            var text = '';
+            if (content === 'name_email') text = (cfg.userName || '') + ' — ' + (cfg.userEmail || '');
+            else if (content === 'name')  text = cfg.userName || '';
+            else if (content === 'email') text = cfg.userEmail || '';
+            else if (content === 'datetime') {
+                var d = new Date();
+                text = (cfg.userName || '') + ' ' + d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
+            } else { text = (cfg.userName || '') + ' — ' + (cfg.userEmail || ''); }
+
+            wmText.textContent = text;
+
+            function move() {
+                var wrap = overlay.parentElement;
+                var w = (wrap ? wrap.offsetWidth  : 0) || 800;
+                var h = (wrap ? wrap.offsetHeight : 0) || 450;
+                var tw = wmText.offsetWidth  || 280;
+                var th = wmText.offsetHeight || 20;
+                wmText.style.left = (Math.random() * Math.max(10, w - tw - 20) + 10) + 'px';
+                wmText.style.top  = (Math.random() * Math.max(10, h - th - 20) + 10) + 'px';
+            }
+
+            overlay.style.display = 'block';
+            setTimeout(move, 80);
+            setInterval(move, (cfg.interval || 10000));
+            console.log('[Watermark] actif :', text);
+
+            // ── Fullscreen : déplacer l'overlay dans le container fullscreen ──
+            function onFullscreenChange() {
+                var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+                var videoJs = document.querySelector('.video-js');
+                var videoPlayer = document.querySelector('.video-player');
+                if (!overlay || !videoJs || !videoPlayer) return;
+                if (fsEl) {
+                    // Plein écran — déplacer l'overlay dans video-js
+                    videoJs.appendChild(overlay);
+                    overlay.style.zIndex = '9999';
+                } else {
+                    // Retour — remettre dans video-player
+                    videoPlayer.appendChild(overlay);
+                    overlay.style.zIndex = '998';
+                }
+            }
+            document.addEventListener('fullscreenchange', onFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startWatermark);
+        } else {
+            startWatermark();
+        }
+    })();
+
     var loginUrl = "{{ route('login') }}";
+
+    // ── Bouton "Réactiver le son" — script inline autonome ──────────────
+    (function() {
+        function initUnmuteBtn() {
+            var btn = document.getElementById('unmuteBtn');
+            var videoEl = document.getElementById('videoPlayer');
+            if (!btn || !videoEl) return;
+            if (btn._unmuteDone) return;
+            btn._unmuteDone = true;
+
+            function isMuted() {
+                return videoEl.muted || videoEl.volume === 0;
+            }
+
+            function sync() {
+                if (isMuted()) {
+                    btn.style.display = 'flex';
+                    btn.querySelector('i').className = 'ph ph-speaker-simple-x';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+
+            // Clic : activer/désactiver le son
+            btn.addEventListener('click', function() {
+                videoEl.muted = false;
+                videoEl.volume = 1;
+                btn.style.display = 'none';
+            });
+
+            // Surveiller les changements de son
+            videoEl.addEventListener('volumechange', sync);
+            videoEl.addEventListener('play', sync);
+            videoEl.addEventListener('playing', sync);
+
+            // Sync initiale après un court délai (player pas encore init)
+            setTimeout(sync, 500);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initUnmuteBtn);
+        } else {
+            initUnmuteBtn();
+        }
+    })();
     var skipTrailerText = "{{ __('messages.skip_trailer') }}";
     var skipIntroText = "{{ __('messages.skip_intro') }}";
     var previousEpisodeText = "{{ __('messages.previous_episode') }}";

@@ -8,6 +8,8 @@ use Modules\HomepageBuilder\Models\HomepageSection;
 use Modules\Entertainment\Models\Entertainment;
 use Modules\Video\Models\Video;
 use Modules\LiveTV\Models\LiveTvChannel;
+use Modules\Season\Models\Season;
+use Modules\Episode\Models\Episode;
 use Illuminate\Support\Str;
 
 class HomepageBuilderController extends Controller
@@ -45,8 +47,18 @@ class HomepageBuilderController extends Controller
         $sortOptions    = HomepageSection::sortOptions();
         $platforms      = ['both' => 'Web + Mobile', 'web' => 'Web seulement', 'mobile' => 'Mobile seulement'];
         $contentOptions = $this->getContentOptions($section);
+
+        // Pour la section tvshow : pré-charger les données de la sélection saisons/épisodes
+        $episodePickerData = $this->buildEpisodePickerData($section);
+
+        $ajaxUrls = [
+            'contentOptions' => url('/app/homepage-builder/content-options'),
+            'tvshowSeasons'  => url('/app/homepage-builder/tvshow-seasons'),
+            'seasonEpisodes' => url('/app/homepage-builder/season-episodes'),
+        ];
+
         return view('homepage-builder::backend.homepage-builder.edit', compact(
-            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions'
+            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData', 'ajaxUrls'
         ));
     }
 
@@ -62,10 +74,18 @@ class HomepageBuilderController extends Controller
             'sort_by'          => 'required|string',
             'card_orientation' => 'nullable|in:vertical,horizontal',
             'content_ids'      => 'nullable|array',
+            'episode_ids'      => 'nullable|array',
+            'settings'                  => 'nullable|array',
+            'settings.card_size'        => 'nullable|in:small,medium,large',
+            'settings.badge_size'       => 'nullable|in:small,medium,large',
+            'settings.hover_effect'     => 'nullable|in:none,subtle,zoom',
+            'settings.items_per_row'    => 'nullable|integer|min:3|max:7',
         ]);
         $data['content_ids']      = !empty($data['content_ids']) ? $data['content_ids'] : null;
+        $data['episode_ids']      = !empty($data['episode_ids']) ? $data['episode_ids'] : null;
         $data['card_orientation'] = $request->input('card_orientation', 'vertical');
         $data['is_active']        = $request->boolean('is_active', $section->is_active);
+        $data['settings']         = $request->input('settings', []);
         $section->update($data);
         HomepageSection::clearCache();
         return redirect()->route('backend.homepage-builder.index')
@@ -80,8 +100,14 @@ class HomepageBuilderController extends Controller
         $platforms      = ['both' => 'Web + Mobile', 'web' => 'Web seulement', 'mobile' => 'Mobile seulement'];
         $section        = null;
         $contentOptions = [];
+        $episodePickerData = null;
+        $ajaxUrls = [
+            'contentOptions' => url('/app/homepage-builder/content-options'),
+            'tvshowSeasons'  => url('/app/homepage-builder/tvshow-seasons'),
+            'seasonEpisodes' => url('/app/homepage-builder/season-episodes'),
+        ];
         return view('homepage-builder::backend.homepage-builder.edit', compact(
-            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions'
+            'section', 'types', 'contentTypes', 'sortOptions', 'platforms', 'contentOptions', 'episodePickerData', 'ajaxUrls'
         ));
     }
 
@@ -96,12 +122,20 @@ class HomepageBuilderController extends Controller
             'sort_by'          => 'required|string',
             'card_orientation' => 'nullable|in:vertical,horizontal',
             'content_ids'      => 'nullable|array',
+            'episode_ids'      => 'nullable|array',
+            'settings'                  => 'nullable|array',
+            'settings.card_size'        => 'nullable|in:small,medium,large',
+            'settings.badge_size'       => 'nullable|in:small,medium,large',
+            'settings.hover_effect'     => 'nullable|in:none,subtle,zoom',
+            'settings.items_per_row'    => 'nullable|integer|min:3|max:7',
         ]);
         $data['slug']             = Str::slug($data['name']) . '-' . uniqid();
         $data['position']         = HomepageSection::max('position') + 1;
         $data['is_active']        = $request->boolean('is_active', true);
         $data['card_orientation'] = $request->input('card_orientation', 'vertical');
         $data['content_ids']      = !empty($data['content_ids']) ? $data['content_ids'] : null;
+        $data['episode_ids']      = !empty($data['episode_ids']) ? $data['episode_ids'] : null;
+        $data['settings']         = $request->input('settings', []);
         HomepageSection::create($data);
         HomepageSection::clearCache();
         return redirect()->route('backend.homepage-builder.index')->with('success', 'Section créée');
@@ -124,6 +158,73 @@ class HomepageBuilderController extends Controller
         return response()->json($this->getContentOptions($section));
     }
 
+    /**
+     * AJAX — Retourne les saisons d'une série TV
+     */
+    public function getTvshowSeasons(Request $request)
+    {
+        $tvshowId = (int) $request->input('tvshow_id');
+        if (!$tvshowId) {
+            return response()->json([]);
+        }
+
+        $seasons = Season::where('entertainment_id', $tvshowId)
+            ->whereNull('deleted_at')
+            ->orderBy('season_number')
+            ->orderBy('id')
+            ->get(['id', 'name', 'season_number'])
+            ->map(function ($s) {
+                // Nom robuste : name > "Saison X" > "Saison #id"
+                $name = !empty(trim((string)$s->name))
+                    ? $s->name
+                    : ($s->season_number ? 'Saison ' . $s->season_number : 'Saison #' . $s->id);
+                return ['id' => $s->id, 'name' => $name];
+            });
+
+        return response()->json($seasons);
+    }
+
+    /**
+     * AJAX — Retourne les épisodes de saisons sélectionnées
+     */
+    public function getSeasonEpisodes(Request $request)
+    {
+        $seasonIds = $request->input('season_ids', []);
+        if (empty($seasonIds)) {
+            return response()->json([]);
+        }
+
+        // Charger TOUS les épisodes des saisons (actifs et inactifs)
+        // pour que l'admin puisse faire son choix
+        $episodes = Episode::whereIn('season_id', $seasonIds)
+            ->whereNull('deleted_at')
+            ->orderBy('season_id')
+            ->orderBy('episode_number')
+            ->orderBy('id')
+            ->get(['id', 'name', 'episode_number', 'season_id']);
+
+        // Charger les noms de saisons en une seule requête
+        $seasons = Season::whereIn('id', $episodes->pluck('season_id')->unique())
+            ->get(['id', 'name', 'season_number'])
+            ->keyBy('id');
+
+        $data = $episodes->map(function ($ep) use ($seasons) {
+            $season      = $seasons->get($ep->season_id);
+            $seasonLabel = $season
+                ? (!empty(trim((string)$season->name)) ? $season->name : 'Saison ' . $season->season_number)
+                : '';
+            $epNum = $ep->episode_number ? 'Ep.' . $ep->episode_number . ' — ' : '';
+            return [
+                'id'   => $ep->id,
+                'name' => $epNum . $ep->name . ($seasonLabel ? ' (' . $seasonLabel . ')' : ''),
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+
     private function getContentOptions(HomepageSection $section): array
     {
         return match($section->type) {
@@ -137,5 +238,49 @@ class HomepageBuilderController extends Controller
             'livetv' => LiveTvChannel::where('status', 1)->orderBy('name')->get(['id', 'name'])->toArray(),
             default  => [],
         };
+    }
+
+    /**
+     * Pré-charge les données du sélecteur saisons/épisodes pour l'édition
+     */
+    private function buildEpisodePickerData(HomepageSection $section): ?array
+    {
+        if ($section->type !== 'entertainment' || $section->content_type !== 'tvshow') {
+            return null;
+        }
+
+        $episodeIds = $section->episode_ids ?? [];
+        if (empty($episodeIds)) {
+            return null;
+        }
+
+        // Retrouver les épisodes sauvegardés
+        $episodes = Episode::whereIn('id', $episodeIds)
+            ->with(['seasondata:id,name,season_number,entertainment_id'])
+            ->get(['id', 'name', 'episode_number', 'season_id']);
+
+        if ($episodes->isEmpty()) {
+            return null;
+        }
+
+        // Retrouver les saisons et la série parente
+        $seasonIds = $episodes->pluck('season_id')->unique()->toArray();
+        $seasons   = Season::whereIn('id', $seasonIds)->get(['id', 'name', 'season_number', 'entertainment_id']);
+        $tvshowIds = $seasons->pluck('entertainment_id')->unique()->toArray();
+        $tvshows   = Entertainment::whereIn('id', $tvshowIds)->get(['id', 'name']);
+
+        return [
+            'tvshows'    => $tvshows->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->toArray(),
+            'seasons'    => $seasons->map(fn($s) => ['id' => $s->id, 'name' => $s->name ?: 'Saison ' . $s->season_number])->toArray(),
+            'episodes'   => $episodes->map(function ($ep) {
+                $sName = $ep->seasondata ? (!empty(trim((string)$ep->seasondata->name)) ? $ep->seasondata->name : 'Saison ' . $ep->seasondata->season_number) : '';
+                return [
+                    'id'   => $ep->id,
+                    'name' => ($ep->episode_number ? 'Ep.' . $ep->episode_number . ' — ' : '') . $ep->name
+                             . ($sName ? ' (' . $sName . ')' : ''),
+                ];
+            })->toArray(),
+            'episode_ids' => $episodeIds,
+        ];
     }
 }

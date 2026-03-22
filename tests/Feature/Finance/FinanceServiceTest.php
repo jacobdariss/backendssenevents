@@ -3,7 +3,7 @@
 namespace Tests\Feature\Finance;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Analytics\Services\FinanceService;
 use Modules\Partner\Models\Partner;
 use Tests\TestCase;
@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class FinanceServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private FinanceService $financeService;
     private Partner $partner;
@@ -101,8 +101,8 @@ class FinanceServiceTest extends TestCase
         $response = $this->actingAs($user)
                          ->get('/app/finance/export?period=30d');
 
-        // Doit rediriger ou refuser l'accès
-        $this->assertNotEquals(200, $response->getStatusCode());
+        // Doit retourner 403 (accès refusé) — jamais du CSV
+        $response->assertStatus(403);
     }
 
     /** @test */

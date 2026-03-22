@@ -130,6 +130,8 @@
         .section-wraper {
             padding-left: 6.25em;
             padding-right: 6.25em;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
         }
         .banner-section {
             padding-left: 0 !important;
@@ -150,6 +152,75 @@
         /* Légendes moins hautes en horizontal */
         .cards-horizontal .iq-card .block-images .card-description {
             padding: .75rem 0;
+        }
+
+        /* ========== Taille des cartes (HomepageBuilder settings) ========== */
+        .card-size-small .iq-card .block-images .image-box img { aspect-ratio: 2/2.4; }
+        .card-size-large .iq-card .block-images .image-box img { aspect-ratio: 2/3.2; }
+        .card-size-small .genres-img { height: 180px !important; }
+        .card-size-large .genres-img { height: 260px !important; }
+        .card-size-small .cast-image { height: 100px !important; width: 100px !important; }
+        .card-size-large .cast-image { height: 160px !important; width: 160px !important; }
+        .card-size-small .top-ten-img { height: 280px !important; }
+        .card-size-large .top-ten-img { height: 380px !important; }
+        .card-size-small .continue-watch-card .continue-watch-image { height: 110px !important; }
+        .card-size-large .continue-watch-card .continue-watch-image { height: 165px !important; }
+        .cards-horizontal.card-size-small .iq-card .block-images .image-box img { aspect-ratio: 16/8 !important; }
+        .cards-horizontal.card-size-large .iq-card .block-images .image-box img { aspect-ratio: 16/10 !important; }
+
+        /* ========== Badges (HomepageBuilder settings) ========== */
+        .badge-size-small .product-premium { height:1.25rem !important; width:1.25rem !important; line-height:1.35rem !important; }
+        .badge-size-small .product-premium i { font-size:.6rem !important; }
+        .badge-size-small .product-rent { font-size:.625rem !important; padding:.2rem .35rem !important; }
+        .badge-size-small .ratting-value { font-size:.625rem !important; padding:.2rem .35rem !important; }
+        .badge-size-large .product-premium { height:2.5rem !important; width:2.5rem !important; line-height:2.6rem !important; }
+        .badge-size-large .product-premium i { font-size:1rem !important; }
+        .badge-size-large .product-rent { font-size:.875rem !important; padding:.45rem .7rem !important; gap:.3rem !important; }
+        .badge-size-large .product-rent i { font-size:1rem !important; }
+        .badge-size-large .ratting-value { font-size:.875rem !important; padding:.45rem .65rem !important; font-weight:600; }
+
+        /* ========== Hover effects (HomepageBuilder settings) ========== */
+        .hover-none .iq-card, .hover-none .genres-card, .hover-none .cast-card,
+        .hover-none .livetv-card, .hover-none .continue-watch-card, .hover-none .channel-card,
+        .hover-none .language-card {
+            transition: none !important;
+        }
+        .hover-none .iq-card:hover, .hover-none .genres-card:hover, .hover-none .cast-card:hover,
+        .hover-none .livetv-card:hover, .hover-none .continue-watch-card:hover {
+            transform: none !important; box-shadow: none !important;
+        }
+        .hover-subtle .iq-card, .hover-subtle .genres-card, .hover-subtle .cast-card,
+        .hover-subtle .livetv-card, .hover-subtle .continue-watch-card, .hover-subtle .channel-card {
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        .hover-subtle .iq-card:hover, .hover-subtle .genres-card:hover, .hover-subtle .cast-card:hover,
+        .hover-subtle .livetv-card:hover, .hover-subtle .continue-watch-card:hover, .hover-subtle .channel-card:hover {
+            transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,.25);
+        }
+        .hover-zoom .slick-item, .hover-zoom .swiper-slide {
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        .hover-zoom .slick-item:hover, .hover-zoom .swiper-slide:hover {
+            transform: scale(1.06) translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,.4);
+            z-index: 10; position: relative;
+        }
+        .hover-zoom .iq-card:hover .block-images .image-box img { mix-blend-mode: inherit; }
+        .hover-zoom .genres-card, .hover-zoom .cast-card, .hover-zoom .livetv-card,
+        .hover-zoom .channel-card, .hover-zoom .continue-watch-card, .hover-zoom .language-card {
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        .hover-zoom .genres-card:hover, .hover-zoom .cast-card:hover, .hover-zoom .livetv-card:hover,
+        .hover-zoom .channel-card:hover, .hover-zoom .continue-watch-card:hover {
+            transform: scale(1.06) translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,.4);
+        }
+        .hover-zoom .language-card:hover {
+            transform: scale(1.06) translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,.3);
+        }
+        @media (max-width: 767.98px) {
+            .hover-zoom .slick-item:hover, .hover-zoom .swiper-slide:hover {
+                transform: none; box-shadow: none;
+            }
         }
     </style>
 
@@ -656,7 +727,7 @@
 
             const createMuteButton = (onToggle) => {
                 const button = document.createElement('button');
-                button.textContent = 'Unmute';
+                button.textContent = '{{ __('messages.unmute') }}';
                 Object.assign(button.style, {
                     position: 'absolute',
                     top: '10px',
@@ -724,7 +795,7 @@
 
                             const muteButton = createMuteButton((button) => {
                                 activePlayer.muted = !activePlayer.muted;
-                                button.textContent = activePlayer.muted ? 'Unmute' : 'Mute';
+                                button.textContent = activePlayer.muted ? '{{ __('messages.unmute') }}' : 'Mute';
                             });
                             previewContainer.appendChild(muteButton);
                         }
@@ -748,7 +819,7 @@
                                         controlVimeoPlayer(activePlayer, 'setVolume',
                                             isMuted ? 0 : 1);
                                     }
-                                    button.textContent = isMuted ? 'Unmute' : 'Mute';
+                                    button.textContent = isMuted ? '{{ __('messages.unmute') }}' : 'Mute';
                                 });
                                 previewContainer.appendChild(muteButton);
                             }

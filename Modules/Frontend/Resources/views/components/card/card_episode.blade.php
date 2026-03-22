@@ -15,6 +15,9 @@
         'release_date' => $data['release_date'] ?? null,
         'episode_number' => $data['episode_number'] ?? null,
         'entertainment_id' => $data['entertainment_id'] ?? null,
+        'trailer_url'      => $data['trailer_url'] ?? '',
+        'trailer_url_type' => $data['trailer_url_type'] ?? '',
+        'episode_slug'     => $data['slug'] ?? '',
     ];
 
     $qualityOptions = [];

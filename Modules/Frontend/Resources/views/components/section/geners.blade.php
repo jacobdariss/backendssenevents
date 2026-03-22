@@ -1,4 +1,4 @@
-<div class="movie-geners-block">
+<div class="movie-geners-block {{ $presentClass ?? '' }}">
    <div class="d-flex align-items-center justify-content-between my-2 me-2">
          <h5 class="main-title text-capitalize mb-0">{{ $title }}</h5>
          <a href="{{route('genresList')}}" class="view-all-button text-decoration-none flex-none"><span>{{__('frontend.view_all')}}</span> <i class="ph ph-caret-right"></i></a>
@@ -22,8 +22,16 @@
 
 
    <div class="card-style-slider slide-data-less">
-      <div class="{{  $class }} " data-items="7.5" data-items-desktop="7.5" data-items-laptop="5.5" data-items-tab="4.5" data-items-mobile-sm="3.5"
-         data-items-mobile="2.5" data-speed="1000" data-autoplay="false" data-center="false" data-infinite="false"
+      @php
+          $ipr = $itemsPerRow ?? 6;
+          $diDesktop = $ipr - 0.5;
+          $diLaptop  = min($ipr - 1.5, 4.5);
+          $diTab     = min($ipr - 2.5, 3.5);
+          $diMobSm   = min($ipr - 2.5, 3.5);
+          $diMob     = 2.5;
+      @endphp
+      <div class="{{  $class }} " data-items="{{ $ipr }}" data-items-desktop="{{ $diDesktop }}" data-items-laptop="{{ $diLaptop }}" data-items-tab="{{ $diTab }}" data-items-mobile-sm="{{ $diMobSm }}"
+         data-items-mobile="{{ $diMob }}" data-speed="1000" data-autoplay="false" data-center="false" data-infinite="false"
          data-navigation="true" data-pagination="false" data-spacing="12">
          @foreach($genres as $key => $value)
             <div class="swiper-slide">

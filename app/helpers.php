@@ -729,12 +729,12 @@ function formatCurrency($number, $noOfDecimal, $decimalSeparator, $thousandSepar
 
     if ($currencyPosition == 'right' || $currencyPosition == 'right_with_space') {
 
-        $currencyString .= $integerPart;
-
         if ($noOfDecimal > 0) {
-            $currencyString .= $decimalSeparator . $decimalPart;
+            $currencyString .= $integerPart . $decimalSeparator . $decimalPart;
         }
-        $currencyString .= ' ';
+        if ($currencyPosition == 'right_with_space') {
+            $currencyString .= ' ';
+        }
         $currencyString .= $currencySymbol;
     }
 
@@ -1090,13 +1090,27 @@ function decryptVideoUrl($encryptedUrl)
             ];
         }
 
+        // Check for embedded iframe AVANT Storage::exists (évite exception sur HTML multi-lignes)
+        if (str_contains($decryptedUrl, '<iframe')) {
+            if (preg_match('/<iframe[^>]*\bsrc=["\x27](https?[^"\x27]+)["\x27][^>]*>/is', $decryptedUrl, $embedMatch)) {
+                return ['platform' => 'embedded', 'url' => $embedMatch[1]];
+            }
+            if (preg_match('/\bsrc\s*=\s*["\x27](https?[^"\x27]+)["\x27]/i', $decryptedUrl, $embedMatch)) {
+                return ['platform' => 'embedded', 'url' => $embedMatch[1]];
+            }
+        }
+
+        // URL directe Cloudflare Stream / short.icu / embed / player
+        if (preg_match('/^https?:\/\/.*(cloudflarestream\.com|short\.icu|iframe\.|embed\.|player\.)/i', $decryptedUrl)) {
+            return ['platform' => 'embedded', 'url' => $decryptedUrl];
+        }
+
         // Check if it's a local file
         $filePath = str_replace(url('/storage'), 'public', $decryptedUrl);
         if (Storage::exists($filePath)) {
             $actualPath = Storage::path($filePath);
             $fileMimeType = mime_content_type($actualPath);
 
-            // Heuristic: check for x265/HEVC in filename or extension
             $isHEVC = false;
             if (preg_match('/\.(mkv|hevc)$/i', $actualPath) || stripos($actualPath, 'x265') !== false || stripos($actualPath, 'hevc') !== false) {
                 $isHEVC = true;
@@ -1112,7 +1126,6 @@ function decryptVideoUrl($encryptedUrl)
 
         // If it's an external URL
         if (filter_var($decryptedUrl, FILTER_VALIDATE_URL)) {
-            // Heuristic: check for x265/HEVC in URL
             $isHEVC = false;
             if (preg_match('/\.(mkv|hevc)$/i', $decryptedUrl) || stripos($decryptedUrl, 'x265') !== false || stripos($decryptedUrl, 'hevc') !== false) {
                 $isHEVC = true;
@@ -1122,22 +1135,6 @@ function decryptVideoUrl($encryptedUrl)
                 'platform' => 'local',
                 'url' => $decryptedUrl,
                 'isHEVC' => $isHEVC
-            ];
-        }
-
-        // Check for embedded iframe-type URL (e.g. short.icu, embedded players)
-        if (preg_match('/<iframe.*?src=[\"\']([^\"\']+)[\"\'].*?>.*?<\/iframe>/i', $decryptedUrl, $embedMatch)) {
-            return [
-                'platform' => 'embedded',
-                'url' => $embedMatch[1]
-            ];
-        }
-
-        // OR: If the decrypted URL is directly an embeddable iframe source (no iframe tag)
-        if (preg_match('/^(https?:\/\/)?(short\.icu|iframe\..+|embed\..+|player\..+)\//i', $decryptedUrl)) {
-            return [
-                'platform' => 'embedded',
-                'url' => $decryptedUrl
             ];
         }
 

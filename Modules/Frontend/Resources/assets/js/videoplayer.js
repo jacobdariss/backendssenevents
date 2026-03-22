@@ -74,6 +74,9 @@ try {
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = document.querySelector('meta[name="baseUrl"]').getAttribute('content');
 
+
+
+
   const player = videojs('videoPlayer', {
     techOrder: ['vimeo', 'youtube', 'html5', 'hls', 'embed'],
     autoplay: false,
@@ -726,35 +729,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.scrollTo({ top: 0, behavior: 'smooth' })
 
-    fetch(`${baseUrl}/api/continuewatch-list`)
-      .then((response) => response.json())
-      .then(async (data) => {
+    const entertainmentId  = button.getAttribute('data-entertainment-id')
+    const entertainmentType = button.getAttribute('data-entertainment-type')
+    const plan_id = button.getAttribute('data-plan-id')
 
-        const entertainmentId = button.getAttribute('data-entertainment-id')
-        const entertainmentType = button.getAttribute('data-entertainment-type')
-        const matchingVideo = data.data.find((item) => item.entertainment_id === parseInt(entertainmentId) && item.entertainment_type === entertainmentType)
-        let lastWatchedTime = 0
-        if (matchingVideo && matchingVideo.total_watched_time) {
-          lastWatchedTime = timeStringToSeconds(matchingVideo.total_watched_time)
-        }
-        if (accessType === 'paid') {
-          const plan_id = button.getAttribute('data-plan-id');
-          let canPlay = plan_id ? await CheckSubscription(plan_id) : false;
+    const watchTimeFetch = fetch(`${baseUrl}/api/v3/watch-time/${entertainmentType}/${entertainmentId}`)
+      .then(r => r.json()).catch(() => ({ watched_time: 0 }))
+    const subFetch = (accessType === 'paid' && plan_id)
+      ? CheckSubscription(plan_id)
+      : Promise.resolve(true)
 
-          if (!canPlay) {
-            player.pause()
-            isPopupShown = true // Mark that popup was shown
-            $('#DeviceSupport').modal('show') // Show device support modal if not supported
-            return // Stop further execution
-          }
-        }
-        if (accessType === 'free' || accessType === 'pay-per-view') {
-          playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-        } else {
-          handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-        }
-      })
-      .catch((error) => console.error('Error fetching continue watch:', error))
+    const [wtData, canPlay] = await Promise.all([watchTimeFetch, subFetch])
+
+    if (!canPlay) {
+      player.pause()
+      isPopupShown = true
+      $('#DeviceSupport').modal('show')
+      return
+    }
+
+    let lastWatchedTime = 0
+    if (wtData && wtData.total_watched_time) {
+      lastWatchedTime = timeStringToSeconds(wtData.total_watched_time)
+    }
+
+    if (accessType === 'free' || accessType === 'pay-per-view') {
+      playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+      // Filigrane PPV — overlay HTML, vérifie lui-même si PPV
+      setTimeout(initPPVWatermark, 500);
+    } else {
+      handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+    }
 
     isWatchHistorySaved = false // Reset flag
   }
@@ -1096,6 +1101,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then((data) => {
           setVideoSource(player, data.platform, data.videoId, data.url, data.mimeType, qualityOptions, subtitleInfo)
           player.load()
+          // Filigrane PPV (fallback pour autoplay)
+          const _access = document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
+          if (_access === 'pay-per-view') initPPVWatermark(_access);
           setSubtitle(player, subtitleInfo);
 
           // Use the reusable function for quality selector
@@ -3064,7 +3072,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const vastUrl = ad.url;
         debugLog('Loading VAST XML', { vastUrl });
 
-        player.ima.initializeAdDisplayContainer(); // ✅ ensure fresh IMA container
+        if (typeof window.initIMAIfNeeded === 'function') window.initIMAIfNeeded();
+        if (!player.ima) { console.warn('IMA not available'); index++; playNextAd(); return; }
+        player.ima.initializeAdDisplayContainer();
         player.ima.changeAdTag(vastUrl);
         player.ima.requestAds();
         player.ima.playAdBreak();
@@ -3588,28 +3598,35 @@ document.addEventListener('DOMContentLoaded', function () {
       originalConsoleError.apply(console, args);
     };
 
-    // IMA setup
-    const adsRenderingSettings = new google.ima.AdsRenderingSettings();
-    adsRenderingSettings.enablePreloading = true;
-    adsRenderingSettings.uiElements = [
-      google.ima.UiElements.AD_ATTRIBUTION,
-      google.ima.UiElements.COUNTDOWN,
-    ];
-    adsRenderingSettings.useStyledLinearAds = true;
+    // IMA désactivé (option 1 — contrib-ads supprimé)
+    if (true) { return; }
 
-    player.ima({
-      id: 'videoPlayer',
-      adTagUrl: '',
-      debug: true,
-      showControlsForJSAds: true,
-      adsRenderingSettings: adsRenderingSettings,
-      disableCustomPlaybackForIOS10Plus: true,
-      contribAdsSettings: {
-        prerollTimeout: 15000,  // 15s: VAST fetch + IMA load can take 5–10+ seconds
-        postrollTimeout: 15000,
-        disablePlayContentBehindAd: true
+    // IMA lazy — chargé seulement si pubs VAST existent
+    let imaInitialized = false;
+    window.initIMAIfNeeded = function() {
+      if (imaInitialized) return;
+      if (!window.google || !window.google.ima) {
+        if (window._imaLoading) return;
+        window._imaLoading = true;
+        const s = document.createElement('script');
+        s.src = '/js/videojs/ima3.js';
+        s.onload = () => { window._imaLoading = false; window.initIMAIfNeeded(); };
+        document.head.appendChild(s);
+        return;
       }
-    });
+      try {
+        const adsRenderingSettings = new google.ima.AdsRenderingSettings();
+        adsRenderingSettings.enablePreloading = true;
+        adsRenderingSettings.uiElements = [google.ima.UiElements.AD_ATTRIBUTION, google.ima.UiElements.COUNTDOWN];
+        adsRenderingSettings.useStyledLinearAds = true;
+        player.ima({
+          id: 'videoPlayer', adTagUrl: '', debug: false, showControlsForJSAds: true,
+          adsRenderingSettings: adsRenderingSettings, disableCustomPlaybackForIOS10Plus: true,
+          contribAdsSettings: { prerollTimeout: 5000, postrollTimeout: 5000, disablePlayContentBehindAd: true }
+        });
+        imaInitialized = true;
+      } catch(e) { console.warn('IMA init failed:', e); }
+    };
 
     let customAdChecked = false;
     player.one('play', function () {
@@ -3618,13 +3635,12 @@ document.addEventListener('DOMContentLoaded', function () {
         player.pause();
         showCustomAdThenPlayMain(function () {
           player.ima.initializeAdDisplayContainer();
-          loadAdsAndStartInterval(); // ✅ NEW central logic
+          loadAdsAndStartInterval();
         });
         return;
       }
-
       player.ima.initializeAdDisplayContainer();
-      loadAdsAndStartInterval(); // ✅ in case no custom ad
+      loadAdsAndStartInterval();
     });
 
     player.on('ended', function () {
@@ -3719,6 +3735,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function loadAdsAndStartInterval() {
+    // IMA/contrib-ads désactivés (option 1)
+    startVideo(); return;
     const params = new URLSearchParams();
     if (contentId) params.append('content_id', contentId);
     if (contentType) params.append('type', contentType);
@@ -3755,6 +3773,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // console.log('Loaded ad types:', adQueue.map(a => a.type));
 
         const hasPreRoll = adQueue.some(ad => ad.type === 'pre-roll');
+        if (adQueue.length > 0 && typeof window.initIMAIfNeeded === 'function') {
+          window.initIMAIfNeeded();
+        }
 
         // Wait for metadata to be loaded before scheduling ads
         if (player.readyState() >= 1) {
@@ -3795,4 +3816,42 @@ document.addEventListener('DOMContentLoaded', function () {
   //     player.on('userinactive', () => player.userActive(true));
   //   });
   // }
+  // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
+  function initPPVWatermark(accessType) {
+    const overlay = document.getElementById('ppv-watermark-overlay');
+    const wmText  = document.getElementById('ppv-wm-text');
+    if (!overlay || !wmText) return;
+
+    // Déjà initialisé
+    if (overlay._wmInitialized) return;
+    overlay._wmInitialized = true;
+
+    // Afficher immédiatement
+    overlay.style.display = 'block';
+
+    function moveWatermark() {
+      const wrapper = overlay.parentElement;
+      const w = (wrapper ? wrapper.offsetWidth  : 0) || 800;
+      const h = (wrapper ? wrapper.offsetHeight : 0) || 450;
+      const tw = wmText.offsetWidth  || 250;
+      const th = wmText.offsetHeight || 20;
+      const x = Math.random() * Math.max(10, w - tw - 20) + 10;
+      const y = Math.random() * Math.max(10, h - th - 20) + 10;
+      wmText.style.left = x + 'px';
+      wmText.style.top  = y + 'px';
+    }
+
+    // Position initiale après rendu
+    setTimeout(moveWatermark, 100);
+    setInterval(moveWatermark, 10000);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Filigrane PPV — démarrer si overlay présent dans le DOM (page PPV)
+  if (document.getElementById('ppv-watermark-overlay')) {
+    console.log('[Watermark] overlay PPV trouvé — init filigrane');
+    initPPVWatermark();
+  }
+
 });

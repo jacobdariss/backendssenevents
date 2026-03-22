@@ -12,12 +12,13 @@ class HomepageSection extends Model
     protected $fillable = [
         'slug', 'name', 'type', 'content_type',
         'position', 'is_active', 'platform',
-        'content_ids', 'content_limit', 'sort_by', 'card_orientation', 'settings',
+        'content_ids', 'episode_ids', 'content_limit', 'sort_by', 'card_orientation', 'settings',
     ];
 
     protected $casts = [
         'is_active'     => 'boolean',
         'content_ids'   => 'array',
+        'episode_ids'   => 'array',
         'settings'      => 'array',
         'position'      => 'integer',
         'content_limit' => 'integer',

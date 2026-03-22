@@ -9,6 +9,7 @@ use Modules\LiveTV\Models\LiveTvChannel;
 use Modules\Genres\Models\Genres;
 use Modules\CastCrew\Models\CastCrew;
 use Modules\Constant\Models\Constant;
+use Modules\Episode\Models\Episode;
 use Modules\Entertainment\Transformers\Backend\CommonContentResourceV3;
 use Modules\Video\Transformers\Backend\VideoResourceV3;
 use Modules\LiveTV\Transformers\Backend\LiveTvChannelResourceV3;
@@ -30,9 +31,16 @@ class HomepageSectionDataService
         // Si des IDs sont sélectionnés manuellement, on les utilise
         $manualIds = $section->content_ids ?? [];
 
+        // Pour les séries TV : si des épisodes sont sélectionnés, on charge directement les épisodes
+        $episodeIds = $section->episode_ids ?? [];
+
         switch ($section->type) {
 
             case 'entertainment':
+                // Si des épisodes sont sélectionnés manuellement → mode "épisodes"
+                if (!empty($episodeIds)) {
+                    return $this->loadEpisodes($episodeIds, $request);
+                }
                 return $this->loadEntertainment($ct, $limit, $sort, $manualIds, $request);
 
             case 'video':
@@ -57,6 +65,65 @@ class HomepageSectionDataService
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Charge des épisodes sélectionnés manuellement pour une section homepage.
+     * Retourne un tableau de données légères adaptées au slider frontend.
+     */
+    private function loadEpisodes(array $ids, Request $request): array
+    {
+        $episodes = Episode::whereIn('id', $ids)
+            ->where('status', 1)
+            ->with([
+                'seasondata:id,name,season_number,entertainment_id',
+                'entertainmentdata:id,name,slug',
+            ])
+            ->get(['id', 'name', 'slug', 'poster_url', 'poster_tv_url', 'episode_number',
+                   'season_id', 'entertainment_id', 'duration', 'release_date',
+                   'access', 'purchase_type', 'plan_id', 'IMDb_rating',
+                   'trailer_url', 'trailer_url_type']);
+
+        // Respecter l'ordre de sélection manuelle
+        $ordered = collect($ids)->map(fn($id) => $episodes->firstWhere('id', $id))->filter()->values();
+
+        $data = $ordered->map(function ($ep) {
+            // Même logique que EpisodeResourceV3 : poster_url avec page_type 'episode'
+            $poster = !empty($ep->poster_url)
+                ? setBaseUrlWithFileName($ep->poster_url, 'image', 'episode')
+                : (!empty($ep->poster_tv_url)
+                    ? setBaseUrlWithFileName($ep->poster_tv_url, 'image', 'episode')
+                    : null);
+
+            $seasonLabel = $ep->seasondata
+                ? (!empty(trim((string)$ep->seasondata->name))
+                    ? $ep->seasondata->name
+                    : 'Saison ' . $ep->seasondata->season_number)
+                : '';
+
+            return [
+                'id'               => $ep->id,
+                'name'             => $ep->name,
+                'slug'             => $ep->slug,
+                'poster_image'     => $poster,
+                'episode_number'   => $ep->episode_number,
+                'season_label'     => $seasonLabel,
+                'entertainment_id' => $ep->entertainment_id,
+                'show_name'        => $ep->entertainmentdata ? $ep->entertainmentdata->name : '',
+                'show_slug'        => $ep->entertainmentdata ? $ep->entertainmentdata->slug : '',
+                'duration'         => $ep->duration,
+                'release_date'     => $ep->release_date,
+                'access'           => $ep->access,
+                'imdb_rating'      => $ep->IMDb_rating,
+                'is_episode'       => true,
+                'trailer_url'      => $ep->trailer_url ?? '',
+                'trailer_url_type' => $ep->trailer_url_type ?? '',
+            ];
+        })->toArray();
+
+        return ['data' => $data, 'mode' => 'episodes'];
+    }
 
     private function loadEntertainment(?string $ct, int $limit, string $sort, array $ids, Request $request): array
     {
@@ -154,9 +221,18 @@ class HomepageSectionDataService
             $query->orderByDesc('created_at');
         }
 
-        return [
-            'data' => $query->limit($limit)->get(),
-        ];
+        $items = $query->limit($limit)->get();
+
+        $data = $items->map(function ($cast) {
+            return [
+                'id'            => $cast->id,
+                'name'          => $cast->name,
+                'type'          => $cast->type,
+                'profile_image' => setBaseUrlWithFileName($cast->file_url, 'image', 'castcrew'),
+            ];
+        })->all();
+
+        return ['data' => $data];
     }
 
     private function loadLanguages(int $limit, array $ids): array

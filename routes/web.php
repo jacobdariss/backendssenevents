@@ -34,6 +34,8 @@ use App\Http\Controllers\Auth\WebQrLoginController;
 require __DIR__ . '/auth.php';
 
 
+
+
 Route::group(['middleware' => ['checkInstallation']], function () {
 
 Route::get('/', [FrontendController::class, 'index'])->name('user.login');
@@ -217,6 +219,8 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'a
     Route::get('homepage-builder',                 [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'index'])->name('homepage-builder.index');
     Route::get('homepage-builder/create',          [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'create'])->name('homepage-builder.create');
     Route::get('homepage-builder/content-options', [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'getContentOptionsAjax'])->name('homepage-builder.content-options');
+    Route::get('homepage-builder/tvshow-seasons',   [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'getTvshowSeasons'])->name('homepage-builder.tvshow-seasons');
+    Route::get('homepage-builder/season-episodes',  [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'getSeasonEpisodes'])->name('homepage-builder.season-episodes');
     Route::post('homepage-builder/reorder',        [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'reorder'])->name('homepage-builder.reorder');
     Route::post('homepage-builder',                [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'store'])->name('homepage-builder.store');
     Route::get('homepage-builder/{id}/edit',       [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'edit'])->name('homepage-builder.edit');
@@ -224,3 +228,4 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'a
     Route::delete('homepage-builder/{id}',         [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'destroy'])->name('homepage-builder.destroy');
     Route::post('homepage-builder/{id}/toggle',    [\Modules\HomepageBuilder\Http\Controllers\Backend\HomepageBuilderController::class, 'toggleActive'])->name('homepage-builder.toggle');
 });
+

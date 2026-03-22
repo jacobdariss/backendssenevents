@@ -8,6 +8,8 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth', 'a
     Route::get('homepage-builder',                  [HomepageBuilderController::class, 'index'])->name('homepage-builder.index');
     Route::get('homepage-builder/create',           [HomepageBuilderController::class, 'create'])->name('homepage-builder.create');
     Route::get('homepage-builder/content-options',  [HomepageBuilderController::class, 'getContentOptionsAjax'])->name('homepage-builder.content-options');
+    Route::get('homepage-builder/tvshow-seasons',   [HomepageBuilderController::class, 'getTvshowSeasons'])->name('homepage-builder.tvshow-seasons');
+    Route::get('homepage-builder/season-episodes',  [HomepageBuilderController::class, 'getSeasonEpisodes'])->name('homepage-builder.season-episodes');
     Route::post('homepage-builder/reorder',         [HomepageBuilderController::class, 'reorder'])->name('homepage-builder.reorder');
     Route::post('homepage-builder',                 [HomepageBuilderController::class, 'store'])->name('homepage-builder.store');
 
