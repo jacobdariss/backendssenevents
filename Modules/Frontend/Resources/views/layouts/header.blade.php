@@ -473,7 +473,7 @@
                                         @endforeach
                                     </div>
                                 </li>
-
+                                @endif
 
                                 @if (auth()->check() && auth()->user()->user_type == 'user' && !getCurrentProfileSession('is_child_profile'))
                                     <li class="nav-item">
