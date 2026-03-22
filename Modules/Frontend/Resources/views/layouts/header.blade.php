@@ -439,16 +439,22 @@
                                         </div>
                                     </div>
                                 </li>
+                                @php
+                                    $langMenuEnabled  = \Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','language_menu_enabled')->value('val') ?? '1';
+                                    $enabledLangs     = json_decode(\Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','enabled_languages')->value('val') ?? json_encode(array_keys(config('app.available_locales'))), true) ?? array_keys(config('app.available_locales'));
+                                    $filteredLocales  = array_filter(config('app.available_locales'), fn($k) => in_array($k, $enabledLangs), ARRAY_FILTER_USE_KEY);
+                                @endphp
+                                @if($langMenuEnabled == '1' && count($filteredLocales) > 1)
                                 <li class="nav-item dropdown dropdown-language-wrapper">
                                     <button class="btn btn-dark gap-3 px-3 dropdown-toggle" data-bs-toggle="dropdown"
                                         aria-haspopup="true" aria-expanded="false">
                                         <img src="{{ asset('flags/' . App::getLocale() . '.png') }}" alt="flag"
-                                            class="img-fluid me-2" class="img-fluid me-2" width="20"
+                                            class="img-fluid me-2" width="20"
                                             onerror="this.onerror=null; this.src='{{ asset('flags/globe.png') }}';">
                                         {{ strtoupper(App::getLocale()) }}
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-language mt-0">
-                                        @foreach (config('app.available_locales') as $locale => $title)
+                                        @foreach ($filteredLocales as $locale => $title)
                                             <a class="dropdown-item {{ App::getLocale() == $locale ? 'active' : '' }}"
                                                 href="{{ route('frontend.language.switch', $locale) }}">
                                                 <span class="d-flex align-items-center gap-3">

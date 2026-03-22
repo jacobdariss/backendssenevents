@@ -212,20 +212,30 @@ class SettingsController extends Controller
         $menuEnabled  = $request->has('language_menu_enabled') ? '1' : '0';
         $enabledLangs = $request->input('enabled_languages', []);
 
-        // updateOrCreate pour créer la clé si elle n'existe pas encore
-        \App\Models\Setting::updateOrCreate(
-            ['name' => 'language_menu_enabled'],
-            ['val' => $menuEnabled, 'type' => 'string']
-        );
-        \App\Models\Setting::updateOrCreate(
-            ['name' => 'enabled_languages'],
-            ['val' => json_encode($enabledLangs), 'type' => 'string']
-        );
+        // Bypass le modèle pour éviter tout problème de cache/SoftDelete
+        foreach ([
+            'language_menu_enabled' => $menuEnabled,
+            'enabled_languages'     => json_encode($enabledLangs),
+        ] as $key => $value) {
+            $exists = \Illuminate\Support\Facades\DB::table('settings')
+                ->whereNull('deleted_at')
+                ->where('name', $key)
+                ->exists();
 
-        // Vider le bon cache key utilisé par Setting::getAllSettings()
+            if ($exists) {
+                \Illuminate\Support\Facades\DB::table('settings')
+                    ->whereNull('deleted_at')
+                    ->where('name', $key)
+                    ->update(['val' => $value, 'updated_at' => now()]);
+            } else {
+                \Illuminate\Support\Facades\DB::table('settings')
+                    ->insert(['name' => $key, 'val' => $value, 'type' => 'string', 'created_at' => now(), 'updated_at' => now()]);
+            }
+        }
+
+        // Vider tous les caches de settings
         \Illuminate\Support\Facades\Cache::forget('settings.all');
         \Illuminate\Support\Facades\Cache::forget('setting');
-        \App\Models\Setting::flushCache();
 
         return redirect()->back()->with('success', __('messages.save_setting'));
     }
