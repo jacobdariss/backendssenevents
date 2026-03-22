@@ -6,18 +6,76 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.11.0/css/flag-icons.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.dash-kpi { border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
-.dash-kpi .kpi-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.dash-kpi .kpi-val { font-size: 1.7rem; font-weight: 800; line-height: 1; }
-.dash-kpi .kpi-label { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; opacity: .65; margin-top: 4px; }
-.dash-kpi .kpi-sub { font-size: .75rem; margin-top: 6px; }
-.shortcut-card { border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; text-decoration: none; transition: transform .15s, box-shadow .15s; cursor: pointer; }
-.shortcut-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.18); text-decoration: none; }
-.shortcut-card .sc-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.shortcut-card .sc-label { font-size: .8rem; opacity: .7; }
-.shortcut-card .sc-title { font-weight: 700; font-size: .95rem; }
-.section-title { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; opacity: .5; font-weight: 700; margin-bottom: 12px; }
-.badge-pending { background: rgba(255,160,0,.15); color: #ffa000; border: 1px solid rgba(255,160,0,.3); font-size: .7rem; padding: 2px 8px; border-radius: 20px; }
+.section-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-secondary); margin-bottom: 10px; }
+/* KPI cards */
+.kpi { border-radius: 14px; padding: 18px 20px; position: relative; overflow: hidden; }
+.kpi-purple { background: #EEEDFE; }
+.kpi-teal   { background: #E1F5EE; }
+.kpi-blue   { background: #E6F1FB; }
+.kpi-amber  { background: #FAEEDA; }
+.kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.kpi-purple .kpi-icon { background: #CECBF6; }
+.kpi-teal   .kpi-icon { background: #9FE1CB; }
+.kpi-blue   .kpi-icon { background: #B5D4F4; }
+.kpi-amber  .kpi-icon { background: #FAC775; }
+.kpi-icon i { font-size: 16px; }
+.kpi-purple .kpi-icon i { color: #3C3489; }
+.kpi-teal   .kpi-icon i { color: #085041; }
+.kpi-blue   .kpi-icon i { color: #0C447C; }
+.kpi-amber  .kpi-icon i { color: #633806; }
+.kpi-val { font-size: 26px; font-weight: 500; line-height: 1; margin-bottom: 4px; }
+.kpi-purple .kpi-val { color: #3C3489; }
+.kpi-teal   .kpi-val { color: #085041; }
+.kpi-blue   .kpi-val { color: #0C447C; }
+.kpi-amber  .kpi-val { color: #633806; }
+.kpi-lbl { font-size: 12px; margin-bottom: 6px; }
+.kpi-purple .kpi-lbl { color: #534AB7; }
+.kpi-teal   .kpi-lbl { color: #0F6E56; }
+.kpi-blue   .kpi-lbl { color: #185FA5; }
+.kpi-amber  .kpi-lbl { color: #854F0B; }
+.kpi-sub { font-size: 11px; }
+.kpi-purple .kpi-sub { color: #7F77DD; }
+.kpi-teal   .kpi-sub { color: #1D9E75; }
+.kpi-blue   .kpi-sub { color: #378ADD; }
+.kpi-amber  .kpi-sub { color: #BA7517; }
+.kpi-deco { position: absolute; right: -10px; bottom: -10px; width: 64px; height: 64px; border-radius: 50%; opacity: .18; }
+.kpi-purple .kpi-deco { background: #534AB7; }
+.kpi-teal   .kpi-deco { background: #0F6E56; }
+.kpi-blue   .kpi-deco { background: #185FA5; }
+.kpi-amber  .kpi-deco { background: #854F0B; }
+/* Shortcut cards */
+.sc { border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; text-decoration: none; transition: opacity .15s; }
+.sc:hover { opacity: .85; text-decoration: none; }
+.sc-purple { background: #EEEDFE; }
+.sc-teal   { background: #E1F5EE; }
+.sc-coral  { background: #FAECE7; }
+.sc-amber  { background: #FAEEDA; }
+.sc .sc-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sc-purple .sc-icon { background: #CECBF6; }
+.sc-teal   .sc-icon { background: #9FE1CB; }
+.sc-coral  .sc-icon { background: #F5C4B3; }
+.sc-amber  .sc-icon { background: #FAC775; }
+.sc .sc-icon i { font-size: 18px; }
+.sc-purple .sc-icon i { color: #3C3489; }
+.sc-teal   .sc-icon i { color: #085041; }
+.sc-coral  .sc-icon i { color: #712B13; }
+.sc-amber  .sc-icon i { color: #633806; }
+.sc .sc-meta  { font-size: 11px; margin-bottom: 2px; }
+.sc .sc-ttl   { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.sc-purple .sc-meta { color: #7F77DD; }
+.sc-purple .sc-ttl  { color: #3C3489; }
+.sc-teal   .sc-meta { color: #1D9E75; }
+.sc-teal   .sc-ttl  { color: #085041; }
+.sc-coral  .sc-meta { color: #D85A30; }
+.sc-coral  .sc-ttl  { color: #712B13; }
+.sc-amber  .sc-meta { color: #BA7517; }
+.sc-amber  .sc-ttl  { color: #633806; }
+.sc-arrow { margin-left: auto; opacity: .35; font-size: 14px; }
+.sc-purple .sc-arrow { color: #534AB7; }
+.sc-teal   .sc-arrow { color: #0F6E56; }
+.sc-coral  .sc-arrow { color: #993C1D; }
+.sc-amber  .sc-arrow { color: #854F0B; }
+.sc-badge { background: #D85A30; color: #fff; font-size: 10px; font-weight: 500; border-radius: 20px; padding: 2px 7px; }
 </style>
 @endpush
 
@@ -41,80 +99,43 @@
 <p class="section-title">Indicateurs clés</p>
 <div class="row g-3 mb-4">
 
-    {{-- Revenus totaux --}}
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="dash-kpi">
-                <div class="kpi-icon" style="background:rgba(34,197,94,.15)">
-                    <i class="ph ph-currency-circle-dollar fs-4" style="color:#22c55e"></i>
-                </div>
-                <div>
-                    <div class="kpi-val">{{ number_format($total_revenue, 0, ',', ' ') }}</div>
-                    <div class="kpi-label">Revenus totaux</div>
-                    <div class="kpi-sub">
-                        <span class="text-muted">PPV {{ number_format($rent_revenue,0,',',' ') }}</span>
-                        &nbsp;·&nbsp;
-                        <span class="text-muted">Abo {{ number_format($subscription_revenue,0,',',' ') }}</span>
-                        <span class="ms-1 text-muted" style="font-size:.7rem">FCFA</span>
-                    </div>
-                </div>
-            </div>
+        <div class="kpi kpi-purple">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-currency-circle-dollar"></i></div>
+            <div class="kpi-val">{{ number_format($total_revenue, 0, ',', ' ') }}</div>
+            <div class="kpi-lbl">Revenus totaux</div>
+            <div class="kpi-sub">PPV {{ number_format($rent_revenue,0,',',' ') }} · Abo {{ number_format($subscription_revenue,0,',',' ') }} FCFA</div>
         </div>
     </div>
 
-    {{-- Utilisateurs --}}
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="dash-kpi">
-                <div class="kpi-icon" style="background:rgba(99,102,241,.15)">
-                    <i class="ph ph-users fs-4" style="color:#6366f1"></i>
-                </div>
-                <div>
-                    <div class="kpi-val">{{ number_format($totalusers) }}</div>
-                    <div class="kpi-label">Utilisateurs</div>
-                    <div class="kpi-sub">
-                        <span class="text-success">{{ number_format($activeusers) }} actifs</span>
-                        &nbsp;·&nbsp;
-                        <span class="text-primary">{{ number_format($totalSubscribers) }} abonnés</span>
-                    </div>
-                </div>
-            </div>
+        <div class="kpi kpi-teal">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-users"></i></div>
+            <div class="kpi-val">{{ number_format($totalusers) }}</div>
+            <div class="kpi-lbl">Utilisateurs</div>
+            <div class="kpi-sub">{{ number_format($activeusers) }} actifs · {{ number_format($totalSubscribers) }} abonnés</div>
         </div>
     </div>
 
-    {{-- Vues --}}
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="dash-kpi">
-                <div class="kpi-icon" style="background:rgba(14,165,233,.15)">
-                    <i class="ph ph-play-circle fs-4" style="color:#0ea5e9"></i>
-                </div>
-                <div>
-                    <div class="kpi-val">{{ number_format($viewsToday) }}</div>
-                    <div class="kpi-label">Vues aujourd'hui</div>
-                    <div class="kpi-sub">
-                        <span class="text-muted">{{ number_format($viewsThisMonth) }} ce mois</span>
-                    </div>
-                </div>
-            </div>
+        <div class="kpi kpi-blue">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-play-circle"></i></div>
+            <div class="kpi-val">{{ number_format($viewsToday) }}</div>
+            <div class="kpi-lbl">Vues aujourd'hui</div>
+            <div class="kpi-sub">{{ number_format($viewsThisMonth) }} ce mois</div>
         </div>
     </div>
 
-    {{-- Contenus --}}
     <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="dash-kpi">
-                <div class="kpi-icon" style="background:rgba(249,115,22,.15)">
-                    <i class="ph ph-film-slate fs-4" style="color:#f97316"></i>
-                </div>
-                <div>
-                    <div class="kpi-val">{{ number_format($totalmovies + $totaltvshow + $totalvideo) }}</div>
-                    <div class="kpi-label">Contenus actifs</div>
-                    <div class="kpi-sub">
-                        <span class="text-muted">{{ $totalmovies }} Emissions · {{ $totaltvshow }} Séries · {{ $totalvideo }} Vidéos</span>
-                    </div>
-                </div>
-            </div>
+        <div class="kpi kpi-amber">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-film-slate"></i></div>
+            <div class="kpi-val">{{ number_format($totalmovies + $totaltvshow + $totalvideo) }}</div>
+            <div class="kpi-lbl">Contenus actifs</div>
+            <div class="kpi-sub">{{ $totalmovies }} Émissions · {{ $totaltvshow }} Séries · {{ $totalvideo }} Vidéos</div>
         </div>
     </div>
 
@@ -125,55 +146,51 @@
 <div class="row g-3 mb-4">
 
     <div class="col-6 col-md-3">
-        <a href="{{ route('backend.analytics.index') }}" class="card shortcut-card">
-            <div class="sc-icon" style="background:rgba(99,102,241,.15)">
-                <i class="ph ph-chart-line fs-5" style="color:#6366f1"></i>
-            </div>
+        <a href="{{ route('backend.analytics.index') }}" class="sc sc-purple">
+            <div class="sc-icon"><i class="ph ph-chart-line"></i></div>
             <div>
-                <div class="sc-label">Module</div>
-                <div class="sc-title">Analytics</div>
+                <div class="sc-meta">Module</div>
+                <div class="sc-ttl">Analytics</div>
             </div>
+            <i class="ph ph-caret-right sc-arrow"></i>
         </a>
     </div>
 
     <div class="col-6 col-md-3">
-        <a href="{{ route('backend.finance.index') }}" class="card shortcut-card">
-            <div class="sc-icon" style="background:rgba(34,197,94,.15)">
-                <i class="ph ph-currency-circle-dollar fs-5" style="color:#22c55e"></i>
-            </div>
+        <a href="{{ route('backend.finance.index') }}" class="sc sc-teal">
+            <div class="sc-icon"><i class="ph ph-currency-circle-dollar"></i></div>
             <div>
-                <div class="sc-label">Module</div>
-                <div class="sc-title">Finance</div>
+                <div class="sc-meta">Module</div>
+                <div class="sc-ttl">Finance</div>
             </div>
+            <i class="ph ph-caret-right sc-arrow"></i>
         </a>
     </div>
 
     <div class="col-6 col-md-3">
-        <a href="{{ route('backend.partners.index') }}" class="card shortcut-card">
-            <div class="sc-icon" style="background:rgba(249,115,22,.15)">
-                <i class="ph ph-handshake fs-5" style="color:#f97316"></i>
-            </div>
+        <a href="{{ route('backend.partners.index') }}" class="sc sc-coral">
+            <div class="sc-icon"><i class="ph ph-handshake"></i></div>
             <div>
-                <div class="sc-label">{{ $activePartners }} actifs / {{ $totalPartners }}</div>
-                <div class="sc-title">Partenaires</div>
+                <div class="sc-meta">{{ $activePartners }} actifs / {{ $totalPartners }}</div>
+                <div class="sc-ttl">Partenaires</div>
             </div>
+            <i class="ph ph-caret-right sc-arrow"></i>
         </a>
     </div>
 
     <div class="col-6 col-md-3">
-        <a href="{{ route('backend.partner-validation.index') }}" class="card shortcut-card">
-            <div class="sc-icon" style="background:rgba(255,160,0,.15)">
-                <i class="ph ph-clock fs-5" style="color:#ffa000"></i>
-            </div>
-            <div>
-                <div class="sc-label">Contenus</div>
-                <div class="sc-title d-flex align-items-center gap-2">
+        <a href="{{ route('backend.partner-validation.index') }}" class="sc sc-amber">
+            <div class="sc-icon"><i class="ph ph-clock"></i></div>
+            <div style="flex:1">
+                <div class="sc-meta">Contenus</div>
+                <div class="sc-ttl">
                     Validation
                     @if($pendingContents > 0)
-                    <span class="badge-pending">{{ $pendingContents }}</span>
+                    <span class="sc-badge">{{ $pendingContents }}</span>
                     @endif
                 </div>
             </div>
+            <i class="ph ph-caret-right sc-arrow"></i>
         </a>
     </div>
 
