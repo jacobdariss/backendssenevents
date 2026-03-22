@@ -4,11 +4,25 @@
 --}}
 @php
     $cfEnabled = config('cloudflare.stream.enabled') && !empty(config('cloudflare.stream.account_id'));
-    $prefix    = $fieldPrefix ?? 'video';
+    // Lire aussi depuis settings DB
+    if (!$cfEnabled) {
+        $dbEnabled  = \Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','cf_stream_enabled')->value('val');
+        $dbAccount  = \Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','cf_stream_account_id')->value('val');
+        $cfEnabled  = ($dbEnabled == '1') && !empty($dbAccount);
+    }
+    $prefix = $fieldPrefix ?? 'video';
 @endphp
 
-@if($cfEnabled)
-<div id="cf-stream-panel-{{ $prefix }}" class="cf-stream-uploader mt-2">
+{{-- Toujours afficher le panel pour le switch JS --}}
+<div id="cf-stream-panel-inner-{{ $prefix }}" class="cf-stream-uploader mt-2">
+
+@if(!$cfEnabled)
+<div class="alert py-2 mb-3 d-flex align-items-center gap-2" style="background:rgba(239,159,39,0.1);border:1px solid rgba(239,159,39,0.3);border-radius:8px;font-size:.82rem;color:#EF9F27">
+    <i class="ph ph-warning"></i>
+    Cloudflare Stream non configuré —
+    <a href="{{ route('backend.settings.storage-settings') }}" class="ms-1" style="color:#EF9F27;font-weight:600">Configurer maintenant</a>
+</div>
+@endif
 
     {{-- Zone de drop / sélection fichier --}}
     <div id="cf-drop-zone-{{ $prefix }}"
@@ -68,13 +82,6 @@
     <input type="hidden" name="cf_stream_uid" id="cf-uid-{{ $prefix }}" value="{{ old('cf_stream_uid') }}">
 
 </div>
-@else
-<div class="alert alert-warning py-2 small">
-    <i class="ph ph-warning me-1"></i>
-    Cloudflare Stream non configuré —
-    <a href="{{ route('backend.settings.storage-settings') }}" class="alert-link">Paramètres Stockage</a>
-</div>
-@endif
 
 @once
 @push('after-scripts')
