@@ -73,21 +73,28 @@ class AnalyticsService
         return $q->groupBy('platform')->orderByDesc('views')->get();
     }
 
-    public function paymentGatewayStats(Carbon $from, Carbon $to): \Illuminate\Support\Collection
+    public function paymentGatewayStats(Carbon $from, Carbon $to, ?int $partnerId = null): \Illuminate\Support\Collection
     {
-        // Transactions PPV par gateway
-        $ppv = \Modules\Frontend\Models\PayperviewTransaction::select(
-                'payment_type',
+        // Transactions PPV par gateway (filtrées par partenaire si fourni)
+        $ppvQuery = \Modules\Frontend\Models\PayperviewTransaction::select(
+                'payperviewstransactions.payment_type',
                 DB::raw('COUNT(*) as transactions'),
-                DB::raw('SUM(amount) as revenue'))
-            ->whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'paid')
-            ->groupBy('payment_type')
+                DB::raw('SUM(payperviewstransactions.amount) as revenue'))
+            ->whereBetween('payperviewstransactions.created_at', [$from, $to])
+            ->where('payperviewstransactions.payment_status', 'paid');
+
+        if ($partnerId) {
+            $ppvQuery->join('pay_per_views', 'pay_per_views.id', '=', 'payperviewstransactions.pay_per_view_id')
+                     ->join('entertainments', 'entertainments.id', '=', 'pay_per_views.movie_id')
+                     ->where('entertainments.partner_id', $partnerId);
+        }
+
+        $ppv = $ppvQuery->groupBy('payperviewstransactions.payment_type')
             ->get()
             ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => $r->transactions, 'revenue' => $r->revenue, 'type' => 'PPV']);
 
-        // Abonnements par gateway
-        $subs = DB::table('subscriptions_transactions')
+        // Abonnements par gateway (global — pas filtrable par partenaire)
+        $subs = $partnerId ? collect() : DB::table('subscriptions_transactions')
             ->select('payment_type',
                 DB::raw('COUNT(*) as transactions'),
                 DB::raw('SUM(amount) as revenue'))

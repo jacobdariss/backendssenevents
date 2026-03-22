@@ -81,7 +81,7 @@ class AnalyticsController extends Controller
         $byDevice    = $this->analytics->viewsByDevice($from, $to, $partnerId);
         $byPlatform  = $this->analytics->viewsByPlatform($from, $to, $partnerId);
         $byCountry    = $this->analytics->viewsByCountry($from, $to, $partnerId);
-        $gatewayStats = collect(); // Le partenaire n'a pas encore de paiements directs
+        $gatewayStats = $this->analytics->paymentGatewayStats($from->copy(), $to->copy(), $partnerId);
         $topContent  = $this->analytics->topContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $ratingsStats = $this->analytics->ratingsStats($from, $to, $partnerId);
         $topRated     = $this->analytics->topRatedContent($from, $to, $partnerId, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
