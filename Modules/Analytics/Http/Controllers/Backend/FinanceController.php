@@ -20,13 +20,14 @@ class FinanceController extends Controller
         $period = $request->get('period', '30d');
         [$from, $to] = $this->finance->getPeriodDates($period);
 
-        $kpis           = $this->finance->globalKpis($from, $to);
-        $revenuePerDay  = $this->finance->revenuePerDay($from, $to);
-        $byGateway      = $this->finance->revenueByGateway($from, $to);
-        $byPartner      = $this->finance->revenueByPartner($from, $to);
-        $topPpv         = $this->finance->topPpvContent($from, $to);
-        $recentTx       = $this->finance->recentTransactions($from, $to);
-        $subDetails     = $this->finance->subscriptionDetails($from, $to);
+        // Utiliser des copies Carbon pour éviter la mutation entre appels
+        $kpis           = $this->finance->globalKpis($from->copy(), $to->copy());
+        $revenuePerDay  = $this->finance->revenuePerDay($from->copy(), $to->copy());
+        $byGateway      = $this->finance->revenueByGateway($from->copy(), $to->copy());
+        $byPartner      = $this->finance->revenueByPartner($from->copy(), $to->copy());
+        $topPpv         = $this->finance->topPpvContent($from->copy(), $to->copy());
+        $recentTx       = $this->finance->recentTransactions($from->copy(), $to->copy());
+        $subDetails     = $this->finance->subscriptionDetails($from->copy(), $to->copy());
         $module_action  = 'Finance';
 
         return view('analytics::backend.finance.index', compact(

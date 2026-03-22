@@ -36,8 +36,8 @@ class FinanceService
 
         // Période précédente pour comparaison
         $diff        = max(1, $from->diffInDays($to));
-        $prevFrom    = (clone $from)->subDays($diff);
-        $prevTo      = (clone $from)->subSecond();
+        $prevFrom    = $from->copy()->subDays($diff);
+        $prevTo      = $from->copy()->subSecond();
         $prevTotal   = (float)(PayperviewTransaction::whereBetween('created_at', [$prevFrom, $prevTo])->where('payment_status', 'success')->sum('amount') ?? 0)
                      + (float)(Subscription::whereBetween('created_at', [$prevFrom, $prevTo])->sum('total_amount') ?? 0);
 
@@ -79,9 +79,9 @@ class FinanceService
         $dates = collect(array_unique(array_merge($ppv->keys()->toArray(), $subs->keys()->toArray())))->sort()->values();
 
         return [
-            'labels'   => $dates,
-            'ppv'      => $dates->map(fn($d) => (float)($ppv[$d]->revenue ?? 0)),
-            'subs'     => $dates->map(fn($d) => (float)($subs[$d]->revenue ?? 0)),
+            'labels'   => $dates->values()->toArray(),
+            'ppv'      => $dates->map(fn($d) => (float)($ppv[$d]->revenue ?? 0))->values()->toArray(),
+            'subs'     => $dates->map(fn($d) => (float)($subs[$d]->revenue ?? 0))->values()->toArray(),
         ];
     }
 
