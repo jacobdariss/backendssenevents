@@ -38,7 +38,7 @@ return [
     'lbl_content_types'        => 'Types de contenu autorisés',
     'lbl_content_types_help'   => 'Sélectionnez les types de contenu que ce partenaire peut gérer.',
     'content_type_video'       => 'Vidéos',
-    'content_type_movie'       => 'Films',
+    'content_type_movie'       => 'Emissions',
     'content_type_tvshow'      => 'Séries TV',
     'content_type_livetv'      => 'TV en direct',
 
