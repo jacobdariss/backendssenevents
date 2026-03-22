@@ -30,8 +30,9 @@ class FinanceService
     {
         $ppvRevenue  = (float)(PayperviewTransaction::whereBetween('created_at', [$from, $to])->where('payment_status', 'success')->sum('amount') ?? 0);
         $ppvCount    = PayperviewTransaction::whereBetween('created_at', [$from, $to])->where('payment_status', 'success')->count();
-        $subRevenue  = (float)(Subscription::whereBetween('created_at', [$from, $to])->sum('total_amount') ?? 0);
-        $subCount    = Subscription::whereBetween('created_at', [$from, $to])->where('status', 'active')->count();
+        // Revenus abonnements : depuis subscriptions_transactions (payment_status='paid')
+        $subRevenue  = (float)(DB::table('subscriptions_transactions')->whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->sum('amount') ?? 0);
+        $subCount    = DB::table('subscriptions_transactions')->whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->count();
         $totalRev    = $ppvRevenue + $subRevenue;
 
         // Période précédente pour comparaison
@@ -39,7 +40,7 @@ class FinanceService
         $prevFrom    = $from->copy()->subDays($diff);
         $prevTo      = $from->copy()->subSecond();
         $prevTotal   = (float)(PayperviewTransaction::whereBetween('created_at', [$prevFrom, $prevTo])->where('payment_status', 'success')->sum('amount') ?? 0)
-                     + (float)(Subscription::whereBetween('created_at', [$prevFrom, $prevTo])->sum('total_amount') ?? 0);
+                     + (float)(DB::table('subscriptions_transactions')->whereBetween('created_at', [$prevFrom, $prevTo])->where('payment_status', 'paid')->sum('amount') ?? 0);
 
         $growth = $prevTotal > 0 ? round(($totalRev - $prevTotal) / $prevTotal * 100, 1) : 0;
 
@@ -67,11 +68,13 @@ class FinanceService
             ->groupBy('date')->orderBy('date')->get()
             ->keyBy('date');
 
-        $subs = Subscription::select(
+        $subs = DB::table('subscriptions_transactions')
+            ->select(
                 DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(total_amount) as revenue'),
+                DB::raw('SUM(amount) as revenue'),
                 DB::raw('COUNT(*) as count'))
             ->whereBetween('created_at', [$from, $to])
+            ->where('payment_status', 'paid')
             ->groupBy('date')->orderBy('date')->get()
             ->keyBy('date');
 
@@ -101,6 +104,7 @@ class FinanceService
                 DB::raw('COUNT(*) as transactions'),
                 DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
+            ->where('payment_status', 'paid')
             ->groupBy('payment_type')->get()
             ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => (int)$r->transactions, 'revenue' => (float)$r->revenue, 'source' => 'Abonnement']);
 
@@ -185,17 +189,19 @@ class FinanceService
             ];
         }
 
-        $subsList = Subscription::whereBetween('created_at', [$from, $to])
+        $subsList = DB::table('subscriptions_transactions')
+            ->whereBetween('created_at', [$from, $to])
+            ->where('payment_status', 'paid')
             ->latest()->limit($limit)->get();
 
         foreach ($subsList as $s) {
             $result[] = [
-                'date'           => $s->created_at->format('Y-m-d H:i:s'),
+                'date'           => $s->created_at,
                 'type'           => 'Abonnement',
-                'amount'         => $s->total_amount,
-                'gateway'        => '—',
-                'status'         => $s->status,
-                'transaction_id' => $s->identifier ?? '—',
+                'amount'         => $s->amount,
+                'gateway'        => $s->payment_type ?? '—',
+                'status'         => $s->payment_status,
+                'transaction_id' => $s->transaction_id ?? '—',
             ];
         }
 
@@ -207,15 +213,16 @@ class FinanceService
     // ─── Abonnements détaillés ────────────────────────────────────────────────
     public function subscriptionDetails(Carbon $from, Carbon $to): array
     {
-        $new     = Subscription::whereBetween('created_at', [$from, $to])->count();
+        $new     = DB::table('subscriptions_transactions')->whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->count();
         $active  = Subscription::where('status', 'active')->count();
         $expired = Subscription::where('status', 'expired')->count();
-        $revenue = (float)(Subscription::whereBetween('created_at', [$from, $to])->sum('total_amount') ?? 0);
+        $revenue = (float)(DB::table('subscriptions_transactions')->whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->sum('amount') ?? 0);
 
         $byPlan = Subscription::select('name',
                 DB::raw('COUNT(*) as count'),
                 DB::raw('SUM(total_amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
+            ->where('status', 'active')
             ->groupBy('name')->orderByDesc('revenue')->get();
 
         $churn = ($active + $expired) > 0 ? round($expired / ($active + $expired) * 100, 1) : 0;
