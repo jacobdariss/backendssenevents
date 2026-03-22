@@ -209,8 +209,18 @@
             videoEl.addEventListener('play', sync);
             videoEl.addEventListener('playing', sync);
 
-            // Sync initiale après un court délai (player pas encore init)
-            setTimeout(sync, 500);
+            // Sync initiale — retry jusqu'à ce que le player soit muet
+            var retryCount = 0;
+            function trysync() {
+                sync();
+                // Si la vidéo est muette mais le bouton pas encore affiché,
+                // ou si Video.js n'a pas encore initialisé l'état muted, on retry
+                retryCount++;
+                if (retryCount < 20) {
+                    setTimeout(trysync, 300);
+                }
+            }
+            setTimeout(trysync, 300);
         }
 
         if (document.readyState === 'loading') {
