@@ -80,7 +80,7 @@
         content:  '{{ setting('ppv_watermark_content', 'name_email') }}',
         opacity:   0.5,
         interval:  10000,
-        userName: '{{ auth()->check() ? addslashes(auth()->user()->name) : 'Test User' }}',
+        userName: '{{ auth()->check() ? addslashes(trim(auth()->user()->first_name . ' ' . auth()->user()->last_name)) : '' }}',
         userEmail:'{{ auth()->check() ? addslashes(auth()->user()->email) : 'test@test.com' }}',
     };
     console.log('[Watermark] config:', window.watermarkConfig);
