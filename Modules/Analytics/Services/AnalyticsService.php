@@ -81,7 +81,7 @@ class AnalyticsService
                 DB::raw('COUNT(*) as transactions'),
                 DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'success')
+            ->where('payment_status', 'paid')
             ->groupBy('payment_type')
             ->get()
             ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => $r->transactions, 'revenue' => $r->revenue, 'type' => 'PPV']);
@@ -121,7 +121,7 @@ class AnalyticsService
     public function ppvRevenue(Carbon $from, Carbon $to, ?int $partnerId = null): array
     {
         $q = PayperviewTransaction::whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'success');
+            ->where('payment_status', 'paid');
         $total = (float) ($q->sum('amount') ?? 0);
         $count = $q->count();
         $commission = 0;
@@ -145,7 +145,7 @@ class AnalyticsService
                 DB::raw('SUM(amount) as revenue'),
                 DB::raw('COUNT(*) as transactions'))
             ->whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'success')
+            ->where('payment_status', 'paid')
             ->groupBy('date')->orderBy('date')->get();
     }
 
