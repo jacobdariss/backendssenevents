@@ -63,21 +63,22 @@
                 bottom: 120px;
                 right: 16px;
                 z-index: 1000;
-                background: rgba(20,20,20,0.85);
+                background: rgba(220,30,30,0.92);
                 color: #fff;
-                border: 1.5px solid rgba(255,255,255,0.3);
-                border-radius: 6px;
-                padding: 7px 14px;
+                border: none;
+                border-radius: 20px;
+                padding: 8px 18px;
                 font-size: 13px;
-                font-weight: 600;
+                font-weight: 700;
                 cursor: pointer;
                 backdrop-filter: blur(6px);
-                gap: 6px;
+                gap: 8px;
                 align-items: center;
-                transition: background 0.2s;
-            " onmouseover="this.style.background='rgba(220,30,30,0.9)'"
-               onmouseout="this.style.background='rgba(20,20,20,0.85)'">
-                <i class="ph ph-speaker-simple-x" style="font-size:15px;"></i>
+                box-shadow: 0 2px 12px rgba(220,30,30,0.5);
+                transition: background 0.2s, transform 0.15s;
+            " onmouseover="this.style.background='rgba(200,10,10,1)'; this.style.transform='scale(1.05)'"
+               onmouseout="this.style.background='rgba(220,30,30,0.92)'; this.style.transform='scale(1)'">
+                <i class="ph ph-speaker-simple-x" style="font-size:16px;"></i>
                 {{ __("messages.unmute") }}
             </button>
 
