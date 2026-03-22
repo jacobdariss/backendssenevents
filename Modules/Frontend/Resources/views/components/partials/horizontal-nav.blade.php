@@ -25,7 +25,7 @@
       </li>
       @endif
 
-      {{-- Films --}}
+      {{-- Emissions --}}
       @if(isenablemodule('movie'))
       <li class="nav-item">
         <a class="nav-link {{ request()->routeIs(['movies', 'movie-details']) ? 'active text-primary' : '' }}" href="{{ route('movies') }}">
