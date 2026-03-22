@@ -44,12 +44,13 @@ class AnalyticsController extends Controller
         $topLiked      = $this->analytics->topLikedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $partners      = Partner::where('status', 1)->orderBy('name')->get();
 
-        // Pré-charger les stats partenaires en une seule requête (évite N+1 en vue)
+        // Pré-charger les stats partenaires filtrées sur la période sélectionnée
         $partnerViewStats = \Modules\Entertainment\Models\EntertainmentView::select(
                 'partner_id',
                 DB::raw('COUNT(*) as views'),
                 DB::raw('SUM(watch_time) as watch_time'))
             ->whereNotNull('partner_id')
+            ->whereBetween('created_at', [$from->copy(), $to->copy()])
             ->groupBy('partner_id')
             ->get()
             ->keyBy('partner_id');
