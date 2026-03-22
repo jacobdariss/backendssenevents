@@ -145,6 +145,25 @@
             setTimeout(move, 80);
             setInterval(move, (cfg.interval || 10000));
             console.log('[Watermark] actif :', text);
+
+            // ── Fullscreen : déplacer l'overlay dans le container fullscreen ──
+            function onFullscreenChange() {
+                var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+                var videoJs = document.querySelector('.video-js');
+                var videoPlayer = document.querySelector('.video-player');
+                if (!overlay || !videoJs || !videoPlayer) return;
+                if (fsEl) {
+                    // Plein écran — déplacer l'overlay dans video-js
+                    videoJs.appendChild(overlay);
+                    overlay.style.zIndex = '9999';
+                } else {
+                    // Retour — remettre dans video-player
+                    videoPlayer.appendChild(overlay);
+                    overlay.style.zIndex = '998';
+                }
+            }
+            document.addEventListener('fullscreenchange', onFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', onFullscreenChange);
         }
 
         if (document.readyState === 'loading') {
