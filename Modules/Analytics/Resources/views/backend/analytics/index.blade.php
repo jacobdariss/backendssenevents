@@ -208,20 +208,22 @@
         <table class="table table-hover mb-0">
             <thead><tr>
                 <th>{{ __('partner::partner.title') }}</th>
-                <th class="text-end">{{ __('analytics::analytics.views') }}</th>
-                <th class="text-end">Watch time</th>
+                <th class="text-end">Contenus</th>
+                <th class="text-end">Actif depuis</th>
                 <th class="text-end">{{ __('messages.action') }}</th>
             </tr></thead>
             <tbody>
                 @foreach($partners as $p)
                 @php
-                    $pViews = $partnerViewStats[$p->id]->views ?? 0;
-                    $pTime  = $partnerViewStats[$p->id]->watch_time ?? 0;
+                    $pContentCount = \Modules\Entertainment\Models\Entertainment::where('partner_id', $p->id)->count()
+                                   + \Modules\Video\Models\Video::where('partner_id', $p->id)->count();
                 @endphp
                 <tr>
                     <td><strong>{{ $p->name }}</strong></td>
-                    <td class="text-end">{{ number_format($pViews) }}</td>
-                    <td class="text-end text-muted small">{{ round($pTime/60) }} min</td>
+                    <td class="text-end">
+                        <span class="badge bg-primary">{{ $pContentCount }} vidéos</span>
+                    </td>
+                    <td class="text-end text-muted small">{{ $p->created_at ? $p->created_at->format('d/m/Y') : '—' }}</td>
                     <td class="text-end">
                         <a href="{{ route('backend.analytics.partner', [$p->id, 'period'=>$period]) }}" class="btn btn-sm btn-outline-primary">
                             <i class="ph ph-chart-bar me-1"></i>{{ __('analytics::analytics.see_details') }}
