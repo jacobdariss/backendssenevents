@@ -3,6 +3,7 @@
 
 @push('after-styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.11.0/css/flag-icons.min.css"/>
 @endpush
 
 @section('content')
@@ -119,7 +120,7 @@
         </div>
     </div>
     <div class="col-md-5">
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-header"><h6 class="mb-0"><i class="ph ph-credit-card me-2"></i>{{ __('analytics::analytics.payment_gateways') }}</h6></div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
@@ -140,6 +141,42 @@
                                         <div class="progress-bar bg-warning" style="width:{{ round($row['revenue']/$totalRev*100) }}%"></div>
                                     </div>
                                     <span class="small text-muted">{{ number_format($row['revenue'],0,',',' ') }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="3" class="text-center text-muted py-3">{{ __('messages.no_record_found') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Pays --}}
+        <div class="card mt-3">
+            <div class="card-header"><h6 class="mb-0"><i class="ph ph-globe me-2"></i>{{ __('analytics::analytics.by_country') }}</h6></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead><tr>
+                        <th>{{ __('analytics::analytics.country') }}</th>
+                        <th class="text-end">{{ __('analytics::analytics.views') }}</th>
+                        <th style="width:100px">%</th>
+                    </tr></thead>
+                    <tbody>
+                        @php $totalCountryViews = $byCountry->sum('views') ?: 1; @endphp
+                        @forelse($byCountry as $row)
+                        <tr>
+                            <td>
+                                <span class="fi fi-{{ strtolower($row->country_code) }} me-2" style="font-size:1.1rem;"></span>
+                                {{ $row->country_code }}
+                            </td>
+                            <td class="text-end fw-bold">{{ number_format($row->views) }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height:6px">
+                                        <div class="progress-bar bg-info" style="width:{{ round($row->views/$totalCountryViews*100) }}%"></div>
+                                    </div>
+                                    <span class="small text-muted">{{ round($row->views/$totalCountryViews*100) }}%</span>
                                 </div>
                             </td>
                         </tr>
