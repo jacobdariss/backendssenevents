@@ -7,13 +7,13 @@
         <!-- YouTube Support -->
         <script src="{{ asset('js/videojs/videojs-youtube.min.js') }}"></script>
 
-        <!-- IMA SDK -->
+        @if(setting('ads_system_enabled', '0') == '1' && isset($content_type) && $content_type !== 'livetv')
+        {{-- IMA + contrib-ads : chargés seulement si pubs activées --}}
         <script src="{{ asset('js/videojs/ima3.js') }}"></script>
-
-        <!-- Video.js Ads & IMA plugins -->
         <script src="{{ asset('js/videojs/videojs-contrib-ads.min.js') }}"></script>
         <script src="{{ asset('js/videojs/videojs.ima.min.js') }}"></script>
         <link href="{{ asset('css/videojs.ima.css') }}" rel="stylesheet">
+        @endif
 
         <div class="video-player">
             <video id="videoPlayer" class="video-js vjs-default-skin vjs-ima" controls width="560" height="315" muted
