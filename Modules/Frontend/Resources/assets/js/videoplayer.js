@@ -3737,6 +3737,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function loadAdsAndStartInterval() {
+    // Si pubs désactivées globalement — skip tout
+    if (!window.adsSystemEnabled) { startVideo(); return; }
     const params = new URLSearchParams();
     if (contentId) params.append('content_id', contentId);
     if (contentType) params.append('type', contentType);
