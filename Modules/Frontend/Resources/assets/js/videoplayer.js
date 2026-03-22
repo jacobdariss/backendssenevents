@@ -753,12 +753,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (accessType === 'free' || accessType === 'pay-per-view') {
       playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
+      // Filigrane PPV après lancement
+      if (accessType === 'pay-per-view') setTimeout(() => initPPVWatermark('pay-per-view'), 500);
     } else {
       handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
     }
-
-    // Filigrane PPV — déclenché ici car le player.ready IMA le bloquait
-    if (accessType === 'pay-per-view') initPPVWatermark('pay-per-view');
 
     isWatchHistorySaved = false // Reset flag
   }

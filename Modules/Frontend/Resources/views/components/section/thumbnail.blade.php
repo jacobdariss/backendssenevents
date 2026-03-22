@@ -76,13 +76,14 @@
     // Filigrane PPV
     window.adsSystemEnabled = {{ setting('ads_system_enabled', '0') == '1' ? 'true' : 'false' }};
     window.watermarkConfig = {
-        enabled:  {{ (setting('ppv_watermark_enabled', '1') !== '0' && setting('ppv_watermark_enabled', '1') !== null) ? 'true' : 'false' }},
+        enabled:   true,
         content:  '{{ setting('ppv_watermark_content', 'name_email') }}',
-        opacity:  {{ (int) setting('ppv_watermark_opacity', 20) }} / 100,
-        interval: {{ (int) setting('ppv_watermark_interval', 15) }} * 1000,
-        userName: '{{ auth()->check() ? addslashes(auth()->user()->name) : '' }}',
-        userEmail:'{{ auth()->check() ? addslashes(auth()->user()->email) : '' }}',
+        opacity:   0.5,
+        interval:  10000,
+        userName: '{{ auth()->check() ? addslashes(auth()->user()->name) : 'Test User' }}',
+        userEmail:'{{ auth()->check() ? addslashes(auth()->user()->email) : 'test@test.com' }}',
     };
+    console.log('[Watermark] config:', window.watermarkConfig);
     var loginUrl = "{{ route('login') }}";
     var skipTrailerText = "{{ __('messages.skip_trailer') }}";
     var skipIntroText = "{{ __('messages.skip_intro') }}";
