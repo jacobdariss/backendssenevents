@@ -440,9 +440,12 @@
                                     </div>
                                 </li>
                                 @php
-                                    $langMenuEnabled  = \Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','language_menu_enabled')->value('val') ?? '1';
-                                    $enabledLangs     = json_decode(\Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','enabled_languages')->value('val') ?? json_encode(array_keys(config('app.available_locales'))), true) ?? array_keys(config('app.available_locales'));
-                                    $filteredLocales  = array_filter(config('app.available_locales'), fn($k) => in_array($k, $enabledLangs), ARRAY_FILTER_USE_KEY);
+                                    $langMenuEnabled = \Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','language_menu_enabled')->value('val');
+                                    if ($langMenuEnabled === null) { $langMenuEnabled = '1'; }
+                                    $rawLangs = \Illuminate\Support\Facades\DB::table('settings')->whereNull('deleted_at')->where('name','enabled_languages')->value('val');
+                                    $enabledLangs = $rawLangs ? json_decode($rawLangs, true) : array_keys(config('app.available_locales'));
+                                    if (!$enabledLangs) { $enabledLangs = array_keys(config('app.available_locales')); }
+                                    $filteredLocales = array_filter(config('app.available_locales'), fn($k) => in_array($k, $enabledLangs), ARRAY_FILTER_USE_KEY);
                                 @endphp
                                 @if($langMenuEnabled == '1' && count($filteredLocales) > 1)
                                 <li class="nav-item dropdown dropdown-language-wrapper">
