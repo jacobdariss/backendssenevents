@@ -92,6 +92,7 @@ class AnalyticsService
                 DB::raw('COUNT(*) as transactions'),
                 DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
+            ->where('payment_status', 'paid')
             ->groupBy('payment_type')
             ->get()
             ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => $r->transactions, 'revenue' => $r->revenue, 'type' => 'Abonnement']);
