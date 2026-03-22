@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 use Modules\Frontend\Models\PayperviewTransaction;
 use Modules\Episode\Models\Episode;
 use Illuminate\Support\Facades\Storage;
+use Modules\Partner\Models\Partner;
+use Modules\Entertainment\Models\EntertainmentView;
 
 
 class BackendController extends Controller
@@ -203,8 +205,45 @@ class BackendController extends Controller
         }
         // Format the storage usage into a readable format
         $totalUsageFormatted = $this->formatBytes($totalUsageInBytes);
+
+        // ── Données partenaires pour le nouveau dashboard ──────────────────
+        $pendingContents = \Modules\Entertainment\Models\Entertainment::where('approval_status', 'pending')->count()
+            + \Modules\Video\Models\Video::where('approval_status', 'pending')->count();
+        $activePartners  = Partner::where('status', 1)->count();
+        $totalPartners   = Partner::count();
+        $viewsToday      = EntertainmentView::whereDate('created_at', today())->count();
+        $viewsThisMonth  = EntertainmentView::whereMonth('created_at', now()->month)
+                              ->whereYear('created_at', now()->year)->count();
+        $recentSubs      = \Modules\Subscriptions\Models\Subscription::with('user')
+                              ->orderBy('created_at', 'desc')->take(5)->get();
+        $topContent30d   = EntertainmentView::select('entertainment_id',
+                              \Illuminate\Support\Facades\DB::raw('COUNT(*) as views'),
+                              \Illuminate\Support\Facades\DB::raw('SUM(watch_time) as watch_time'))
+                          ->whereNotNull('entertainment_id')
+                          ->where('created_at', '>=', now()->subDays(30))
+                          ->groupBy('entertainment_id')
+                          ->orderByDesc('views')
+                          ->limit(5)->get()
+                          ->map(function($row) {
+                              $row->content_name = \Modules\Entertainment\Models\Entertainment::find($row->entertainment_id)?->name ?? '#'.$row->entertainment_id;
+                              return $row;
+                          });
+        $revenuePerDay30 = \Modules\Subscriptions\Models\SubscriptionTransactions::select(
+                              \Illuminate\Support\Facades\DB::raw('DATE(created_at) as date'),
+                              \Illuminate\Support\Facades\DB::raw('SUM(amount) as revenue'))
+                          ->where('payment_status', 'paid')
+                          ->where('created_at', '>=', now()->subDays(30))
+                          ->groupBy('date')->orderBy('date')->get();
+        $ppvPerDay30     = PayperviewTransaction::select(
+                              \Illuminate\Support\Facades\DB::raw('DATE(created_at) as date'),
+                              \Illuminate\Support\Facades\DB::raw('SUM(amount) as revenue'))
+                          ->where('payment_status', 'paid')
+                          ->where('created_at', '>=', now()->subDays(30))
+                          ->groupBy('date')->orderBy('date')->get();
+
         return view('backend.dashboard.index', compact(
             'defaultFormat','dateRange','totalUsageFormatted','count_of_rent_movie','count_of_rent_episode','rent_revenue','subscription_revenue','totalreview','totalsoontoexpire','total_revenue','allUsers', 'newUsersCount', 'totalDownloads', 'totalTransactions', 'transactions', 'entertainments','totalusers','activeusers','totalSubscribers','totalmovies','totaltvshow','totalvideo','reviewData','subscriptionData','count_of_rent_video',
+            'pendingContents','activePartners','totalPartners','viewsToday','viewsThisMonth','recentSubs','topContent30d','revenuePerDay30','ppvPerDay30',
             'usersChangePercent','usersChangeUp',
             'subsChangePercent','subsChangeUp',
             'soonExpireChangePercent','soonExpireChangeUp',
