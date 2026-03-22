@@ -2257,9 +2257,14 @@
                     handleVideoUrlTypeChange(this.value);
                 });
 
+                // select2 ne déclenche pas toujours 'change' natif — double bind
+                $(videoUploadType).on('change', function() {
+                    handleVideoUrlTypeChange($(this).val());
+                });
+
                 // Also handle select2 change event
                 $('#video_upload_type').on('select2:select', function(e) {
-                    handleVideoUrlTypeChange(e.target.value);
+                    handleVideoUrlTypeChange($(this).val());
                 });
             }
         });
