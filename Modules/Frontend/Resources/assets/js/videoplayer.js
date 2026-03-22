@@ -3597,13 +3597,10 @@ document.addEventListener('DOMContentLoaded', function () {
       originalConsoleError.apply(console, args);
     };
 
-    // LiveTV : pas de pubs
-    if (contentType === 'livetv') { return; }
+    // IMA désactivé (option 1 — contrib-ads supprimé)
+    if (true) { return; }
 
-    // Pubs désactivées globalement
-    if (!window.adsSystemEnabled) { return; }
-
-    // IMA lazy — chargé seulement si pubs VAST existent (évite pause 15s CDN Google)
+    // IMA lazy — chargé seulement si pubs VAST existent
     let imaInitialized = false;
     window.initIMAIfNeeded = function() {
       if (imaInitialized) return;
@@ -3737,8 +3734,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function loadAdsAndStartInterval() {
-    // Si pubs désactivées globalement — skip tout
-    if (!window.adsSystemEnabled) { startVideo(); return; }
+    // IMA/contrib-ads désactivés (option 1)
+    startVideo(); return;
     const params = new URLSearchParams();
     if (contentId) params.append('content_id', contentId);
     if (contentType) params.append('type', contentType);

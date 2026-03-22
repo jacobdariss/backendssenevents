@@ -7,15 +7,7 @@
         <!-- YouTube Support -->
         <script src="{{ asset('js/videojs/videojs-youtube.min.js') }}"></script>
 
-        @php $adsEnabled = in_array(setting('ads_system_enabled'), ['1', 1, true], false); @endphp
-        {{-- DEBUG: ads_system_enabled={{ setting('ads_system_enabled', 'NULL') }} adsEnabled={{ $adsEnabled ? 'true' : 'false' }} --}}
-        @if($adsEnabled && (!isset($content_type) || $content_type !== 'livetv'))
-        {{-- IMA + contrib-ads : chargés seulement si pubs activées --}}
-        <script src="{{ asset('js/videojs/ima3.js') }}"></script>
-        <script src="{{ asset('js/videojs/videojs-contrib-ads.min.js') }}"></script>
-        <script src="{{ asset('js/videojs/videojs.ima.min.js') }}"></script>
-        <link href="{{ asset('css/videojs.ima.css') }}" rel="stylesheet">
-        @endif
+        {{-- IMA/contrib-ads désactivés (option 1 — fichiers supprimés) --}}
 
         <div class="video-player">
             <video id="videoPlayer" class="video-js vjs-default-skin vjs-ima" controls width="560" height="315" muted
