@@ -34,6 +34,28 @@
                 </iframe>
             </div>
 
+            <!-- Filigrane PPV — overlay HTML direct -->
+            @if(isset($dataAccess) && $dataAccess === 'pay-per-view' && auth()->check())
+            <div id="ppv-watermark-overlay" style="
+                display:none;
+                position:absolute;
+                top:0;left:0;width:100%;height:100%;
+                pointer-events:none;
+                z-index:998;
+                overflow:hidden;
+            ">
+                <span id="ppv-wm-text" style="
+                    position:absolute;
+                    color:rgba(255,255,255,0.5);
+                    font-size:14px;
+                    font-weight:600;
+                    text-shadow:1px 1px 3px rgba(0,0,0,0.8);
+                    white-space:nowrap;
+                    user-select:none;
+                ">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }} — {{ auth()->user()->email }}</span>
+            </div>
+            @endif
+
             <!-- Bouton Réactiver le son -->
             <button id="unmuteBtn" style="
                 display: none;

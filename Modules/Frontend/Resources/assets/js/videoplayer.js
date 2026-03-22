@@ -753,8 +753,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (accessType === 'free' || accessType === 'pay-per-view') {
       playVideo(player, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
-      // Filigrane PPV après lancement
-      if (accessType === 'pay-per-view') setTimeout(() => initPPVWatermark('pay-per-view'), 500);
+      // Filigrane PPV — overlay HTML, vérifie lui-même si PPV
+      setTimeout(initPPVWatermark, 500);
     } else {
       handleSubscription(button, videoUrl, qualityOptions, lastWatchedTime, subtitleInfo)
     }
@@ -3816,92 +3816,40 @@ document.addEventListener('DOMContentLoaded', function () {
   // }
   // ── Filigrane utilisateur (PPV) ──────────────────────────────────────────
   function initPPVWatermark(accessType) {
-    const cfg = window.watermarkConfig;
-    if (!cfg || !cfg.enabled || cfg.enabled === '0' || cfg.enabled === 0) return;
+    const overlay = document.getElementById('ppv-watermark-overlay');
+    const wmText  = document.getElementById('ppv-wm-text');
+    if (!overlay || !wmText) return;
 
-    // Accepter l'access passé en paramètre OU lire depuis data-movie-access
-    const access = accessType || document.getElementById('videoPlayer')?.getAttribute('data-movie-access');
-    if (access !== 'pay-per-view') return;
+    let _wmInterval = null;
 
-    const wrapper = document.querySelector('.video-player-wrapper');
-    console.log('[Watermark] wrapper:', wrapper, 'size:', wrapper?.offsetWidth, 'x', wrapper?.offsetHeight);
-    if (!wrapper) { console.log('[Watermark] ERREUR: wrapper introuvable'); return; }
-
-    // Créer le canvas overlay
-    const canvas = document.createElement('canvas');
-    canvas.id = 'ppv-watermark';
-    Object.assign(canvas.style, {
-      position:      'absolute',
-      top:           '0',
-      left:          '0',
-      width:         '100%',
-      height:        '100%',
-      pointerEvents: 'none',
-      zIndex:        '999',
-    });
-    wrapper.appendChild(canvas);
-
-    function buildText() {
-      const parts = [];
-      if (cfg.content === 'name_email' || cfg.content === 'name') parts.push(cfg.userName);
-      if (cfg.content === 'name_email' || cfg.content === 'email') parts.push(cfg.userEmail);
-      if (cfg.content === 'datetime') parts.push(new Date().toLocaleString('fr-FR'));
-      return parts.filter(Boolean).join('  |  ');
+    function moveWatermark() {
+      const w = overlay.offsetWidth  || 800;
+      const h = overlay.offsetHeight || 450;
+      const tw = wmText.offsetWidth  || 200;
+      const th = wmText.offsetHeight || 20;
+      const x = Math.random() * Math.max(0, w - tw - 20) + 10;
+      const y = Math.random() * Math.max(0, h - th - 20) + 10;
+      wmText.style.left = x + 'px';
+      wmText.style.top  = y + 'px';
     }
 
-    function drawWatermark() {
-      console.log('[Watermark] drawWatermark appelé, canvas:', canvas.width, 'x', canvas.height);
-      const rect = wrapper.getBoundingClientRect();
-      canvas.width  = rect.width  || wrapper.offsetWidth;
-      canvas.height = rect.height || wrapper.offsetHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const text = buildText();
-      if (!text) return;
-
-      const fontSize = Math.max(12, Math.min(canvas.width / 40, 18));
-      ctx.font      = `${fontSize}px Arial, sans-serif`;
-      ctx.fillStyle = `rgba(255, 255, 255, ${cfg.opacity})`;
-      ctx.shadowColor   = 'rgba(0,0,0,0.6)';
-      ctx.shadowBlur    = 4;
-
-      // Position aléatoire dans la zone de lecture (évite les bords)
-      const margin = fontSize * 3;
-      const maxX = canvas.width  - ctx.measureText(text).width - margin;
-      const maxY = canvas.height - margin;
-      const x = margin + Math.random() * Math.max(0, maxX - margin);
-      const y = margin + Math.random() * Math.max(0, maxY - margin);
-
-      ctx.fillText(text, x, y);
+    function showWatermark() {
+      overlay.style.display = 'block';
+      moveWatermark();
+      if (_wmInterval) clearInterval(_wmInterval);
+      _wmInterval = setInterval(moveWatermark, 10000);
     }
 
-    // Démarrer au premier timeupdate (plus fiable — IMA peut bloquer play/playing)
-    let _wmStarted = false;
-    function startWatermark() {
-      if (_wmStarted) return;
-      _wmStarted = true;
-      drawWatermark();
-      if (window._watermarkTimer) clearInterval(window._watermarkTimer);
-      window._watermarkTimer = setInterval(drawWatermark, cfg.interval);
+    function hideWatermark() {
+      overlay.style.display = 'none';
+      if (_wmInterval) clearInterval(_wmInterval);
     }
-    player.one('timeupdate', startWatermark);
-    player.on('play', startWatermark);
-    player.on('playing', startWatermark);
 
-    player.on('pause', function() {
-      if (window._watermarkTimer) { clearInterval(window._watermarkTimer); }
-    });
-
-    player.on('ended', function() {
-      if (window._watermarkTimer) { clearInterval(window._watermarkTimer); }
-      const cv = document.getElementById('ppv-watermark');
-      if (cv) { const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, cv.width, cv.height); }
-    });
-
-    // Dessiner immédiatement + redessiner au redimensionnement
-    setTimeout(drawWatermark, 200);
-    window.addEventListener('resize', drawWatermark);
+    player.on('play',    showWatermark);
+    player.on('playing', showWatermark);
+    player.on('pause',   hideWatermark);
+    player.on('ended',   hideWatermark);
+    setTimeout(showWatermark, 300);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
