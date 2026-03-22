@@ -75,6 +75,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = document.querySelector('meta[name="baseUrl"]').getAttribute('content');
 
 
+
+
   const player = videojs('videoPlayer', {
     techOrder: ['vimeo', 'youtube', 'html5', 'hls', 'embed'],
     autoplay: false,
@@ -3853,5 +3855,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+
+  // Filigrane PPV — démarrer si overlay présent dans le DOM (page PPV)
+  if (document.getElementById('ppv-watermark-overlay')) {
+    console.log('[Watermark] overlay PPV trouvé — init filigrane');
+    initPPVWatermark();
+  }
 
 });
