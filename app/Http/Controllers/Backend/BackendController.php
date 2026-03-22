@@ -21,7 +21,6 @@ use Modules\Frontend\Models\PayperviewTransaction;
 use Modules\Episode\Models\Episode;
 use Illuminate\Support\Facades\Storage;
 use Modules\Partner\Models\Partner;
-use Modules\Entertainment\Models\EntertainmentView;
 
 
 class BackendController extends Controller
