@@ -536,6 +536,11 @@
                         </div>
                     </div>
                     <div class="col-md-6">
+                        {{-- ── Cloudflare Stream Uploader ── --}}
+                        <div class="mb-3 d-none" id="cf-stream-panel-video">
+                            @include('entertainment::backend.components.cf_stream_uploader', ['fieldPrefix' => 'video'])
+                        </div>
+
                         <div class="mb-3 d-none" id="video_url_input_section">
                             {{ html()->label(__('movie.video_url_input') . '<span class="text-danger">*</span>',
                             'video_url_input')->class('form-label') }}
@@ -550,11 +555,6 @@
                             <div class="invalid-feedback" id="url-pattern-error" style="display:none;">
                                 Please enter a valid URL starting with http:// or https://.
                             </div>
-                        </div>
-
-                        {{-- ── Cloudflare Stream Uploader ── --}}
-                        <div class="mb-3 d-none" id="cf-stream-panel-video">
-                            @include('entertainment::backend.components.cf_stream_uploader', ['fieldPrefix' => 'video'])
                         </div>
 
                         <div class="mb-3 d-none" id="video_file_input_section">
@@ -3176,8 +3176,13 @@
                 });
             }
 
-            // ── CF Stream : rebind après init select2 ──────────────────────
-            $('#video_upload_type').off('select2:select.cfstream').on('select2:select.cfstream', function() {
+            // ── CF Stream : binding robuste après init select2 ─────────────
+            // $(document).on() survivra aux reinit select2
+            $(document).off('select2:select.cfstream').on('select2:select.cfstream', '#video_upload_type', function() {
+                handleVideoUrlTypeChange($(this).val());
+            });
+            // Aussi écouter le change natif (au cas où)
+            $(document).off('change.cfstream').on('change.cfstream', '#video_upload_type', function() {
                 handleVideoUrlTypeChange($(this).val());
             });
             // Déclencher l'état initial
