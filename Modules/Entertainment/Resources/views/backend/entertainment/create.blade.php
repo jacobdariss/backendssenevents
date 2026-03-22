@@ -3175,6 +3175,14 @@
                     }
                 });
             }
+
+            // ── CF Stream : rebind après init select2 ──────────────────────
+            $('#video_upload_type').off('select2:select.cfstream').on('select2:select.cfstream', function() {
+                handleVideoUrlTypeChange($(this).val());
+            });
+            // Déclencher l'état initial
+            var initialType = $('#video_upload_type').val();
+            if (initialType) handleVideoUrlTypeChange(initialType);
         });
 
         // Local helper to manage delete buttons for quality info rows
