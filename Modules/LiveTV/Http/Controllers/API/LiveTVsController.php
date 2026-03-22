@@ -341,7 +341,7 @@ class LiveTVsController extends Controller
                     })
                     ->where(function($q) {
                         $q->whereNull('first_play_date')
-                          ->orWhereRaw('DATE_ADD(first_play_date, INTERVAL available_for DAY) > ?', [now()]);
+                          ->orWhereRaw('DATE_ADD(first_play_date, INTERVAL access_duration DAY) > ?', [now()]);
                     })
                     ->select('movie_id', 'type')
                     ->get();

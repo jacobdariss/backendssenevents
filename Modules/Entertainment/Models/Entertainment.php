@@ -1588,7 +1588,7 @@ public static function get_movie($movieId, $user_id, $profile_id, $device_id)
             })
             ->where(function ($query) {
                 $query->whereNull('first_play_date')
-                    ->orWhereRaw('DATE_ADD(first_play_date, INTERVAL available_for DAY) > ?', [now()]);
+                    ->orWhereRaw('DATE_ADD(first_play_date, INTERVAL access_duration DAY) > ?', [now()]);
             })
             ->exists();
     }
