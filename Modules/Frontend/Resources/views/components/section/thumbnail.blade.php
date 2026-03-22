@@ -7,7 +7,9 @@
         <!-- YouTube Support -->
         <script src="{{ asset('js/videojs/videojs-youtube.min.js') }}"></script>
 
-        @if(setting('ads_system_enabled', '0') == '1' && isset($content_type) && $content_type !== 'livetv')
+        @php $adsEnabled = in_array(setting('ads_system_enabled'), ['1', 1, true], false); @endphp
+        {{-- DEBUG: ads_system_enabled={{ setting('ads_system_enabled', 'NULL') }} adsEnabled={{ $adsEnabled ? 'true' : 'false' }} --}}
+        @if($adsEnabled && (!isset($content_type) || $content_type !== 'livetv'))
         {{-- IMA + contrib-ads : chargés seulement si pubs activées --}}
         <script src="{{ asset('js/videojs/ima3.js') }}"></script>
         <script src="{{ asset('js/videojs/videojs-contrib-ads.min.js') }}"></script>
