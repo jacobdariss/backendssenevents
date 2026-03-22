@@ -35,6 +35,7 @@
             </div>
 
             <!-- Filigrane PPV — overlay HTML direct -->
+            {{-- DEBUG: dataAccess={{ $dataAccess ?? 'NON_DEFINI' }} --}}
             @if(isset($dataAccess) && $dataAccess === 'pay-per-view' && auth()->check())
             <div id="ppv-watermark-overlay" style="
                 display:none;
