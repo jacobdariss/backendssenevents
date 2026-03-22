@@ -44,16 +44,29 @@ class AnalyticsController extends Controller
         $topLiked      = $this->analytics->topLikedContent($from, $to, null, 10)->map(fn($r) => tap($r, fn($r) => $r->content_name = $this->resolveName($r)));
         $partners      = Partner::where('status', 1)->orderBy('name')->get();
 
-        // Pré-charger les stats partenaires filtrées sur la période sélectionnée
-        $partnerViewStats = \Modules\Entertainment\Models\EntertainmentView::select(
-                'partner_id',
-                DB::raw('COUNT(*) as views'),
-                DB::raw('SUM(watch_time) as watch_time'))
-            ->whereNotNull('partner_id')
-            ->whereBetween('created_at', [$from->copy(), $to->copy()])
-            ->groupBy('partner_id')
-            ->get()
-            ->keyBy('partner_id');
+        // Stats partenaires : jointure directe sur entertainments + episodes + videos
+        // pour couvrir le cas où entertainment_views.partner_id est NULL
+        $partnerViewStats = collect();
+        foreach ($partners as $p) {
+            $entIds = \Modules\Entertainment\Models\Entertainment::where('partner_id', $p->id)->pluck('id');
+            $epIds  = \Modules\Episode\Models\Episode::where('partner_id', $p->id)->pluck('id');
+            $vidIds = \Modules\Video\Models\Video::where('partner_id', $p->id)->pluck('id');
+
+            $views = \Modules\Entertainment\Models\EntertainmentView::whereBetween('created_at', [$from->copy(), $to->copy()])
+                ->where(function($q) use ($entIds, $epIds, $vidIds, $p) {
+                    $q->where('partner_id', $p->id)
+                      ->orWhereIn('entertainment_id', $entIds)
+                      ->orWhereIn('episode_id', $epIds)
+                      ->orWhereIn('video_id', $vidIds);
+                })
+                ->selectRaw('COUNT(*) as views, SUM(watch_time) as watch_time')
+                ->first();
+
+            $partnerViewStats[$p->id] = (object)[
+                'views'      => $views->views ?? 0,
+                'watch_time' => $views->watch_time ?? 0,
+            ];
+        }
         $module_action = 'Analytics';
 
         return view('analytics::backend.analytics.index', compact(
