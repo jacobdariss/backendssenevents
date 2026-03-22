@@ -3822,36 +3822,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const wmText  = document.getElementById('ppv-wm-text');
     if (!overlay || !wmText) return;
 
-    let _wmInterval = null;
+    // Déjà initialisé
+    if (overlay._wmInitialized) return;
+    overlay._wmInitialized = true;
+
+    // Afficher immédiatement
+    overlay.style.display = 'block';
 
     function moveWatermark() {
-      const w = overlay.offsetWidth  || 800;
-      const h = overlay.offsetHeight || 450;
-      const tw = wmText.offsetWidth  || 200;
+      const wrapper = overlay.parentElement;
+      const w = (wrapper ? wrapper.offsetWidth  : 0) || 800;
+      const h = (wrapper ? wrapper.offsetHeight : 0) || 450;
+      const tw = wmText.offsetWidth  || 250;
       const th = wmText.offsetHeight || 20;
-      const x = Math.random() * Math.max(0, w - tw - 20) + 10;
-      const y = Math.random() * Math.max(0, h - th - 20) + 10;
+      const x = Math.random() * Math.max(10, w - tw - 20) + 10;
+      const y = Math.random() * Math.max(10, h - th - 20) + 10;
       wmText.style.left = x + 'px';
       wmText.style.top  = y + 'px';
     }
 
-    function showWatermark() {
-      overlay.style.display = 'block';
-      moveWatermark();
-      if (_wmInterval) clearInterval(_wmInterval);
-      _wmInterval = setInterval(moveWatermark, 10000);
-    }
-
-    function hideWatermark() {
-      overlay.style.display = 'none';
-      if (_wmInterval) clearInterval(_wmInterval);
-    }
-
-    player.on('play',    showWatermark);
-    player.on('playing', showWatermark);
-    player.on('pause',   hideWatermark);
-    player.on('ended',   hideWatermark);
-    setTimeout(showWatermark, 300);
+    // Position initiale après rendu
+    setTimeout(moveWatermark, 100);
+    setInterval(moveWatermark, 10000);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
