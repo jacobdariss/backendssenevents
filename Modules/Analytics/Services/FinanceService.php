@@ -28,8 +28,8 @@ class FinanceService
     // ─── KPIs globaux ────────────────────────────────────────────────────────
     public function globalKpis(Carbon $from, Carbon $to): array
     {
-        $ppvRevenue  = (float)(PayperviewTransaction::whereBetween('created_at', [$from, $to])->where('payment_status', 'success')->sum('amount') ?? 0);
-        $ppvCount    = PayperviewTransaction::whereBetween('created_at', [$from, $to])->where('payment_status', 'success')->count();
+        $ppvRevenue  = (float)(PayperviewTransaction::whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->sum('amount') ?? 0);
+        $ppvCount    = PayperviewTransaction::whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->count();
         // Revenus abonnements : depuis subscriptions_transactions (payment_status='paid')
         $subRevenue  = (float)(DB::table('subscriptions_transactions')->whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->sum('amount') ?? 0);
         $subCount    = DB::table('subscriptions_transactions')->whereBetween('created_at', [$from, $to])->where('payment_status', 'paid')->count();
@@ -39,7 +39,7 @@ class FinanceService
         $diff        = max(1, $from->diffInDays($to));
         $prevFrom    = $from->copy()->subDays($diff);
         $prevTo      = $from->copy()->subSecond();
-        $prevTotal   = (float)(PayperviewTransaction::whereBetween('created_at', [$prevFrom, $prevTo])->where('payment_status', 'success')->sum('amount') ?? 0)
+        $prevTotal   = (float)(PayperviewTransaction::whereBetween('created_at', [$prevFrom, $prevTo])->where('payment_status', 'paid')->sum('amount') ?? 0)
                      + (float)(DB::table('subscriptions_transactions')->whereBetween('created_at', [$prevFrom, $prevTo])->where('payment_status', 'paid')->sum('amount') ?? 0);
 
         $growth = $prevTotal > 0 ? round(($totalRev - $prevTotal) / $prevTotal * 100, 1) : 0;
@@ -64,7 +64,7 @@ class FinanceService
                 DB::raw('SUM(amount) as revenue'),
                 DB::raw('COUNT(*) as count'))
             ->whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'success')
+            ->where('payment_status', 'paid')
             ->groupBy('date')->orderBy('date')->get()
             ->keyBy('date');
 
@@ -95,7 +95,7 @@ class FinanceService
                 DB::raw('COUNT(*) as transactions'),
                 DB::raw('SUM(amount) as revenue'))
             ->whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'success')
+            ->where('payment_status', 'paid')
             ->groupBy('payment_type')->get()
             ->map(fn($r) => ['gateway' => $r->payment_type ?? 'Inconnu', 'transactions' => (int)$r->transactions, 'revenue' => (float)$r->revenue, 'source' => 'PPV']);
 
@@ -124,7 +124,7 @@ class FinanceService
         return Partner::where('status', 1)->get()->map(function($partner) use ($from, $to) {
             // PPV sur les contenus du partenaire
             $ppvRev = (float)(PayperviewTransaction::whereBetween('payperviewstransactions.created_at', [$from, $to])
-                ->where('payperviewstransactions.payment_status', 'success')
+                ->where('payperviewstransactions.payment_status', 'paid')
                 ->join('pay_per_views', 'pay_per_views.id', '=', 'payperviewstransactions.pay_per_view_id')
                 ->join('entertainments', 'entertainments.id', '=', 'pay_per_views.movie_id')
                 ->where('entertainments.partner_id', $partner->id)
@@ -152,7 +152,7 @@ class FinanceService
                 DB::raw('SUM(payperviewstransactions.amount) as revenue'))
             ->join('pay_per_views', 'pay_per_views.id', '=', 'payperviewstransactions.pay_per_view_id')
             ->whereBetween('payperviewstransactions.created_at', [$from, $to])
-            ->where('payperviewstransactions.payment_status', 'success')
+            ->where('payperviewstransactions.payment_status', 'paid')
             ->groupBy('pay_per_views.movie_id', 'pay_per_views.type')
             ->orderByDesc('revenue')
             ->limit($limit)
@@ -175,7 +175,7 @@ class FinanceService
         $result = [];
 
         $ppvList = PayperviewTransaction::whereBetween('created_at', [$from, $to])
-            ->where('payment_status', 'success')
+            ->where('payment_status', 'paid')
             ->latest()->limit($limit)->get();
 
         foreach ($ppvList as $t) {
