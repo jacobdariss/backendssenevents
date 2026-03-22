@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Partner\Models\Partner;
 use Modules\Video\Models\Video;
 use Modules\Entertainment\Models\Entertainment;
+use Modules\Entertainment\Models\EntertainmentView;
+use Modules\Frontend\Models\PayperviewTransaction;
+use Illuminate\Support\Facades\DB;
 
 class PartnerDashboardController extends Controller
 {
@@ -46,7 +49,48 @@ class PartnerDashboardController extends Controller
             'quota_max'       => $partner->video_quota,
         ];
 
-        return view('partner::frontend.dashboard', compact('partner', 'stats'));
+        // ── Analytics enrichis ──────────────────────────────────────────
+        $entIds = Entertainment::where('partner_id', $partner->id)->pluck('id');
+        $vidIds = Video::where('partner_id', $partner->id)->pluck('id');
+
+        $viewsToday = EntertainmentView::whereDate('created_at', today())
+            ->where('partner_id', $partner->id)->count();
+
+        $viewsThisMonth = EntertainmentView::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('partner_id', $partner->id)->count();
+
+        $viewsTotal = EntertainmentView::where('partner_id', $partner->id)->count();
+
+        $ppvRevenue = (float) PayperviewTransaction::where('payment_status', 'paid')
+            ->join('pay_per_views', 'pay_per_views.id', '=', 'payperviewstransactions.pay_per_view_id')
+            ->join('entertainments', 'entertainments.id', '=', 'pay_per_views.movie_id')
+            ->where('entertainments.partner_id', $partner->id)
+            ->sum('payperviewstransactions.amount');
+
+        $commission = round($ppvRevenue * ($partner->commission_rate ?? 0) / 100, 2);
+
+        $topContent = EntertainmentView::select('entertainment_id',
+                DB::raw('COUNT(*) as views'))
+            ->where('partner_id', $partner->id)
+            ->whereNotNull('entertainment_id')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('entertainment_id')
+            ->orderByDesc('views')
+            ->limit(5)->get()
+            ->map(function($row) {
+                $row->content_name = Entertainment::find($row->entertainment_id)?->name ?? '#'.$row->entertainment_id;
+                return $row;
+            });
+
+        $recentContent = Entertainment::where('partner_id', $partner->id)
+            ->latest()->limit(5)->get();
+
+        return view('partner::frontend.dashboard', compact(
+            'partner', 'stats',
+            'viewsToday', 'viewsThisMonth', 'viewsTotal',
+            'ppvRevenue', 'commission', 'topContent', 'recentContent'
+        ));
     }
 
     /**
