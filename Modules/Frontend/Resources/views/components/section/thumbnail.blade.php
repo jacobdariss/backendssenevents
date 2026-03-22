@@ -174,6 +174,51 @@
     })();
 
     var loginUrl = "{{ route('login') }}";
+
+    // ── Bouton "Réactiver le son" — script inline autonome ──────────────
+    (function() {
+        function initUnmuteBtn() {
+            var btn = document.getElementById('unmuteBtn');
+            var videoEl = document.getElementById('videoPlayer');
+            if (!btn || !videoEl) return;
+            if (btn._unmuteDone) return;
+            btn._unmuteDone = true;
+
+            function isMuted() {
+                return videoEl.muted || videoEl.volume === 0;
+            }
+
+            function sync() {
+                if (isMuted()) {
+                    btn.style.display = 'flex';
+                    btn.querySelector('i').className = 'ph ph-speaker-simple-x';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+
+            // Clic : activer/désactiver le son
+            btn.addEventListener('click', function() {
+                videoEl.muted = false;
+                videoEl.volume = 1;
+                btn.style.display = 'none';
+            });
+
+            // Surveiller les changements de son
+            videoEl.addEventListener('volumechange', sync);
+            videoEl.addEventListener('play', sync);
+            videoEl.addEventListener('playing', sync);
+
+            // Sync initiale après un court délai (player pas encore init)
+            setTimeout(sync, 500);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initUnmuteBtn);
+        } else {
+            initUnmuteBtn();
+        }
+    })();
     var skipTrailerText = "{{ __('messages.skip_trailer') }}";
     var skipIntroText = "{{ __('messages.skip_intro') }}";
     var previousEpisodeText = "{{ __('messages.previous_episode') }}";
