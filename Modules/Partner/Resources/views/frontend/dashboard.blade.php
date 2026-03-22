@@ -147,9 +147,9 @@
         <div class="kpi kpi-purple">
             <div class="kpi-deco"></div>
             <div class="kpi-icon"><i class="ph ph-currency-circle-dollar"></i></div>
-            <div class="kpi-val">{{ number_format($ppvRevenue, 0, ',', ' ') }}</div>
+            <div class="kpi-val">{{ number_format($ppvRevenue, 0, ',', ' ') }} <span style="font-size:13px;opacity:.7">XOF</span></div>
             <div class="kpi-lbl">Revenus PPV</div>
-            <div class="kpi-sub">Commission {{ number_format($commission, 0, ',', ' ') }} FCFA ({{ $partner->commission_rate }}%)</div>
+            <div class="kpi-sub">Commission {{ number_format($commission, 0, ',', ' ') }} XOF ({{ $partner->commission_rate }}%)</div>
         </div>
     </div>
 

@@ -103,9 +103,9 @@
         <div class="kpi kpi-purple">
             <div class="kpi-deco"></div>
             <div class="kpi-icon"><i class="ph ph-currency-circle-dollar"></i></div>
-            <div class="kpi-val">{{ number_format($total_revenue, 0, ',', ' ') }}</div>
+            <div class="kpi-val">{{ number_format($total_revenue, 0, ',', ' ') }} <span style="font-size:13px;opacity:.7">XOF</span></div>
             <div class="kpi-lbl">Revenus totaux</div>
-            <div class="kpi-sub">PPV {{ number_format($rent_revenue,0,',',' ') }} · Abo {{ number_format($subscription_revenue,0,',',' ') }} FCFA</div>
+            <div class="kpi-sub">PPV {{ number_format($rent_revenue,0,',',' ') }} XOF · Abo {{ number_format($subscription_revenue,0,',',' ') }} XOF</div>
         </div>
     </div>
 
@@ -429,7 +429,7 @@
             },
             scales: {
                 x: { ticks: { font: { size: 10 }, maxTicksLimit: 8 }, grid: { display: false } },
-                y: { ticks: { font: { size: 10 } }, beginAtZero: true }
+                y: { ticks: { font: { size: 10 }, callback: v => v.toLocaleString() + ' XOF' }, beginAtZero: true }
             }
         }
     });
