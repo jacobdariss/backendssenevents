@@ -164,6 +164,92 @@
             </div>
         </div>
 
+
+        {{-- ── Cloudflare Stream ──────────────────────────────────────────── --}}
+        <div class="card mb-4 mt-4">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="ph ph-cloud fs-5" style="color:#F6821F"></i>
+                <h6 class="mb-0">Cloudflare Stream</h6>
+                <span class="badge ms-2" style="background:rgba(246,130,31,0.15);color:#F6821F;font-size:.7rem">Direct Creator Uploads</span>
+            </div>
+            <div class="card-body">
+
+                {{-- Toggle activation --}}
+                <div class="d-flex align-items-center justify-content-between p-3 rounded mb-4"
+                     style="background:rgba(246,130,31,0.06);border:1px solid rgba(246,130,31,0.2)">
+                    <div>
+                        <div class="fw-semibold">Activer Cloudflare Stream</div>
+                        <small class="text-muted">Upload vidéo direct vers Cloudflare — sans passer par le serveur</small>
+                    </div>
+                    <div class="form-check form-switch ms-3">
+                        <input class="form-check-input" type="checkbox" name="cf_stream_enabled"
+                               id="cf_stream_enabled" role="switch"
+                               value="1"
+                               {{ old('cf_stream_enabled', $settings['cf_stream_enabled'] ?? '0') == '1' ? 'checked' : '' }}
+                               style="width:2.5rem;height:1.3rem">
+                        <input type="hidden" name="cf_stream_enabled_default" value="0">
+                    </div>
+                </div>
+
+                <div id="cf-stream-fields" style="{{ old('cf_stream_enabled', $settings['cf_stream_enabled'] ?? '0') == '1' ? '' : 'display:none' }}">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Account ID <span class="text-danger">*</span></label>
+                            <input type="text" name="cf_stream_account_id" class="form-control"
+                                   placeholder="023e105f4ecef8ad9ca31a8372d0c353"
+                                   value="{{ old('cf_stream_account_id', $settings['cf_stream_account_id'] ?? '') }}">
+                            <small class="text-muted">Cloudflare Dashboard → Account ID</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">API Token <span class="text-danger">*</span></label>
+                            <input type="password" name="cf_stream_api_token" class="form-control"
+                                   placeholder="••••••••••••••••••••••••"
+                                   value="{{ old('cf_stream_api_token', $settings['cf_stream_api_token'] ?? '') }}">
+                            <small class="text-muted">Token avec permission Stream:Edit</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Customer Subdomain</label>
+                            <input type="text" name="cf_stream_customer_subdomain" class="form-control"
+                                   placeholder="myvckkqiszi5ayhh"
+                                   value="{{ old('cf_stream_customer_subdomain', $settings['cf_stream_customer_subdomain'] ?? '') }}">
+                            <small class="text-muted">customer-<strong>XXXX</strong>.cloudflarestream.com</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Durée max (secondes)</label>
+                            <input type="number" name="cf_stream_max_duration" class="form-control"
+                                   placeholder="3600" min="60" max="86400"
+                                   value="{{ old('cf_stream_max_duration', $settings['cf_stream_max_duration'] ?? '3600') }}">
+                            <small class="text-muted">Durée maximum réservée par vidéo (3600 = 1h)</small>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Webhook Secret <span class="text-muted fw-normal">(optionnel)</span></label>
+                            <input type="password" name="cf_stream_webhook_secret" class="form-control"
+                                   placeholder="Secret pour vérifier les webhooks Cloudflare"
+                                   value="{{ old('cf_stream_webhook_secret', $settings['cf_stream_webhook_secret'] ?? '') }}">
+                            <small class="text-muted">
+                                URL Webhook à configurer dans Cloudflare Stream :
+                                <code>{{ config('app.url') }}/api/cf-stream/webhook</code>
+                            </small>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+        document.getElementById('cf_stream_enabled')?.addEventListener('change', function() {
+            const fields = document.getElementById('cf-stream-fields');
+            if (fields) fields.style.display = this.checked ? '' : 'none';
+        });
+        </script>
+
         <div class="text-end">
             <button type="submit" id="submit-button" class="btn btn-primary">{{ __('messages.save') }}</button>
         </div>

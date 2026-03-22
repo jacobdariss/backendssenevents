@@ -136,3 +136,12 @@ Route::prefix('tv')->group(function () {
     Route::get('/initiate-session', [TvAuthController::class, 'initiateSession']);
     Route::post('/check-session', [TvAuthController::class, 'checkSession']);
 });
+
+// ── Cloudflare Stream — Direct Creator Uploads ──────────────────────────────
+Route::middleware(['auth:sanctum'])->prefix('cf-stream')->group(function () {
+    Route::post('upload-url', [\App\Http\Controllers\API\CloudflareStreamController::class, 'generateUploadUrl'])->name('cf-stream.upload-url');
+    Route::post('tus-url',    [\App\Http\Controllers\API\CloudflareStreamController::class, 'generateTusUrl'])->name('cf-stream.tus-url');
+    Route::get('status/{uid}', [\App\Http\Controllers\API\CloudflareStreamController::class, 'videoStatus'])->name('cf-stream.status');
+});
+// Webhook CF Stream — sans auth Sanctum (vérification HMAC)
+Route::post('cf-stream/webhook', [\App\Http\Controllers\API\CloudflareStreamController::class, 'webhook'])->name('cf-stream.webhook')->withoutMiddleware(['auth:sanctum']);

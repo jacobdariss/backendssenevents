@@ -519,6 +519,11 @@
                             </div>
                         </div>
 
+                        {{-- ── Cloudflare Stream Uploader ── --}}
+                        <div class="col-md-6 d-none" id="cf-stream-panel-video">
+                            @include('entertainment::backend.components.cf_stream_uploader', ['fieldPrefix' => 'video'])
+                        </div>
+
                         <div class="col-md-6 d-none" id="video_file_input_section">
                             {{ html()->label(__('movie.video_file_input'), 'video_file')->class('form-label') }}
 
@@ -2236,6 +2241,7 @@
                     VideoEmbedInput.classList.remove('d-none');
                     VideoFileInput.classList.add('d-none');
                     VideoURLInput.classList.add('d-none');
+                    document.getElementById('cf-stream-panel-video')?.classList.add('d-none');
                     if (videoembed) videoembed.setAttribute('required', 'required');
                     if (videofile) videofile.removeAttribute('required');
                     if (videourl) videourl.removeAttribute('required');

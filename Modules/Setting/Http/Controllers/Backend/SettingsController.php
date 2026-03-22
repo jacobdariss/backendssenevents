@@ -279,7 +279,13 @@ class SettingsController extends Controller
             'bunny_stream_api_key',
             'bunny_video_key',
             'bunny_cdn_hostname',
-            'bunny_stream_pull_zone'
+            'bunny_stream_pull_zone',
+            'cf_stream_enabled',
+            'cf_stream_account_id',
+            'cf_stream_api_token',
+            'cf_stream_customer_subdomain',
+            'cf_stream_max_duration',
+            'cf_stream_webhook_secret',
         ];
 
         $settings = $this->fieldsData($fields);

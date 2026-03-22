@@ -71,7 +71,9 @@ class Video extends BaseModel
         'partner_id',
         'approval_status',
         'rejection_reason',
-    ];
+    
+        'cf_stream_uid',
+        'cf_stream_status',];
 
     protected $casts = [
         'release_date' => 'date',

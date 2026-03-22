@@ -552,6 +552,11 @@
                             </div>
                         </div>
 
+                        {{-- ── Cloudflare Stream Uploader ── --}}
+                        <div class="mb-3 d-none" id="cf-stream-panel-video">
+                            @include('entertainment::backend.components.cf_stream_uploader', ['fieldPrefix' => 'video'])
+                        </div>
+
                         <div class="mb-3 d-none" id="video_file_input_section">
                             {{ html()->label(__('movie.video_file_input') . '<span class="text-danger">*</span>',
                             'video_file')->class('form-label') }}
@@ -2210,6 +2215,7 @@
             VideoFileInput.classList.add('d-none');
             VideoURLInput.classList.add('d-none');
             VideoEmbedInput.classList.add('d-none');
+            document.getElementById('cf-stream-panel-video')?.classList.add('d-none');
 
             // Remove all required attributes
             videoUrl?.removeAttribute('required');
@@ -2233,6 +2239,9 @@
                 case 'x265':
                     VideoURLInput.classList.remove('d-none');
                     videoUrl?.setAttribute('required', 'required');
+                    break;
+                case 'CF_Stream':
+                    document.getElementById('cf-stream-panel-video')?.classList.remove('d-none');
                     break;
             }
         }

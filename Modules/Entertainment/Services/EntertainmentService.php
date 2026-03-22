@@ -616,6 +616,18 @@ class EntertainmentService
     {
         // Get all request data
 $data = $request->all();
+        // Cloudflare Stream — sauvegarder le UID et définir l'embed URL
+        if (!empty($data['cf_stream_uid'])) {
+            $data['cf_stream_status'] = 'pending';
+            // L'URL embed sera mise à jour par le webhook quand la vidéo sera prête
+            // On peut déjà stocker l'URL iframe basique
+            $cfService = app(\App\Services\CloudflareStreamService::class);
+            if ($cfService->isEnabled()) {
+                $data['video_url_input'] = $cfService->buildEmbedUrl($data['cf_stream_uid']);
+                $data['video_upload_type'] = 'CF_Stream';
+            }
+        }
+
         // Attribution partenaire
         if (!empty($data['partner_id'])) {
             $data['approval_status'] = 'pending';
