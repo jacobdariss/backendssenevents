@@ -209,13 +209,20 @@ class SettingsController extends Controller
 
     public function saveLanguageMenuSettings(Request $request)
     {
-        $menuEnabled     = $request->has('language_menu_enabled') ? '1' : '0';
-        $enabledLangs    = $request->input('enabled_languages', []);
+        $menuEnabled  = $request->has('language_menu_enabled') ? '1' : '0';
+        $enabledLangs = $request->input('enabled_languages', []);
 
-        \App\Models\Setting::add('language_menu_enabled', $menuEnabled, 'string', null);
-        \App\Models\Setting::add('enabled_languages', json_encode($enabledLangs), 'string', null);
+        // updateOrCreate pour créer la clé si elle n'existe pas encore
+        \App\Models\Setting::updateOrCreate(
+            ['name' => 'language_menu_enabled'],
+            ['val' => $menuEnabled, 'type' => 'string']
+        );
+        \App\Models\Setting::updateOrCreate(
+            ['name' => 'enabled_languages'],
+            ['val' => json_encode($enabledLangs), 'type' => 'string']
+        );
 
-        \Illuminate\Support\Facades\Cache::forget('setting');
+        \Illuminate\Support\Facades\Cache::flush();
 
         return redirect()->back()->with('success', __('messages.save_setting'));
     }
