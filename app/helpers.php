@@ -700,45 +700,34 @@ function formatDuration($duration)
 
 function formatCurrency($number, $noOfDecimal, $decimalSeparator, $thousandSeparator, $currencyPosition, $currencySymbol)
 {
+    $number = is_numeric($number) ? (float)$number : 0;
+    $noOfDecimal = (int)($noOfDecimal ?? 0);
+    $thousandSeparator = $thousandSeparator ?? ' ';
+    $decimalSeparator  = $decimalSeparator  ?? '.';
+    $currencyPosition  = $currencyPosition  ?? 'right_with_space';
+    $currencySymbol    = $currencySymbol    ?? 'XOF';
 
     $formattedNumber = number_format($number, $noOfDecimal, '.', '');
 
+    $parts       = explode('.', $formattedNumber);
+    $integerPart = number_format((int)$parts[0], 0, '', $thousandSeparator);
+    $decimalPart = $parts[1] ?? '';
 
-    $parts = explode('.', $formattedNumber);
-    $integerPart = $parts[0];
-    $decimalPart = isset($parts[1]) ? $parts[1] : '';
+    $numberFormatted = $noOfDecimal > 0
+        ? $integerPart . $decimalSeparator . $decimalPart
+        : $integerPart;
 
-    $integerPart = number_format($integerPart, 0, '', $thousandSeparator);
-
-
-    $currencyString = '';
-
-    if ($currencyPosition == 'left' || $currencyPosition == 'left_with_space') {
-        $currencyString .= $currencySymbol;
-        if ($currencyPosition == 'left_with_space') {
-            $currencyString .= ' ';
-        }
-
-        $currencyString .= $integerPart;
-
-        if ($noOfDecimal > 0) {
-            $currencyString .= $decimalSeparator . $decimalPart;
-        }
+    if ($currencyPosition === 'left') {
+        return $currencySymbol . $numberFormatted;
     }
-
-
-    if ($currencyPosition == 'right' || $currencyPosition == 'right_with_space') {
-
-        if ($noOfDecimal > 0) {
-            $currencyString .= $integerPart . $decimalSeparator . $decimalPart;
-        }
-        if ($currencyPosition == 'right_with_space') {
-            $currencyString .= ' ';
-        }
-        $currencyString .= $currencySymbol;
+    if ($currencyPosition === 'left_with_space') {
+        return $currencySymbol . ' ' . $numberFormatted;
     }
-
-    return $currencyString;
+    if ($currencyPosition === 'right') {
+        return $numberFormatted . $currencySymbol;
+    }
+    // right_with_space (défaut) ou toute autre valeur
+    return $numberFormatted . ' ' . $currencySymbol;
 }
 
 
