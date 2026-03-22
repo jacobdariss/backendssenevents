@@ -222,7 +222,10 @@ class SettingsController extends Controller
             ['val' => json_encode($enabledLangs), 'type' => 'string']
         );
 
-        \Illuminate\Support\Facades\Cache::flush();
+        // Vider le bon cache key utilisé par Setting::getAllSettings()
+        \Illuminate\Support\Facades\Cache::forget('settings.all');
+        \Illuminate\Support\Facades\Cache::forget('setting');
+        \App\Models\Setting::flushCache();
 
         return redirect()->back()->with('success', __('messages.save_setting'));
     }
