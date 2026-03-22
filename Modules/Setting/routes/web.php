@@ -59,6 +59,7 @@ Route::group(['prefix' => 'app', 'as' => 'backend.', 'middleware' => ['auth','ad
       Route::get('currency-settings', [SettingsController::class, 'currencySettings'])->name('currency-settings');
       Route::get('payment-method', [SettingsController::class, 'paymentMethod'])->name('payment-method');
       Route::get('language-settings', [SettingsController::class, 'languageSettings'])->name('language-settings');
+      Route::post('language-menu-settings', [SettingsController::class, 'saveLanguageMenuSettings'])->name('language-menu-settings.save');
       Route::get('misc-setting', [SettingsController::class, 'miscSetting'])->name('misc'); // Define the missing route for 'misc' setting
       Route::get('other-settings', [SettingsController::class, 'otherSettings'])->name('other-settings');
       Route::get('notification-configuration', [SettingsController::class, 'notificationConfiguration'])->name('notification-configuration');
