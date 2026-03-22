@@ -60,7 +60,7 @@
             <button id="unmuteBtn" style="
                 display: none;
                 position: absolute;
-                bottom: 70px;
+                bottom: 120px;
                 right: 16px;
                 z-index: 1000;
                 background: rgba(20,20,20,0.85);
@@ -469,7 +469,7 @@
 
     @media (max-width: 768px) {
         .vjs-skip-ad-button {
-            bottom: 70px;
+            bottom: 120px;
             padding: 8px 16px;
             font-size: 14px;
         }
