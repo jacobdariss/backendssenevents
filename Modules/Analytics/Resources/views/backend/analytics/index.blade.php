@@ -4,6 +4,50 @@
 @push('after-styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.11.0/css/flag-icons.min.css"/>
+<style>
+.kpi { border-radius: 14px; padding: 18px 20px; position: relative; overflow: hidden; }
+.kpi-purple { background: rgba(174,169,236,0.12); }
+.kpi-teal   { background: rgba(29,158,117,0.12); }
+.kpi-blue   { background: rgba(55,138,221,0.12); }
+.kpi-amber  { background: rgba(239,159,39,0.12); }
+.kpi-coral  { background: rgba(216,90,48,0.12); }
+.kpi .kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.kpi-purple .kpi-icon { background: rgba(174,169,236,0.25); }
+.kpi-teal   .kpi-icon { background: rgba(29,158,117,0.25); }
+.kpi-blue   .kpi-icon { background: rgba(55,138,221,0.25); }
+.kpi-amber  .kpi-icon { background: rgba(239,159,39,0.25); }
+.kpi-coral  .kpi-icon { background: rgba(216,90,48,0.25); }
+.kpi .kpi-icon i { font-size: 16px; }
+.kpi-purple .kpi-icon i { color: #AFA9EC; }
+.kpi-teal   .kpi-icon i { color: #5DCAA5; }
+.kpi-blue   .kpi-icon i { color: #85B7EB; }
+.kpi-amber  .kpi-icon i { color: #EF9F27; }
+.kpi-coral  .kpi-icon i { color: #F0997B; }
+.kpi .kpi-val { font-size: 26px; font-weight: 500; line-height: 1; margin-bottom: 4px; }
+.kpi-purple .kpi-val { color: #AFA9EC; }
+.kpi-teal   .kpi-val { color: #5DCAA5; }
+.kpi-blue   .kpi-val { color: #85B7EB; }
+.kpi-amber  .kpi-val { color: #EF9F27; }
+.kpi-coral  .kpi-val { color: #F0997B; }
+.kpi .kpi-lbl { font-size: 12px; margin-bottom: 4px; }
+.kpi-purple .kpi-lbl { color: #7F77DD; }
+.kpi-teal   .kpi-lbl { color: #1D9E75; }
+.kpi-blue   .kpi-lbl { color: #378ADD; }
+.kpi-amber  .kpi-lbl { color: #BA7517; }
+.kpi-coral  .kpi-lbl { color: #D85A30; }
+.kpi .kpi-sub { font-size: 11px; }
+.kpi-purple .kpi-sub { color: rgba(174,169,236,0.6); }
+.kpi-teal   .kpi-sub { color: rgba(29,158,117,0.7); }
+.kpi-blue   .kpi-sub { color: rgba(55,138,221,0.7); }
+.kpi-amber  .kpi-sub { color: rgba(239,159,39,0.6); }
+.kpi-coral  .kpi-sub { color: rgba(216,90,48,0.6); }
+.kpi .kpi-deco { position: absolute; right:-10px; bottom:-10px; width:64px; height:64px; border-radius:50%; opacity:.1; }
+.kpi-purple .kpi-deco { background:#7F77DD; }
+.kpi-teal   .kpi-deco { background:#1D9E75; }
+.kpi-blue   .kpi-deco { background:#378ADD; }
+.kpi-amber  .kpi-deco { background:#BA7517; }
+.kpi-coral  .kpi-deco { background:#D85A30; }
+</style>
 @endpush
 
 @section('content')
@@ -29,30 +73,41 @@
 
 {{-- KPIs --}}
 <div class="row g-3 mb-4">
-    @php $kpis = [
-        ['label'=>__('analytics::analytics.total_views'),    'value'=>number_format($stats['total_views']),          'sub'=>'',                           'icon'=>'ph-eye',                    'color'=>'primary'],
-        ['label'=>__('analytics::analytics.watch_time'),     'value'=>$stats['watch_time']['hours'].'h',             'sub'=>number_format($stats['watch_time']['minutes']).' min', 'icon'=>'ph-clock',  'color'=>'success'],
-        ['label'=>__('analytics::analytics.ppv_revenue'),    'value'=>number_format($stats['ppv_revenue']['total'],0,',',' ').' FCFA', 'sub'=>$stats['ppv_revenue']['count'].' transactions', 'icon'=>'ph-currency-circle-dollar', 'color'=>'warning'],
-        ['label'=>__('analytics::analytics.unique_viewers'), 'value'=>number_format($stats['unique_viewers']),       'sub'=>$stats['partner_count'].' partenaires actifs', 'icon'=>'ph-users', 'color'=>'info'],
-    ]; @endphp
-    @foreach($kpis as $kpi)
-    <div class="col-md-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <p class="text-muted small mb-1">{{ $kpi['label'] }}</p>
-                        <h3 class="mb-0 fw-bold">{{ $kpi['value'] }}</h3>
-                        @if($kpi['sub'])<small class="text-muted">{{ $kpi['sub'] }}</small>@endif
-                    </div>
-                    <div class="bg-{{ $kpi['color'] }} bg-opacity-10 rounded p-2">
-                        <i class="ph {{ $kpi['icon'] }} text-{{ $kpi['color'] }} fs-4"></i>
-                    </div>
-                </div>
-            </div>
+    <div class="col-6 col-md-3">
+        <div class="kpi kpi-blue">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-eye"></i></div>
+            <div class="kpi-val">{{ number_format($stats['total_views']) }}</div>
+            <div class="kpi-lbl">{{ __('analytics::analytics.total_views') }}</div>
         </div>
     </div>
-    @endforeach
+    <div class="col-6 col-md-3">
+        <div class="kpi kpi-teal">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-clock"></i></div>
+            <div class="kpi-val">{{ $stats['watch_time']['hours'] }}h</div>
+            <div class="kpi-lbl">{{ __('analytics::analytics.watch_time') }}</div>
+            <div class="kpi-sub">{{ number_format($stats['watch_time']['minutes']) }} min</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="kpi kpi-amber">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-currency-circle-dollar"></i></div>
+            <div class="kpi-val">{{ number_format($stats['ppv_revenue']['total'],0,',',' ') }} <span style="font-size:13px;opacity:.7">XOF</span></div>
+            <div class="kpi-lbl">{{ __('analytics::analytics.ppv_revenue') }}</div>
+            <div class="kpi-sub">{{ $stats['ppv_revenue']['count'] }} transactions</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="kpi kpi-purple">
+            <div class="kpi-deco"></div>
+            <div class="kpi-icon"><i class="ph ph-users"></i></div>
+            <div class="kpi-val">{{ number_format($stats['unique_viewers']) }}</div>
+            <div class="kpi-lbl">{{ __('analytics::analytics.unique_viewers') }}</div>
+            <div class="kpi-sub">{{ $stats['partner_count'] }} partenaires actifs</div>
+        </div>
+    </div>
 </div>
 
 {{-- Courbes --}}
