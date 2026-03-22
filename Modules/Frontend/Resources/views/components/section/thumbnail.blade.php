@@ -175,52 +175,39 @@
 
     var loginUrl = "{{ route('login') }}";
 
-    // ── Bouton "Réactiver le son" — script inline autonome ──────────────
+    // ── Bouton "Réactiver le son" — style YouTube ───────────────────────
     (function() {
         function initUnmuteBtn() {
             var btn = document.getElementById('unmuteBtn');
-            var videoEl = document.getElementById('videoPlayer');
-            if (!btn || !videoEl) return;
-            if (btn._unmuteDone) return;
+            if (!btn || btn._unmuteDone) return;
             btn._unmuteDone = true;
 
-            function isMuted() {
-                return videoEl.muted || videoEl.volume === 0;
-            }
+            // Afficher immédiatement (comme YouTube — autoplay = toujours muet)
+            btn.style.display = 'flex';
 
-            function sync() {
-                if (isMuted()) {
-                    btn.style.display = 'flex';
-                    btn.querySelector('i').className = 'ph ph-speaker-simple-x';
-                } else {
-                    btn.style.display = 'none';
-                }
-            }
-
-            // Clic : activer/désactiver le son
             btn.addEventListener('click', function() {
-                videoEl.muted = false;
-                videoEl.volume = 1;
+                // Couper le son via Video.js si dispo, sinon via l'élément natif
+                var videoEl = document.getElementById('videoPlayer');
+                if (window.videojs && videojs.getPlayer && videojs.getPlayer('videoPlayer')) {
+                    var player = videojs.getPlayer('videoPlayer');
+                    player.muted(false);
+                    player.volume(1);
+                } else if (videoEl) {
+                    videoEl.muted = false;
+                    videoEl.volume = 1;
+                }
                 btn.style.display = 'none';
             });
 
-            // Surveiller les changements de son
-            videoEl.addEventListener('volumechange', sync);
-            videoEl.addEventListener('play', sync);
-            videoEl.addEventListener('playing', sync);
-
-            // Sync initiale — retry jusqu'à ce que le player soit muet
-            var retryCount = 0;
-            function trysync() {
-                sync();
-                // Si la vidéo est muette mais le bouton pas encore affiché,
-                // ou si Video.js n'a pas encore initialisé l'état muted, on retry
-                retryCount++;
-                if (retryCount < 20) {
-                    setTimeout(trysync, 300);
-                }
+            // Cacher si l'utilisateur unmute via les contrôles natifs du player
+            var videoEl = document.getElementById('videoPlayer');
+            if (videoEl) {
+                videoEl.addEventListener('volumechange', function() {
+                    if (!videoEl.muted && videoEl.volume > 0) {
+                        btn.style.display = 'none';
+                    }
+                });
             }
-            setTimeout(trysync, 300);
         }
 
         if (document.readyState === 'loading') {
