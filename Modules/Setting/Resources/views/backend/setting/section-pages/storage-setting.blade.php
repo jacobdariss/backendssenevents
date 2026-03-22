@@ -243,13 +243,6 @@
             </div>
         </div>
 
-        <script>
-        document.getElementById('cf_stream_enabled')?.addEventListener('change', function() {
-            const fields = document.getElementById('cf-stream-fields');
-            if (fields) fields.style.display = this.checked ? '' : 'none';
-        });
-        </script>
-
         <div class="text-end">
             <button type="submit" id="submit-button" class="btn btn-primary">{{ __('messages.save') }}</button>
         </div>
@@ -257,6 +250,18 @@
 @endsection
 
 @push('after-scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle CF Stream fields
+    const cfToggle = document.getElementById('cf_stream_enabled');
+    if (cfToggle) {
+        cfToggle.addEventListener('change', function() {
+            const fields = document.getElementById('cf-stream-fields');
+            if (fields) fields.style.display = this.checked ? '' : 'none';
+        });
+    }
+});
+</script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const localCheckbox = document.getElementById('local');
