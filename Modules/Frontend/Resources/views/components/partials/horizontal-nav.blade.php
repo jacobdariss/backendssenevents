@@ -29,7 +29,7 @@
       @if(isenablemodule('movie'))
       <li class="nav-item">
         <a class="nav-link {{ request()->routeIs(['movies', 'movie-details']) ? 'active text-primary' : '' }}" href="{{ route('movies') }}">
-          <span class="item-name">Films</span>
+          <span class="item-name">Emissions</span>
         </a>
       </li>
       @endif

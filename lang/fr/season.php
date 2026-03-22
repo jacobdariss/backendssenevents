@@ -15,7 +15,7 @@ return [
     'title' => 'Saisons',
     'new_title' => 'Nouvelle Saison',
     'edit_title' => 'Modifier la Saison',
-    'lbl_tv_shows' => 'Émission TV',
+    'lbl_tv_shows' => 'Série TV',
     'lbl_import' => 'Importer',
     'lbl_loading' => 'Chargement...',
     'already_added_season' => 'La saison a déjà été ajoutée.',
