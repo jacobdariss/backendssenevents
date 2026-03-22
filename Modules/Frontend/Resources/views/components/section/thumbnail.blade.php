@@ -35,7 +35,6 @@
             </div>
 
             <!-- Filigrane PPV — overlay HTML direct -->
-            {{-- DEBUG: dataAccess={{ $dataAccess ?? 'NON_DEFINI' }} --}}
             @if(isset($dataAccess) && $dataAccess === 'pay-per-view' && auth()->check())
             <div id="ppv-watermark-overlay" style="
                 display:none;
@@ -107,6 +106,54 @@
         userEmail:'{{ auth()->check() ? addslashes(auth()->user()->email) : 'test@test.com' }}',
     };
     console.log('[Watermark] config:', window.watermarkConfig);
+
+    // ── Filigrane PPV — init autonome (indépendant de videoplayer.js) ──
+    (function() {
+        function startWatermark() {
+            var overlay = document.getElementById('ppv-watermark-overlay');
+            var wmText  = document.getElementById('ppv-wm-text');
+            if (!overlay || !wmText) return;
+            if (overlay._wmDone) return;
+            overlay._wmDone = true;
+
+            var cfg = window.watermarkConfig || {};
+            if (!cfg.enabled) return;
+
+            var content = cfg.content || 'name_email';
+            var text = '';
+            if (content === 'name_email') text = (cfg.userName || '') + ' — ' + (cfg.userEmail || '');
+            else if (content === 'name')  text = cfg.userName || '';
+            else if (content === 'email') text = cfg.userEmail || '';
+            else if (content === 'datetime') {
+                var d = new Date();
+                text = (cfg.userName || '') + ' ' + d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR');
+            } else { text = (cfg.userName || '') + ' — ' + (cfg.userEmail || ''); }
+
+            wmText.textContent = text;
+
+            function move() {
+                var wrap = overlay.parentElement;
+                var w = (wrap ? wrap.offsetWidth  : 0) || 800;
+                var h = (wrap ? wrap.offsetHeight : 0) || 450;
+                var tw = wmText.offsetWidth  || 280;
+                var th = wmText.offsetHeight || 20;
+                wmText.style.left = (Math.random() * Math.max(10, w - tw - 20) + 10) + 'px';
+                wmText.style.top  = (Math.random() * Math.max(10, h - th - 20) + 10) + 'px';
+            }
+
+            overlay.style.display = 'block';
+            setTimeout(move, 80);
+            setInterval(move, (cfg.interval || 10000));
+            console.log('[Watermark] actif :', text);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startWatermark);
+        } else {
+            startWatermark();
+        }
+    })();
+
     var loginUrl = "{{ route('login') }}";
     var skipTrailerText = "{{ __('messages.skip_trailer') }}";
     var skipIntroText = "{{ __('messages.skip_intro') }}";
