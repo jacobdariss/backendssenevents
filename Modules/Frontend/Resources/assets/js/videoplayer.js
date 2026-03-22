@@ -3824,7 +3824,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (access !== 'pay-per-view') return;
 
     const wrapper = document.querySelector('.video-player-wrapper');
-    if (!wrapper) return;
+    console.log('[Watermark] wrapper:', wrapper, 'size:', wrapper?.offsetWidth, 'x', wrapper?.offsetHeight);
+    if (!wrapper) { console.log('[Watermark] ERREUR: wrapper introuvable'); return; }
 
     // Créer le canvas overlay
     const canvas = document.createElement('canvas');
@@ -3849,6 +3850,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function drawWatermark() {
+      console.log('[Watermark] drawWatermark appelé, canvas:', canvas.width, 'x', canvas.height);
       const rect = wrapper.getBoundingClientRect();
       canvas.width  = rect.width  || wrapper.offsetWidth;
       canvas.height = rect.height || wrapper.offsetHeight;
